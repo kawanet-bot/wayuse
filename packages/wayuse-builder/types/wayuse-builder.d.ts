@@ -19,7 +19,7 @@ export declare namespace WayuseBuilder {
     }
 
     interface NodeConfig {
-        /** A full version such as "24.11.1". Ranges and aliases are refused. */
+        /** A full version such as "24.11.1". Ranges and aliases are refused. Default: the Node.js that runs wayuse-build. */
         version?: string
     }
 

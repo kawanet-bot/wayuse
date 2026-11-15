@@ -73,8 +73,15 @@ export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cd
     app.route("/", createSlotApp(deps))
     app.route("/", createClipboardApp(deps))
 
-    // An application that is not installed has no routes, so every path under it is a 404.
+    // Decided when the image is built: one that was not installed is not started either, and trying it would only time out.
     if (config.apps.chrome) app.route("/", createChromeApp(deps))
+
+    // Said in words, so a caller does not take it for a path that was misspelled.
+    app.all("/app/:name/*", c => {
+        throw new HttpError(404, `Application not installed: ${c.req.param("name")}`)
+    })
+
+    app.notFound(c => c.json({error: {message: "Not Found"}}, 404))
 
     app.onError((error, c) => {
         if (error instanceof HttpError) return c.json({error: {message: error.message}}, error.status as ContentfulStatusCode)

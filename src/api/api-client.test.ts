@@ -126,8 +126,8 @@ describe(TITLE, () => {
     it("has no route under /app/chrome/ in an image without Chrome", async () => {
         const bare = createFakeServer({config: resolveConfig({})})
         const of = createClient({url: "http://wayuse.test/", token: bare.jwt, fetch: bare.fetch})
-        await assert.rejects(of.getChromeTabs(), refusal(404, /Not Found/))
-        await assert.rejects(of.openChromeTab({url: "about:blank"}), refusal(404, /Not Found/))
+        await assert.rejects(of.getChromeTabs(), refusal(404, /^Application not installed: chrome$/))
+        await assert.rejects(of.openChromeTab({url: "about:blank"}), refusal(404, /^Application not installed: chrome$/))
         assert.equal((await of.getSlots()).length, 2)
     })
 

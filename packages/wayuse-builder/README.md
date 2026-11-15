@@ -25,6 +25,9 @@ export default defineConfig({
     packages: [
         "fonts-noto-cjk",
         "fonts-noto-color-emoji",
+        "fonts-noto-core",
+        "fonts-morisawa-bizud-gothic",
+        "fonts-morisawa-bizud-mincho",
     ],
 })
 ```
@@ -43,8 +46,8 @@ Every item may be left out.
 
 | Item | Default | Meaning |
 |---|---|---|
-| `node.version` | `"26.13.1"` | Node.js in the image. A full version: ranges are refused. |
-| `apps.chrome` | not installed | Installs Google Chrome. |
+| `node.version` | the Node.js that runs `wayuse-build` | Node.js in the image. A full version: ranges are refused. |
+| `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
 | `apps.chrome.env` | `{}` | Environment variables for the Chrome process alone. `LANGUAGE` sets Chrome's language. No secrets: they are baked into the image. |
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |

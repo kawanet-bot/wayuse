@@ -6,8 +6,8 @@ import {VERSION} from "./version.ts"
 type Input = WayuseBuilder.Config
 type Resolved = WayuseClient.Config
 
-// The current LTS when this builder was released: a default a newer builder may move.
-const DEFAULT_NODE_VERSION = "26.13.1"
+// The Node.js that runs this builder: the one the image's owner already develops and tests with.
+const DEFAULT_NODE_VERSION = process.versions.node
 
 const CHANNELS = ["stable", "beta", "unstable"] as const
 
@@ -86,7 +86,8 @@ export const resolveConfig = (input: Input): Resolved => {
 
     return {
         builder: {version: VERSION},
-        node: {version: stringOf(node.version, "config.node.version", NODE_VERSION, DEFAULT_NODE_VERSION)},
+        // The default is checked like a given value: a nightly build of Node.js has no release to download.
+        node: {version: stringOf(node.version ?? DEFAULT_NODE_VERSION, "config.node.version", NODE_VERSION, "")},
         apps: apps.chrome === undefined ? {} : {chrome: chromeOf(apps.chrome)},
         timezone: stringOf(config.timezone, "config.timezone", TIMEZONE, "Etc/UTC"),
         screen: {

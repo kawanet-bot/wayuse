@@ -9,7 +9,7 @@ describe(TITLE, () => {
     it("fills in every default", () => {
         const config = resolveConfig({})
         assert.match(config.builder.version, /^\d+\.\d+\.\d+/)
-        assert.match(config.node.version, /^\d+\.\d+\.\d+$/)
+        assert.equal(config.node.version, process.versions.node)
         assert.deepEqual(config.apps, {})
         assert.equal(config.timezone, "Etc/UTC")
         assert.deepEqual(config.screen, {width: 1280, height: 960})

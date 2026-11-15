@@ -1,5 +1,6 @@
 import {serveStatic} from "@hono/node-server/serve-static"
 import {Hono} from "hono"
+import {existsSync} from "node:fs"
 import {fileURLToPath} from "node:url"
 
 // Resolved by name, so the sources under test and the built copy serve the same files.
@@ -19,8 +20,8 @@ export const createStaticApp = (vendorDir: string): Hono => {
     app.use("/console/js/*", serveStatic({root: `${root}dist/console`, rewriteRequestPath: path => path.replace(/^\/console\/js/, "")}))
     app.use("/console/*", serveStatic({root: `${root}htdocs`}))
 
-    // What wayuse-build puts into the image from other packages for the pages: noVNC.
-    app.use("/vendor/*", serveStatic({root: vendorDir, rewriteRequestPath: path => path.replace(/^\/vendor/, "")}))
+    // What wayuse-build puts into the image from other packages for the pages: noVNC. Outside an image there is none.
+    if (existsSync(vendorDir)) app.use("/vendor/*", serveStatic({root: vendorDir, rewriteRequestPath: path => path.replace(/^\/vendor/, "")}))
 
     return app
 }

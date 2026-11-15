@@ -28,7 +28,7 @@ The image [wayuse-builder](../wayuse-builder/README.md) builds installs and star
 The modifiers are `shift`, `ctrl`, `mod1` (Alt) and `mod4` (Meta). In `keys`, two to ten dots pause for 100ms each.
 The input of `/slot/` goes through wayvnc, so it reaches whatever is on the screen, Chrome's own address bar included.
 
-An image with Chrome also has these. A tab's id is the targetId of the Chrome DevTools Protocol.
+An image with Chrome also has these. In one without, they answer 404 with `Application not installed: chrome`. A tab's id is the targetId of the Chrome DevTools Protocol.
 
 | Request | Response |
 |---|---|

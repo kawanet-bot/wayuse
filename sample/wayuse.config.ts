@@ -16,5 +16,6 @@ export default defineConfig({
         "fonts-noto-color-emoji",
         "fonts-noto-core",
         "fonts-morisawa-bizud-gothic",
+        "fonts-morisawa-bizud-mincho",
     ],
 })

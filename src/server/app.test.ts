@@ -57,7 +57,9 @@ describe(TITLE, () => {
         for (const path of ["/slot/", "/slot/HEADLESS-1", "/slot/HEADLESS-1/capture.png", "/auth/me", "/missing"]) {
             assert.equal((await run(path)).res.status, 403, path)
         }
-        assert.equal((await run("/missing", bearer)).res.status, 404)
+        const missing = (await run("/missing", bearer)).res
+        assert.equal(missing.status, 404)
+        assert.deepEqual(await missing.json(), {error: {message: "Not Found"}})
     })
 
     it("refuses every token while it has no public key", async () => {
