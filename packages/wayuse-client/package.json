@@ -1,0 +1,30 @@
+{
+  "name": "wayuse-client",
+  "description": "The API client and CLI for a wayuse container.",
+  "version": "0.0.0",
+  "author": "Kawanet",
+  "bugs": {
+    "url": "https://github.com/kawanet/wayuse/issues"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "files": [
+    "LICENSE",
+    "README.md"
+  ],
+  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-client#readme",
+  "keywords": [
+    "cli",
+    "client",
+    "wayland",
+    "wayuse"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kawanet/wayuse.git",
+    "directory": "packages/wayuse-client"
+  },
+  "type": "module"
+}

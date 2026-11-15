@@ -1,0 +1,33 @@
+{
+  "include": [
+    "packages/*/types/",
+    "src/"
+  ],
+  "exclude": [
+    "node_modules/"
+  ],
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "noImplicitThis": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "skipLibCheck": false,
+    "sourceMap": false,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "target": "ES2022",
+    "types": [
+      "node"
+    ],
+    "verbatimModuleSyntax": true
+  }
+}

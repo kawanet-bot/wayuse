@@ -1,0 +1,31 @@
+{
+  "name": "wayuse-workspace",
+  "description": "Workspace for wayuse-builder, wayuse-server and wayuse-client.",
+  "author": "Kawanet",
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^6.0.3"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=22.18.0",
+      "onFail": "warn"
+    }
+  },
+  "license": "MIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kawanet/wayuse.git"
+  },
+  "scripts": {
+    "fixpack": "fixpack && fixpack packages/wayuse-builder/package.json && fixpack packages/wayuse-server/package.json && fixpack packages/wayuse-client/package.json"
+  },
+  "type": "module",
+  "workspaces": [
+    "packages/wayuse-builder",
+    "packages/wayuse-server",
+    "packages/wayuse-client"
+  ]
+}
