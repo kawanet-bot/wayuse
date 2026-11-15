@@ -1,8 +1,9 @@
-import {cp, mkdir, rm, writeFile} from "node:fs/promises"
+import {copyFile, cp, mkdir, rm, writeFile} from "node:fs/promises"
 import {dirname, join} from "node:path"
 import {fileURLToPath} from "node:url"
 import type {WayuseClient} from "wayuse-client"
-import {dockerfileOf} from "./dockerfile.ts"
+import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
+import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
 import {shellEnvOf} from "./shell-env.ts"
 import {swayConfigOf} from "./sway-config.ts"
 
@@ -14,11 +15,12 @@ const assetsRoot = (): string => fileURLToPath(new URL("../assets/", import.meta
 /**
  * The generated files by their path in the build directory. rootfs/ mirrors the image's file system.
  */
-export const generatedFilesOf = (config: Resolved): Record<string, string> => {
+export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): Record<string, string> => {
     const files: Record<string, string> = {
-        "Dockerfile": dockerfileOf(config),
+        "Dockerfile": dockerfileOf(config, options),
         "rootfs/etc/wayuse/wayuse.json": JSON.stringify(config, null, 2) + "\n",
         "rootfs/etc/wayuse/sway/config": swayConfigOf(config),
+        "rootfs/opt/wayuse/package.json": npmPackageOf(options.serverTarball != null),
     }
 
     const {chrome} = config.apps
@@ -28,19 +30,27 @@ export const generatedFilesOf = (config: Resolved): Record<string, string> => {
 }
 
 /**
- * Writes the build directory anew and returns the paths of what it holds.
+ * Writes the build directory anew and returns the paths of what it generated.
  */
-export const writeBuildDir = async (config: Resolved, outdir: string): Promise<string[]> => {
+export const writeBuildDir = async (config: Resolved, outdir: string, options: BuildOptions = {}): Promise<string[]> => {
     // A file an earlier configuration generated must not linger and reach the image.
     await rm(outdir, {recursive: true, force: true})
     await cp(assetsRoot(), outdir, {recursive: true})
 
-    const files = generatedFilesOf(config)
+    const files = generatedFilesOf(config, options)
     for (const [path, content] of Object.entries(files)) {
         const file = join(outdir, path)
         await mkdir(dirname(file), {recursive: true})
         await writeFile(file, content)
     }
 
-    return Object.keys(files)
+    const paths = Object.keys(files)
+
+    if (options.serverTarball != null) {
+        const path = `rootfs/opt/wayuse/${SERVER_TARBALL}`
+        await copyFile(options.serverTarball, join(outdir, path))
+        paths.push(path)
+    }
+
+    return paths
 }

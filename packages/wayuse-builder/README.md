@@ -34,7 +34,7 @@ export default defineConfig({
 ```sh
 npx wayuse-build
 docker build -t my-wayuse .wayuse
-docker run --rm --shm-size 256m -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
+docker run --rm --shm-size 256m -p 127.0.0.1:3000:3000 -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
 
 ## CONFIGURATION
@@ -55,10 +55,11 @@ Every item may be left out.
 
 ```
 Usage: wayuse-build [options]
-  -c, --config <file>  the configuration to read (default: wayuse.config.ts)
-  -o, --outdir <dir>   the build directory to write, emptied first (default: .wayuse)
-  -v, --version        print this package's version
-  -h, --help           print this usage
+  -c, --config <file>      the configuration to read (default: wayuse.config.ts)
+  -o, --outdir <dir>       the build directory to write, emptied first (default: .wayuse)
+  --server-tarball <file>  a wayuse-server tarball to install in place of the one on npm
+  -v, --version            print this package's version
+  -h, --help               print this usage
 ```
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
@@ -74,11 +75,12 @@ The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
 | `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |
 
 The container runs as the user `wayuse` (uid 1000).
-It keeps a session D-Bus, sway, wayvnc and Chrome running: one that exits is started again.
+It keeps a session D-Bus, sway, wayvnc, Chrome and wayuse-server running: one that exits is started again.
 tini is PID 1 in the image, so `--init` is not needed.
 
 | Port | Listener |
 |---|---|
+| 3000 | wayuse-server. Publish it with `-p` to reach the container from outside |
 | 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
 | 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
 

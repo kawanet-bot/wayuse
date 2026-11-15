@@ -1,4 +1,4 @@
-# npx wayuse-build && docker compose up --build -d
+# make -C ../builder/pack && npx wayuse-build --server-tarball ../builder/pack/server.tgz && docker compose up --build -d
 
 name: wayuse-sample
 
@@ -10,6 +10,8 @@ services:
     build:
       context: "./.wayuse/"
     shm_size: "256mb" # sway dies of a bus error on the 64MB Docker gives by default
+    ports:
+      - "127.0.0.1:3000:3000"
     environment:
       WAYUSE_OUTPUTS: "2"
     volumes:

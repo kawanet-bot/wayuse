@@ -3,15 +3,32 @@
   "description": "The HTTP and MCP server that runs inside the wayuse container.",
   "version": "0.0.0",
   "author": "Kawanet",
+  "bin": {
+    "wayuse-server": "bin/wayuse-server.js"
+  },
   "bugs": {
     "url": "https://github.com/kawanet/wayuse/issues"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.8",
+    "hono": "^4.13.18"
   },
   "engines": {
     "node": ">=22.18.0"
   },
+  "exports": {
+    ".": {
+      "types": "./types/wayuse-server.d.ts",
+      "module-sync": "./dist/wayuse-server.js",
+      "import": "./dist/wayuse-server.js"
+    }
+  },
   "files": [
+    "bin/wayuse-server.js",
+    "dist/wayuse-server.js",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "types/*.d.ts"
   ],
   "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-server#readme",
   "keywords": [
@@ -26,5 +43,6 @@
     "url": "git+https://github.com/kawanet/wayuse.git",
     "directory": "packages/wayuse-server"
   },
-  "type": "module"
+  "type": "module",
+  "types": "./types/wayuse-server.d.ts"
 }

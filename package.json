@@ -7,6 +7,7 @@
     "@rollup/plugin-sucrase": "^5.1.0",
     "@types/node": "^24.19.2",
     "rollup": "^4.68.2",
+    "ts-refine": "^0.6.3",
     "typescript": "^6.0.3"
   },
   "devEngines": {
@@ -25,7 +26,8 @@
   "scripts": {
     "build": "make -C builder",
     "fixpack": "fixpack && fixpack packages/wayuse-builder/package.json && fixpack packages/wayuse-server/package.json && fixpack packages/wayuse-client/package.json",
-    "test": "make -C builder test"
+    "test": "make -C builder test",
+    "ts-refine": "./node_modules/.bin/ts-refine format && ./node_modules/.bin/ts-refine imports"
   },
   "type": "module",
   "workspaces": [

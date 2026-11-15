@@ -25,7 +25,7 @@ describe(TITLE, () => {
         assert.match(dockerfile, /google-chrome-beta_current_/)
         assert.match(dockerfile, /zoneinfo\/Asia\/Tokyo \/etc\/localtime/)
         assert.match(dockerfile, /\n {8}fonts-noto-cjk\n/)
-        assert.match(dockerfile, /chrome-start\.sh"\]\n$/)
+        assert.match(dockerfile, /chrome-start\.sh","\/opt\/wayuse\/bin\/server-start\.sh"\]\n$/)
         assert.match(files["rootfs/etc/wayuse/sway/config"]!, /^output \* resolution 1920x1080$/m)
         assert.equal(files["rootfs/etc/wayuse/chrome.env"], "LANGUAGE='ja'\n")
         assert.deepEqual(JSON.parse(files["rootfs/etc/wayuse/wayuse.json"]!), config)

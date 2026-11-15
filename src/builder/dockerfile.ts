@@ -1,6 +1,12 @@
 import type {WayuseClient} from "wayuse-client"
+import {SERVER_TARBALL} from "./npm-package.ts"
 
 type Resolved = WayuseClient.Config
+
+export interface BuildOptions {
+    /** A wayuse-server tarball to install in place of the one on npm. */
+    serverTarball?: string
+}
 
 const UBUNTU = "ubuntu:26.04"
 
@@ -48,6 +54,13 @@ const timezoneSetup = (timezone: string): string => [
     `    ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime`,
 ].join("\n")
 
+// Copied ahead of the rest of rootfs/, so a changed setting does not install the packages again.
+const npmInstall = (tarball: boolean): string => [
+    `COPY ${["package.json", ...(tarball ? [SERVER_TARBALL] : [])].map(name => `rootfs/opt/wayuse/${name}`).join(" ")} /opt/wayuse/`,
+    "RUN npm install --prefix /opt/wayuse --omit=dev --no-audit --no-fund && \\",
+    "    npm cache clean --force",
+].join("\n")
+
 // Fixed paths, so that `docker exec` reaches the same sway and D-Bus as the processes started here.
 const RUNTIME_ENV = [
     "XDG_RUNTIME_DIR=/run/wayuse",
@@ -62,12 +75,13 @@ export const commandsOf = (config: Resolved): string[] => [
     "/opt/wayuse/bin/sway-start.sh",
     "/opt/wayuse/bin/wayvnc-start.sh",
     ...(config.apps.chrome ? ["/opt/wayuse/bin/chrome-start.sh"] : []),
+    "/opt/wayuse/bin/server-start.sh",
 ]
 
 /**
  * The Dockerfile, ordered so that a changed setting rebuilds as few layers as it can.
  */
-export const dockerfileOf = (config: Resolved): string => {
+export const dockerfileOf = (config: Resolved, options: BuildOptions = {}): string => {
     const {chrome} = config.apps
 
     const steps = [
@@ -79,8 +93,11 @@ export const dockerfileOf = (config: Resolved): string => {
         config.packages.length > 0 && aptInstall(config.packages),
         USER_SETUP,
         timezoneSetup(config.timezone),
+        // Last of the installs: the server is what changes most often while it is developed.
+        npmInstall(options.serverTarball != null),
         "COPY rootfs/ /",
         [
+            "EXPOSE 3000",
             "USER wayuse",
             "WORKDIR /home/wayuse",
             `ENV ${RUNTIME_ENV.join(" ")}`,

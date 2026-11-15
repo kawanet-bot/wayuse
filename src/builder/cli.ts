@@ -8,10 +8,11 @@ import {VERSION} from "./version.ts"
 
 const USAGE = [
     "Usage: wayuse-build [options]",
-    "  -c, --config <file>  the configuration to read (default: wayuse.config.ts)",
-    "  -o, --outdir <dir>   the build directory to write, emptied first (default: .wayuse)",
-    "  -v, --version        print this package's version",
-    "  -h, --help           print this usage",
+    "  -c, --config <file>      the configuration to read (default: wayuse.config.ts)",
+    "  -o, --outdir <dir>       the build directory to write, emptied first (default: .wayuse)",
+    "  --server-tarball <file>  a wayuse-server tarball to install in place of the one on npm",
+    "  -v, --version            print this package's version",
+    "  -h, --help               print this usage",
 ].map(line => `${line}\n`).join("")
 
 const EXIT_USAGE = 2
@@ -21,6 +22,7 @@ const readArgs = (args: string[]) => parseArgs({
     options: {
         config: {type: "string", short: "c", default: "wayuse.config.ts"},
         outdir: {type: "string", short: "o", default: ".wayuse"},
+        "server-tarball": {type: "string"},
         version: {type: "boolean", short: "v"},
         help: {type: "boolean", short: "h"},
     },
@@ -55,7 +57,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
 
     try {
         const config = resolveConfig(await loadConfig(options.config) as declared.WayuseBuilder.Config)
-        const files = await writeBuildDir(config, options.outdir)
+        const files = await writeBuildDir(config, options.outdir, {serverTarball: options["server-tarball"]})
         for (const file of files) process.stdout.write(`${options.outdir}/${file}\n`)
         return 0
     } catch (error) {
