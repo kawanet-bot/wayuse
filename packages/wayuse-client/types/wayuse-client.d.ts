@@ -22,6 +22,47 @@ export declare namespace WayuseClient {
         env: Record<string, string>
     }
 
+    /** A screen: one sway output, HEADLESS-1 and up. */
+    interface Slot {
+        /** The name of the sway output, such as "HEADLESS-1". */
+        id: string
+        /** As `swaymsg -t get_outputs` and `get_tree` report them. */
+        sway: {output: SwayOutput, windows: SwayWindow[]}
+        /** The number of VNC clients now connected to the screen. */
+        wayvnc: {clients: number}
+    }
+
+    interface SlotList {
+        data: Slot[]
+    }
+
+    interface SwayOutput {
+        name: string
+        active: boolean
+        /** The place among all outputs, which sway lays side by side. */
+        rect: Rect
+        current_workspace: string
+    }
+
+    interface SwayWindow {
+        id: number
+        app_id: string
+        pid: number
+        /** The title of the window. */
+        name: string
+        marks: string[]
+        focused: boolean
+        /** In the coordinates of all outputs, not of the window's own output. */
+        rect: Rect
+    }
+
+    interface Rect {
+        x: number
+        y: number
+        width: number
+        height: number
+    }
+
     /** The claims wayuse-server reads. Any other claim passes through to GET /auth/me. */
     interface JwtClaims {
         /** Must equal the server's WAYUSE_JWT_AUDIENCE. */
@@ -44,10 +85,30 @@ export declare namespace WayuseClient {
         publicKey: string
     }
 
+    interface ClientOptions {
+        /** Where the server is reached, a path ahead of its routes included: "http://127.0.0.1:3000/". */
+        url: string
+        /** The JWT, or a function that returns the one to send with each request. */
+        token?: string | (() => string | undefined | Promise<string | undefined>)
+        /** Default: the global fetch. */
+        fetch?: (input: URL, init?: RequestInit) => Promise<Response>
+    }
+
+    /** One method per API of wayuse-server. Each rejects with an ApiError when the server refuses. */
+    interface Client {
+        /** The claims of the token, as the server reads them. */
+        getMe(): Promise<JwtClaims>
+        getConfig(): Promise<Config>
+        getSlots(): Promise<Slot[]>
+        getSlot(id: string): Promise<Slot>
+        /** A PNG of the whole screen. */
+        captureSlot(id: string): Promise<Uint8Array>
+    }
+
     interface CLIOptions {
         /** The arguments as the executable gets them: process.argv.slice(2). */
         args: string[]
-        /** Where WAYUSE_JWT_PRIVATE_KEY and WAYUSE_JWT_AUDIENCE are read from. Default: process.env. */
+        /** Where WAYUSE_URL, WAYUSE_JWT and the other variables are read from. Default: process.env. */
         env?: Record<string, string | undefined>
     }
 }
@@ -60,6 +121,16 @@ export declare function publicKeyOf(privateKey: string): string
 
 /** Signs a JWT that wayuse-server verifies with the public key. */
 export declare function signJwt(claims: WayuseClient.JwtInput, privateKey: string): string
+
+/** The server's answer when it is not a success: its status, and its message as the error's message. */
+export declare class ApiError extends Error {
+    status: number
+
+    constructor(status: number, message: string)
+}
+
+/** A client of wayuse-server on web standards alone, so the same code runs in Node.js and in a browser. */
+export declare function createClient(options: WayuseClient.ClientOptions): WayuseClient.Client
 
 /** Runs the command line once per process and resolves to its exit code. The caller ends the process. */
 export declare function CLI(options: WayuseClient.CLIOptions): Promise<number>

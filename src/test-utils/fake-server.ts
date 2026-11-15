@@ -1,0 +1,56 @@
+// A wayuse-server for the tests: the real application over recorded answers of sway, with no container.
+
+import {readFileSync} from "node:fs"
+import type {WayuseClient} from "wayuse-client"
+import {resolveConfig} from "../builder/config.ts"
+import {generateKeyPair, signJwt} from "../client/jwt-sign.ts"
+import {createApp} from "../server/app.ts"
+import type {Exec} from "../server/exec.ts"
+import {parsePublicKey} from "../server/jwt-verify.ts"
+
+const fixture = (name: string): Buffer => readFileSync(new URL(`./fixtures/${name}`, import.meta.url))
+
+/** The first bytes of every PNG, which is all a test needs of a capture. */
+export const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+
+// Recorded from a container with two screens and one Chrome window, which sits on HEADLESS-2.
+export const fakeExec: Exec = async (file, args) => {
+    const command = [file, ...args].join(" ")
+    if (command === "swaymsg -r -t get_tree") return fixture("sway-get_tree.json")
+    if (command === "swaymsg -r -t get_outputs") return fixture("sway-get_outputs.json")
+    if (/^wayvncctl --socket=\/run\/test\/wayvncctl-[12] --json client-list$/.test(command)) return Buffer.from("[]\n")
+    if (/^grim -o HEADLESS-[12] -$/.test(command)) return PNG_SIGNATURE
+    if (file === "grim") throw new Error(`unknown output '${args[1]}'`)
+    throw new Error(`unexpected command: ${command}`)
+}
+
+export interface FakeServer {
+    config: WayuseClient.Config
+    /** A token the server accepts. */
+    jwt: string
+    /** The access log so far, one item per line. */
+    lines: string[]
+    /** A fetch that reaches the application directly, for createClient() and runCLI(). */
+    fetch: NonNullable<WayuseClient.ClientOptions["fetch"]>
+}
+
+export const createFakeServer = (exec: Exec = fakeExec): FakeServer => {
+    const config = resolveConfig({apps: {chrome: {}}})
+    const pair = generateKeyPair()
+    const lines: string[] = []
+
+    const app = createApp({
+        config,
+        stderr: {write: text => lines.push(text)},
+        auth: {publicKey: parsePublicKey(pair.publicKey), audience: "wayuse"},
+        runtimeDir: "/run/test",
+        exec,
+    })
+
+    return {
+        config,
+        jwt: signJwt({aud: "wayuse", sub: "user@example.com", iat: 1}, pair.privateKey),
+        lines,
+        fetch: async (input, init) => app.request(input, init),
+    }
+}

@@ -8,7 +8,7 @@ SHELL := bash
 BUILDER_SRC := $(shell find ../src/builder -name '*.ts' -not -name '*.test.ts')
 SERVER_SRC := $(shell find ../src/server -name '*.ts' -not -name '*.test.ts')
 CLIENT_SRC := $(shell find ../src/client -name '*.ts' -not -name '*.test.ts')
-SHARED_SRC := $(shell find ../src/jwt -name '*.ts' -not -name '*.test.ts')
+SHARED_SRC := $(shell find ../src/jwt ../src/api -name '*.ts' -not -name '*.test.ts')
 TYPES := $(wildcard ../packages/*/types/*.d.ts)
 ROLLUP_SRC := $(wildcard ./*.ts)
 
@@ -40,7 +40,7 @@ $(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../pac
 	@ls -l $@
 	@echo ""
 
-# The signer's half of the JWT code: the verifier's half is in the server, and src/jwt/ is what both bundle.
+# src/jwt/ is bundled here and into the server, and src/api/ here and, later, into the console.
 $(CLIENT_DST): $(CLIENT_CONFIG) $(CLIENT_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/wayuse-client/package.json
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<

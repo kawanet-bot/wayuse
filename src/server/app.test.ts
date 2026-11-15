@@ -17,7 +17,11 @@ describe(TITLE, () => {
 
     const run = async (path: string, headers: Record<string, string> = {}, options: AuthOptions = auth) => {
         const lines: string[] = []
-        const app = createApp({config, stderr: {write: text => lines.push(text)}, auth: options})
+        const app = createApp({
+            config, stderr: {write: text => lines.push(text)}, auth: options, runtimeDir: "/run/test", exec: async () => {
+                throw new Error("no command is expected to run")
+            },
+        })
         const res = await app.request(path, {headers})
         return {res, lines}
     }
@@ -48,6 +52,14 @@ describe(TITLE, () => {
         }
     })
 
+    // Which paths exist is not told to a caller without a token.
+    it("refuses every path but /ok without a token, one that does not exist among them", async () => {
+        for (const path of ["/slot/", "/slot/HEADLESS-1", "/slot/HEADLESS-1/capture.png", "/auth/me", "/missing"]) {
+            assert.equal((await run(path)).res.status, 403, path)
+        }
+        assert.equal((await run("/missing", bearer)).res.status, 404)
+    })
+
     it("refuses every token while it has no public key", async () => {
         assert.equal((await run("/config", bearer, keyless)).res.status, 403)
         assert.equal((await run("/ok", {}, keyless)).res.status, 200)
@@ -57,6 +69,13 @@ describe(TITLE, () => {
         assert.match((await run("/ok")).lines.join(""), /^GET \/ok 200 0 - \d+\.\d+ ms\n$/)
         assert.match((await run("/config?q=1", bearer)).lines.join(""), /^GET \/config\?q=1 200 (\d+|-) - \d+\.\d+ ms\n$/)
         assert.match((await run("/config")).lines.join(""), /^GET \/config 403 (\d+|-) - \d+\.\d+ ms\n$/)
-        assert.match((await run("/missing")).lines.join(""), /^GET \/missing 404 (\d+|-) - \d+\.\d+ ms\n$/)
+        assert.match((await run("/missing", bearer)).lines.join(""), /^GET \/missing 404 (\d+|-) - \d+\.\d+ ms\n$/)
+    })
+
+    it("answers a command that failed with a 500 and its words", async () => {
+        const {res, lines} = await run("/slot/HEADLESS-1/capture.png", bearer)
+        assert.equal(res.status, 500)
+        assert.deepEqual(await res.json(), {error: {message: "grim: no command is expected to run"}})
+        assert.equal(lines.length, 1)
     })
 })

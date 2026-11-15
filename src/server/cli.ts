@@ -67,7 +67,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     if (!publicKey) process.stderr.write("WAYUSE_JWT_PUBLIC_KEY is not set: every API that needs a token is refused\n")
 
     const auth = {publicKey, audience: WAYUSE_JWT_AUDIENCE || DEFAULT_AUDIENCE}
-    const app = createApp({config, stderr: process.stderr, auth})
+    const app = createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? ""})
 
     const server = serve({fetch: app.fetch, port: options.port}, ({port}) => {
         process.stderr.write(`wayuse-server ${VERSION} http://localhost:${port}/ok\n`)

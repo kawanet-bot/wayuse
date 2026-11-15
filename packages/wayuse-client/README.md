@@ -4,6 +4,47 @@
 
 The API client and CLI for a wayuse container.
 
+## SYNOPSIS
+
+```sh
+export WAYUSE_URL=http://127.0.0.1:3000/    # where wayuse-server is reached
+export WAYUSE_JWT=...                       # see TOKENS below
+
+npx wayuse slot list                        # every screen, as JSON
+npx wayuse slot capture -o screen.png       # a PNG of the screen
+npx wayuse slot capture HEADLESS-2 -o 2.png # of one screen, when the container has more
+```
+
+The same from a program. It uses web standards alone, so it runs in Node.js and in a browser:
+
+```ts
+import {createClient} from "wayuse-client"
+
+const client = createClient({url: "http://127.0.0.1:3000/", token: process.env.WAYUSE_JWT})
+const slots = await client.getSlots()
+const png = await client.captureSlot(slots[0].id)
+```
+
+## COMMAND
+
+```
+Usage: wayuse <command> [options]
+  auth me                         print the claims of WAYUSE_JWT, as the server reads them
+  config                          print the configuration the image was built from
+  slot list                       print every screen
+  slot show [<slot>]              print one screen
+  slot capture [<slot>] [-o <file>]
+                                  write a PNG of one screen (default: to the standard output)
+  jwt keygen                      print a new key pair, as lines for an .env file
+  jwt public-key                  print the public key of WAYUSE_JWT_PRIVATE_KEY
+  jwt sign --sub <subject> [--claim <name>[=<value>]]...
+                                  print a JWT signed with WAYUSE_JWT_PRIVATE_KEY, for WAYUSE_JWT_AUDIENCE
+  -v, --version                   print this package's version
+  -h, --help                      print this usage
+```
+
+`<slot>` may be left out while the container has one screen.
+
 ## TOKENS
 
 wayuse-server takes a JWT signed with Ed25519, and holds the public key alone.
