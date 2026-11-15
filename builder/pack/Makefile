@@ -52,9 +52,10 @@ test-build:
 	grep -q '"html-slim"' tmp/rootfs/opt/wayuse/package.json
 
 # What the image does, without Docker: install the generated package.json, start the server, and ask it.
+# Run through bash: an artifact passed between jobs keeps no executable bit.
 test-server: test-build
 	npm install --prefix tmp/rootfs/opt/wayuse --omit=dev --no-audit --no-fund
-	./smoke.sh tmp/rootfs $(PORT)
+	bash smoke.sh tmp/rootfs $(PORT)
 
 # Run in place against the checkout's own packages, with no tarball installed.
 test-dist:
