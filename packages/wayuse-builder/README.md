@@ -74,7 +74,8 @@ The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
 | `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |
 
 The container runs as the user `wayuse` (uid 1000).
-It keeps sway, wayvnc and Chrome running: one that exits is started again.
+It keeps a session D-Bus, sway, wayvnc and Chrome running: one that exits is started again.
+tini is PID 1 in the image, so `--init` is not needed.
 
 | Port | Listener |
 |---|---|
