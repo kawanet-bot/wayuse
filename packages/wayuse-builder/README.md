@@ -92,6 +92,42 @@ tini is PID 1 in the image, so `--init` is not needed.
 | 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
 | 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
 
+### A server on the host
+
+A development server on the host, such as `wrangler dev`, is opened in the container as `http://host.docker.internal:<port>/`.
+On Linux a container does not reach the host's `127.0.0.1`, so two things are needed.
+
+1. Give the container the host's name, with `docker run --add-host host.docker.internal:host-gateway`, or in a `docker-compose.yml`:
+
+   ```yaml
+   services:
+     wayuse:
+       extra_hosts:
+         - "host.docker.internal:host-gateway"
+   ```
+
+2. Make the server listen on more than `127.0.0.1`, which is where `wrangler dev`, like most development servers, listens by default:
+
+   ```sh
+   npx wrangler dev --ip 0.0.0.0 --port 8787
+   ```
+
+Then the page opens and is captured as any other:
+
+```sh
+npx wayuse chrome open http://host.docker.internal:8787/
+npx wayuse slot capture -o screen.png
+```
+
+| The server on the host listens on | From the container |
+|---|---|
+| `0.0.0.0` | Reached. The network the host is on reaches it too. |
+| the address of Docker's bridge, which `ip -4 addr show docker0` tells, such as `172.17.0.1` | Reached, and by the containers alone. |
+| `127.0.0.1` | Not reached: Chrome shows that the connection was refused. |
+
+`docker run --network host` is another way: the container then shares the host's network, `127.0.0.1` included.
+Its own ports are then the host's as well: 3000, on every address of the host, and 9222 and 5900 + n.
+
 ## SEE ALSO
 
 - https://github.com/kawanet/wayuse

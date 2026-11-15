@@ -11,6 +11,8 @@ services:
     build:
       context: "./.wayuse/"
     shm_size: "256mb" # sway dies of a bus error on the 64MB Docker gives by default
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # a server on this host is http://host.docker.internal:<port>/
     ports:
       # Reached from this host alone, unless .env says otherwise: WAYUSE_PUBLISH=0.0.0.0:3000
       - "${WAYUSE_PUBLISH:-127.0.0.1:3000}:3000"
