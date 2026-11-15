@@ -28,10 +28,14 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
     // Paths below are relative, so a prefix a reverse proxy adds ahead of the routes stays in the URL.
     const base = url.endsWith("/") ? url : `${url}/`
 
-    const request = async (path: string, init: RequestInit = {}): Promise<Response> => {
+    const raw = async (path: string, init: RequestInit = {}): Promise<Response> => {
         const jwt = typeof token === "function" ? await token() : token
         const headers = {...init.headers, ...(jwt ? {authorization: `Bearer ${jwt}`} : {})}
-        const res = await fetchFn(new URL(path, base), {...init, headers})
+        return fetchFn(new URL(path, base), {...init, headers})
+    }
+
+    const request = async (path: string, init?: RequestInit): Promise<Response> => {
+        const res = await raw(path, init)
         if (!res.ok) throw new ApiError(res.status, await messageOf(res))
         return res
     }
@@ -45,6 +49,8 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
     const tabPath = (id: string): string => `app/chrome/tab/${encodeURIComponent(id)}`
 
     return {
+        fetch: raw,
+
         getMe: async () => (await json<{me: WayuseClient.JwtClaims}>("auth/me")).me,
         getConfig: () => json("config"),
         getSlots: async () => (await json<WayuseClient.SlotList>("slot/")).data,

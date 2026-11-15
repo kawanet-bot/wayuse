@@ -46,7 +46,7 @@ The body of PUT and POST is `{"url": "https://...", "slot": "HEADLESS-1", "width
 Only `url` is required. `slot` is the first screen when left out, and the size is that of the image's configuration.
 `"context": "temporary"` opens the window in a context of its own, which shares no login and no cookie with any other.
 
-Every API but `/ok` needs `Authorization: Bearer <JWT>`, and answers 403 without a valid one.
+Every API needs `Authorization: Bearer <JWT>`, and answers 403 without a valid one. Only `/ok` and the pages under `/console/` are open.
 An error is answered as `{"error": {"message": "..."}}` with its status.
 The server takes its routes from `/`. A reverse proxy may put a path ahead of them.
 The server holds the public key alone. [wayuse-client](../wayuse-client/README.md) makes the key pair and signs the tokens.
@@ -55,6 +55,24 @@ The server holds the public key alone. [wayuse-client](../wayuse-client/README.m
 |---|---|
 | `WAYUSE_JWT_PUBLIC_KEY` | The key tokens are verified with. Without it, every API that needs a token is refused. |
 | `WAYUSE_JWT_AUDIENCE` | The `aud` a token must carry. Default: `wayuse`. |
+
+## CONSOLE
+
+The server has pages for a person, at `/console/`:
+
+| Page | What it is |
+|---|---|
+| `/console/` | The entry. It goes on to the monitor with a token the server accepts, and asks for one otherwise. |
+| `/console/monitor/` | Every screen as a still picture, with the host's load. A click on a picture is sent as a click. |
+| `/console/vnc/#slot=HEADLESS-1` | One screen over VNC, seen and operated in the browser. |
+| `/console/api/` | A form that tries each API, and shows its URL and the `wayuse` command that does the same. |
+
+The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
+A link of the form `/console/#jwt=<JWT>` signs in with the token after the `#`, which a browser sends to no server.
+The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
+
+The vnc page loads [noVNC](https://github.com/novnc/noVNC), which is under the MPL 2.0.
+It is a dependency of this package, served from its own files as npm installed them, and no part of it is in this package's own files.
 
 ## VNC
 

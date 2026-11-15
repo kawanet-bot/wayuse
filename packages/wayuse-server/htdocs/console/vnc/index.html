@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The script rewrites the title with the state of the connection and the slot's name. -->
+  <title>⏳ vnc</title>
+  <link rel="stylesheet" href="../css/vnc.css">
+  <script type="module" src="../js/vnc.js"></script>
+</head>
+<body>
+<!-- The slot is named as vnc/#slot=HEADLESS-1. noVNC draws the screen into this element. -->
+<div class="vnc-screen" id="screen"></div>
+<p class="vnc-message" id="message" hidden></p>
+<button type="button" class="vnc-message vnc-reload" id="reload" hidden></button>
+</body>
+</html>

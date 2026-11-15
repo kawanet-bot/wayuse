@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wayuse API</title>
+  <link rel="stylesheet" href="../css/console.css">
+  <script type="module" src="../js/api.js"></script>
+</head>
+<body>
+<header class="header">
+  <div class="header-brand">
+    <span class="header-icon">🖥️</span>
+    <span class="header-title">wayuse</span>
+    <span class="header-badge">API</span>
+  </div>
+  <div class="header-meta">
+    <span id="host"></span>
+    <a href="../monitor/">monitor</a>
+  </div>
+</header>
+
+<main class="api-main">
+  <section class="card">
+    <h2>Request</h2>
+
+    <div class="api-field">
+      <label for="endpoint">Endpoint</label>
+      <select id="endpoint"></select>
+      <p class="api-note" id="note"></p>
+    </div>
+
+    <div class="api-field" data-field="slot">
+      <label for="slot">slot</label>
+      <select id="slot"></select>
+    </div>
+
+    <div class="api-field" data-field="id">
+      <label for="id">id <span class="api-hint">(a tab of Chrome)</span></label>
+      <div class="api-row">
+        <select id="id"></select>
+        <button type="button" class="button-sub" id="reload" title="Read the slots and the tabs again">🔄</button>
+      </div>
+    </div>
+
+    <div class="api-field" data-field="url">
+      <label for="url">url</label>
+      <input type="text" id="url" value="https://example.com/" spellcheck="false">
+    </div>
+
+    <div class="api-field" data-field="width">
+      <label for="width">width <span class="api-hint">(768 to 2560, with height. Empty for the configured size)</span></label>
+      <input type="number" id="width" min="768" max="2560">
+    </div>
+
+    <div class="api-field" data-field="height">
+      <label for="height">height</label>
+      <input type="number" id="height" min="768" max="2560">
+    </div>
+
+    <div class="api-field" data-field="context">
+      <label for="context">context <span class="api-hint">(temporary shares no login with any other window)</span></label>
+      <select id="context">
+        <option value="">default</option>
+        <option value="temporary">temporary</option>
+      </select>
+    </div>
+
+    <div class="api-field" data-field="x">
+      <label for="x">x <span class="api-hint">(a pixel of the capture, from its left)</span></label>
+      <input type="number" id="x" value="0" min="0" max="2559">
+    </div>
+
+    <div class="api-field" data-field="y">
+      <label for="y">y <span class="api-hint">(from its top)</span></label>
+      <input type="number" id="y" value="0" min="0" max="2559">
+    </div>
+
+    <div class="api-field" data-field="button">
+      <label for="button">button <span class="api-hint">(as sway's bindsym writes it. Also used for a click on the picture)</span></label>
+      <input type="text" id="button" value="button1" list="button-list" spellcheck="false">
+      <datalist id="button-list">
+        <option value="button1">
+        <option value="button2">
+        <option value="button3">
+        <option value="ctrl+button1">
+        <option value="shift+button1">
+      </datalist>
+    </div>
+
+    <div class="api-field" data-field="keys">
+      <label for="keys">keys <span class="api-hint">(as sway's bindsym writes them, separated by spaces. Two dots pause for 200ms)</span></label>
+      <input type="text" id="keys" value="ctrl+l .. ctrl+v .. Return" spellcheck="false">
+    </div>
+
+    <div class="api-field" data-field="text">
+      <label for="text">text</label>
+      <input type="text" id="text" value="https://example.org/" spellcheck="false">
+    </div>
+
+    <div class="api-field" data-field="expression">
+      <label for="expression">expression <span class="api-hint">(JavaScript for the tab's page. A promise is awaited)</span></label>
+      <textarea id="expression" class="api-editable" rows="4" spellcheck="false">({title: document.title, url: location.href})</textarea>
+    </div>
+
+    <div class="api-field">
+      <label for="request">HTTP <span class="api-hint">(the method and the URL, then the body)</span></label>
+      <textarea id="request" rows="2" readonly spellcheck="false"></textarea>
+    </div>
+
+    <div class="api-field">
+      <label for="cli">Command <span class="api-hint">(the same from a shell, with WAYUSE_URL and WAYUSE_JWT set)</span></label>
+      <textarea id="cli" rows="2" readonly spellcheck="false"></textarea>
+    </div>
+
+    <div class="api-actions">
+      <button type="button" class="button-sub" id="copy">📋 Copy the command</button>
+      <button type="button" class="button-main" id="run">▶ Run</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Response <span class="status" id="status"></span></h2>
+    <textarea id="response" rows="24" readonly spellcheck="false"></textarea>
+    <img id="image" alt="">
+  </section>
+</main>
+</body>
+</html>

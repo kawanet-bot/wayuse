@@ -9,6 +9,7 @@ import {HttpError} from "./http-error.ts"
 import {type AuthEnv, type AuthOptions, jwtCheck} from "./jwt-verify.ts"
 import {type Writer, logger} from "./logger.ts"
 import {createSlotApp} from "./slot/slot-api.ts"
+import {createStaticApp} from "./static.ts"
 import {getStatus} from "./status/status.ts"
 import {createSwayLocks} from "./sway/sway-lock.ts"
 import {type VncTickets, createVncTickets} from "./wayvnc/vnc-ticket.ts"
@@ -50,6 +51,9 @@ export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cd
 
     // Open to all: a load balancer's health check carries no token.
     app.get("/ok", c => c.body(null, 200))
+
+    // The console's pages come before the check: a browser sends no token when it loads a page.
+    app.route("/", createStaticApp())
 
     // Every route below needs a token, one that does not exist included.
     app.use(jwtCheck(auth))

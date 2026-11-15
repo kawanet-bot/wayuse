@@ -1,0 +1,428 @@
+/* Shared by the sign-in, API and monitor pages. A class without a prefix is a shared part, and login-, api- and monitor- belong to one page. */
+
+:root {
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --text: #1f2933;
+  --muted: #6b7785;
+  --line: #dde3ea;
+  --header: #1c2433;
+  --header-text: #e6ebf2;
+  --accent: #2f7cf6;
+  --accent-dark: #1f63d1;
+  --ok: #1e9e5a;
+  --ng: #d64545;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.6 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+}
+
+/* Header */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 52px;
+  padding: 0 20px;
+  background: var(--header);
+  color: var(--header-text);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.header-icon {
+  color: var(--accent);
+}
+
+.header-title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.header-badge {
+  padding: 1px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 12px;
+  color: #aab4c3;
+  white-space: nowrap;
+}
+
+.header-meta a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.header-meta a:hover {
+  color: #fff;
+}
+
+/* Card */
+
+.card {
+  padding: 18px 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.card h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Form controls */
+
+select,
+input,
+textarea {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+}
+
+/* The browser's own arrow sits too close to the edge, so one is drawn with room beside it. */
+select {
+  appearance: none;
+  padding-right: 34px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%236b7785' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center / 11px 8px;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(47, 124, 246, 0.15);
+}
+
+input,
+textarea {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+textarea {
+  resize: vertical;
+  background: #fafbfc;
+}
+
+/* Buttons */
+
+button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.button-main {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.button-main:hover {
+  background: var(--accent-dark);
+}
+
+.button-main:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.button-sub {
+  background: #fff;
+  color: var(--text);
+}
+
+.button-sub:hover {
+  background: var(--bg);
+}
+
+/* A result, such as an HTTP status */
+
+.status {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.status.ok {
+  color: var(--ok);
+}
+
+.status.ng {
+  color: var(--ng);
+}
+
+/* ---- sign in ---- */
+
+.login-main {
+  display: flex;
+  justify-content: center;
+  padding: 80px 20px;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 480px;
+  max-width: 100%;
+  text-align: center;
+}
+
+/* The flex above would otherwise show a form that is hidden. */
+.login-card[hidden] {
+  display: none;
+}
+
+.login-message {
+  margin: 0;
+}
+
+.login-message.is-error {
+  color: var(--ng);
+}
+
+/* ---- API ---- */
+
+.api-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+@media (max-width: 900px) {
+  .api-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.api-field {
+  margin-bottom: 14px;
+}
+
+.api-field[hidden] {
+  display: none;
+}
+
+.api-field label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.api-hint,
+.api-note {
+  font-weight: normal;
+  color: var(--muted);
+}
+
+.api-note {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.api-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* The request, the command and the response are read only. The expression is written, so it is white like an input. */
+textarea.api-editable {
+  background: #fff;
+}
+
+.api-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+#status {
+  margin-left: auto;
+}
+
+#image {
+  display: block;
+  max-width: 100%;
+  margin-top: 12px;
+  border: 1px solid var(--line);
+}
+
+/* A capture that sends a click where it is clicked */
+#image.clickable {
+  cursor: crosshair;
+}
+
+#image:not([src]) {
+  display: none;
+}
+
+#endpoint {
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+/* ---- monitor ---- */
+
+.monitor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+
+.monitor-toolbar label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.monitor-toolbar select {
+  width: auto;
+}
+
+/* A button with an icon alone is lower than a line of text, so both take one height. */
+.monitor-toolbar select,
+.monitor-toolbar button {
+  height: 36px;
+}
+
+.monitor-load {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+/* More screens wrap to the next row, at the same scale. */
+.monitor-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+}
+
+/* The script sets the width from the screen's size. The border is outside it, so the picture is exactly that wide. */
+.monitor-tile {
+  box-sizing: content-box;
+  max-width: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.monitor-tile-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 8px 0 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.monitor-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.monitor-meta {
+  flex: 1;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.monitor-tile-head a {
+  padding: 3px 6px;
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.monitor-tile-head a:hover {
+  color: var(--accent);
+}
+
+/* Takes the screen's shape before the first picture, so the tiles do not jump. */
+.monitor-frame {
+  background: var(--header);
+}
+
+.monitor-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.monitor-image:not([src]) {
+  display: none;
+}
+
+/* While a click is on its way, the picture shows that another cannot follow yet. */
+.monitor-tile.is-busy .monitor-image {
+  opacity: 0.7;
+  cursor: wait;
+}

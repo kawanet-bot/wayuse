@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wayuse monitor</title>
+  <link rel="stylesheet" href="../css/console.css">
+  <script type="module" src="../js/monitor.js"></script>
+</head>
+<body>
+<header class="header">
+  <div class="header-brand">
+    <span class="header-icon">🖥️</span>
+    <span class="header-title">wayuse</span>
+    <span class="header-badge">monitor</span>
+  </div>
+  <div class="header-meta">
+    <span id="host"></span>
+    <a href="../api/">API</a>
+  </div>
+</header>
+
+<div class="monitor-toolbar">
+  <label for="auto">Refresh</label>
+  <select id="auto" title="HIGH waits a second after each picture and goes round all screens. LOW waits a minute after each round.">
+    <option value="off">OFF</option>
+    <option value="fast">HIGH</option>
+    <option value="slow">LOW</option>
+  </select>
+  <button type="button" class="button-sub" id="recapture-all" title="Capture every screen again">🔄</button>
+  <span class="status" id="status"></span>
+  <span class="monitor-load" id="load"></span>
+</div>
+
+<main class="monitor-grid" id="grid"></main>
+
+<!-- One screen. A click on the picture is sent as a click at that pixel, and a drag takes the picture to another application. -->
+<template id="tile">
+  <section class="monitor-tile">
+    <div class="monitor-tile-head">
+      <span class="monitor-name"></span>
+      <span class="monitor-meta"></span>
+      <span class="status"></span>
+      <a title="Open over VNC">↗</a>
+    </div>
+    <div class="monitor-frame">
+      <img class="monitor-image" alt="" draggable="true">
+    </div>
+  </section>
+</template>
+</body>
+</html>

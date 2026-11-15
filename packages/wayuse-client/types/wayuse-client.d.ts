@@ -197,6 +197,9 @@ export declare namespace WayuseClient {
 
     /** One method per API of wayuse-server. Each rejects with an ApiError when the server refuses. */
     interface Client {
+        /** Any path of the server with the token, as the response itself: a refusal is returned, not thrown. */
+        fetch(path: string, init?: RequestInit): Promise<Response>
+
         /** The claims of the token, as the server reads them. */
         getMe(): Promise<JwtClaims>
         getConfig(): Promise<Config>

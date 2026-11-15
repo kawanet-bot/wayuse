@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>wayuse</title>
+  <link rel="stylesheet" href="css/console.css">
+  <script type="module" src="js/login.js"></script>
+</head>
+<body>
+<header class="header">
+  <div class="header-brand">
+    <span class="header-icon">🖥️</span>
+    <span class="header-title">wayuse</span>
+    <span class="header-badge">sign in</span>
+  </div>
+</header>
+
+<main class="login-main">
+  <!-- Hidden until a saved token has been tried: with one the server accepts, the page goes on by itself. -->
+  <form class="card login-card" id="form" hidden>
+    <p class="login-message" id="message"></p>
+    <textarea id="jwt" rows="5" spellcheck="false" placeholder="JWT" aria-label="JWT"></textarea>
+    <button type="submit" class="button-main">Sign in</button>
+  </form>
+</main>
+</body>
+</html>
