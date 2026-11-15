@@ -9,9 +9,15 @@
   "engines": {
     "node": ">=22.18.0"
   },
+  "exports": {
+    ".": {
+      "types": "./types/wayuse-client.d.ts"
+    }
+  },
   "files": [
     "LICENSE",
-    "README.md"
+    "README.md",
+    "types/*.d.ts"
   ],
   "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-client#readme",
   "keywords": [
@@ -26,5 +32,6 @@
     "url": "git+https://github.com/kawanet/wayuse.git",
     "directory": "packages/wayuse-client"
   },
-  "type": "module"
+  "type": "module",
+  "types": "./types/wayuse-client.d.ts"
 }

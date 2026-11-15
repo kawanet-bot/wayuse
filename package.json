@@ -3,7 +3,10 @@
   "description": "Workspace for wayuse-builder, wayuse-server and wayuse-client.",
   "author": "Kawanet",
   "devDependencies": {
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-sucrase": "^5.1.0",
     "@types/node": "^24.19.2",
+    "rollup": "^4.68.2",
     "typescript": "^6.0.3"
   },
   "devEngines": {
@@ -20,7 +23,9 @@
     "url": "git+https://github.com/kawanet/wayuse.git"
   },
   "scripts": {
-    "fixpack": "fixpack && fixpack packages/wayuse-builder/package.json && fixpack packages/wayuse-server/package.json && fixpack packages/wayuse-client/package.json"
+    "build": "make -C builder",
+    "fixpack": "fixpack && fixpack packages/wayuse-builder/package.json && fixpack packages/wayuse-server/package.json && fixpack packages/wayuse-client/package.json",
+    "test": "make -C builder test"
   },
   "type": "module",
   "workspaces": [

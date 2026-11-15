@@ -4,6 +4,83 @@
 
 Build the wayuse Docker image.
 
+## SYNOPSIS
+
+`wayuse.config.ts` defines what the image holds:
+
+```ts
+import {defineConfig} from "wayuse-builder"
+
+export default defineConfig({
+    node: {
+        version: "26.13.1",
+    },
+    apps: {
+        chrome: {
+            channel: "stable",
+            env: {LANGUAGE: "ja"},
+        },
+    },
+    timezone: "Asia/Tokyo",
+    packages: [
+        "fonts-noto-cjk",
+        "fonts-noto-color-emoji",
+    ],
+})
+```
+
+`wayuse-build` writes the build directory, and Docker builds the image from it:
+
+```sh
+npx wayuse-build
+docker build -t my-wayuse .wayuse
+docker run --rm --shm-size 256m -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
+```
+
+## CONFIGURATION
+
+Every item may be left out.
+
+| Item | Default | Meaning |
+|---|---|---|
+| `node.version` | `"26.13.1"` | Node.js in the image. A full version: ranges are refused. |
+| `apps.chrome` | not installed | Installs Google Chrome. |
+| `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
+| `apps.chrome.env` | `{}` | Environment variables for the Chrome process alone. `LANGUAGE` sets Chrome's language. No secrets: they are baked into the image. |
+| `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |
+| `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
+| `packages` | `[]` | Additional apt packages, fonts among them. |
+
+## COMMAND
+
+```
+Usage: wayuse-build [options]
+  -c, --config <file>  the configuration to read (default: wayuse.config.ts)
+  -o, --outdir <dir>   the build directory to write, emptied first (default: .wayuse)
+  -v, --version        print this package's version
+  -h, --help           print this usage
+```
+
+The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
+The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
+
+## CONTAINER
+
+| `docker run` | Meaning |
+|---|---|
+| `--shm-size 256m` | Required. sway dies of a bus error on the 64MB Docker gives by default. |
+| `-e WAYUSE_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: 1. |
+| `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: Chrome's own. |
+| `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |
+
+The container runs as the user `wayuse` (uid 1000).
+It keeps sway, wayvnc and Chrome running: one that exits is started again.
+
+| Port | Listener |
+|---|---|
+| 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
+| 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
+
 ## SEE ALSO
 
 - https://github.com/kawanet/wayuse
