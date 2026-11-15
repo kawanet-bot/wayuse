@@ -12,7 +12,8 @@ services:
       context: "./.wayuse/"
     shm_size: "256mb" # sway dies of a bus error on the 64MB Docker gives by default
     ports:
-      - "127.0.0.1:3000:3000"
+      # Reached from this host alone, unless .env says otherwise: WAYUSE_PUBLISH=0.0.0.0:3000
+      - "${WAYUSE_PUBLISH:-127.0.0.1:3000}:3000"
     environment:
       WAYUSE_OUTPUTS: "2"
       WAYUSE_JWT_PUBLIC_KEY: "${WAYUSE_JWT_PUBLIC_KEY:-}"
