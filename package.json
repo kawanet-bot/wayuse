@@ -28,6 +28,7 @@
   "scripts": {
     "build": "make -C builder",
     "fixpack": "fixpack && fixpack packages/wayuse-builder/package.json && fixpack packages/wayuse-server/package.json && fixpack packages/wayuse-client/package.json",
+    "prepare": "make -C builder is-not-buildable 2> /dev/null || make -C builder clean all test",
     "test": "make -C builder test",
     "ts-refine": "./node_modules/.bin/ts-refine format && ./node_modules/.bin/ts-refine imports"
   },

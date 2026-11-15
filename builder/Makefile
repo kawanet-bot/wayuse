@@ -25,9 +25,20 @@ CONSOLE_CONFIG := ./rollup-console.config.ts
 
 ALL := $(BUILDER_DST) $(SERVER_DST) $(CLIENT_DST) $(CONSOLE_DST)
 
+# The build and the tests run .ts as it is, which takes Node's own type stripping: 22.18 and up.
+BUILDABLE := $(shell node -e 'console.log(process.features.typescript ? "YES" : "NO")')
+
 ####
 
-all: $(ALL)
+all: is-buildable $(ALL)
+
+# A build starts only where it can finish: with type stripping, and with the devDependencies installed.
+is-buildable:
+	@ [ "$(BUILDABLE)" = "YES" ] && [ -f ../node_modules/.bin/rollup ]
+
+# The gate of `npm prepare`, turned around: an install that cannot build leaves the build alone.
+is-not-buildable:
+	@ [ "$(BUILDABLE)" != "YES" ] || [ ! -f ../node_modules/.bin/rollup ]
 
 # The package name resolves to this file, for bin/wayuse-build.js and for a wayuse.config.ts alike.
 $(BUILDER_DST): $(BUILDER_CONFIG) $(BUILDER_SRC) $(ROLLUP_SRC) ../packages/wayuse-builder/package.json
@@ -62,7 +73,14 @@ $(CONSOLE_DST): $(CONSOLE_CONFIG) $(CONSOLE_SRC) $(SHARED_SRC) $(ROLLUP_SRC)
 
 ####
 
-test: test-quick
+# `npm install` runs prepare, which ends here: the build is enough for it, and the tests would only slow it.
+test:
+	@case "$$npm_command" in \
+		install|ci|pack) echo "npm $$npm_command detected: skipping full tests." ;; \
+		*) $(MAKE) test-full ;; \
+	esac
+
+test-full: test-quick
 	cd .. && node --test 'src/**/*.test.ts'
 
 test-quick: all
@@ -73,4 +91,4 @@ test-quick: all
 clean:
 	/bin/rm -fr $(ALL) $(dir $(CONSOLE_DST)) $(dir $(SERVER_DST))server
 
-.PHONY: all clean test test-quick
+.PHONY: all clean test test-full test-quick is-buildable is-not-buildable
