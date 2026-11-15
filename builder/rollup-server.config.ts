@@ -9,9 +9,12 @@ const rollupConfig: RollupOptions = {
     // Bare specifiers stay external; only relative paths are bundled.
     external: [/^[^.\/]/],
 
+    // An application's code is imported only in an image that has it, so each is a file of its own beside the entry.
     output: {
-        file: "../packages/wayuse-server/dist/wayuse-server.js",
+        dir: "../packages/wayuse-server/dist",
         format: "esm",
+        entryFileNames: "wayuse-server.js",
+        chunkFileNames: "server/[name].js",
     },
 
     plugins: [

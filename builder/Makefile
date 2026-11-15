@@ -39,8 +39,11 @@ $(BUILDER_DST): $(BUILDER_CONFIG) $(BUILDER_SRC) $(ROLLUP_SRC) ../packages/wayus
 # Node strips no types under node_modules, so the image runs this file and never the sources.
 $(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/wayuse-server/package.json
 	@mkdir -p $(dir $@)
+	@/bin/rm -fr $(dir $@)server
 	../node_modules/.bin/rollup -c $<
-	@ls -l $@
+	@# What only Chrome needs must stay in Chrome's own file, or an image without Chrome would load it at start.
+	@! grep -q "html-slim" $@ $(dir $@)server/server.js || { echo "ERROR: the server loads html-slim at start" >&2; exit 1; }
+	@ls -l $@ $(dir $@)server
 	@echo ""
 
 # src/jwt/ is bundled here and into the server, and src/api/ here and, later, into the console.
@@ -68,6 +71,6 @@ test-quick: all
 	cd .. && node_modules/.bin/ts-refine imports --check
 
 clean:
-	/bin/rm -fr $(ALL) $(dir $(CONSOLE_DST))
+	/bin/rm -fr $(ALL) $(dir $(CONSOLE_DST)) $(dir $(SERVER_DST))server
 
 .PHONY: all clean test test-quick

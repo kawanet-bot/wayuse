@@ -17,7 +17,7 @@ describe(TITLE, () => {
 
     const run = async (path: string, headers: Record<string, string> = {}, options: AuthOptions = auth) => {
         const lines: string[] = []
-        const app = createApp({
+        const app = await createApp({
             config, stderr: {write: text => lines.push(text)}, auth: options, runtimeDir: "/run/test", exec: async () => {
                 throw new Error("no command is expected to run")
             },

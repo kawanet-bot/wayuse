@@ -53,6 +53,7 @@ export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps:
     const pair = generateKeyPair()
     const lines: string[] = []
 
+    // Not awaited here, so a test may make its server where it declares its values: each request waits for it.
     const app = createApp({
         config,
         stderr: {write: text => lines.push(text)},
@@ -70,6 +71,6 @@ export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps:
         config,
         jwt: signJwt({aud: "wayuse", sub: "user@example.com", iat: 1}, pair.privateKey),
         lines,
-        fetch: async (input, init) => app.request(input, init),
+        fetch: async (input, init) => (await app).request(input, init),
     }
 }

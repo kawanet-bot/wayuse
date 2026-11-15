@@ -72,7 +72,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
 
     const auth = {publicKey, audience: WAYUSE_JWT_AUDIENCE || DEFAULT_AUDIENCE}
     const tickets = createVncTickets()
-    const app = createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets, vendorDir: options.vendor})
+    const app = await createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets, vendorDir: options.vendor})
 
     const server = serve({fetch: app.fetch, port: options.port}, ({port}) => {
         process.stderr.write(`wayuse-server ${VERSION} http://localhost:${port}/ok\n`)

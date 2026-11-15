@@ -1,7 +1,6 @@
 import {Hono} from "hono"
 import type {ContentfulStatusCode} from "hono/utils/http-status"
 import type {WayuseClient} from "wayuse-client"
-import {createChromeApp} from "./chrome/chrome-api.ts"
 import {createClipboardApp} from "./clipboard/clipboard-api.ts"
 import type {ServerDeps} from "./deps.ts"
 import {type Exec, exec as realExec} from "./exec.ts"
@@ -46,7 +45,7 @@ export const defaultVncPort = (n: number): number => 5900 + n
 /**
  * The application apart from the socket it listens on, so a test reaches it without one.
  */
-export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cdpOrigin = CDP_ORIGIN, vncPort = defaultVncPort, tickets = createVncTickets(), vendorDir = VENDOR_DIR}: AppOptions): Hono<AuthEnv> => {
+export const createApp = async ({config, stderr, auth, runtimeDir, exec = realExec, cdpOrigin = CDP_ORIGIN, vncPort = defaultVncPort, tickets = createVncTickets(), vendorDir = VENDOR_DIR}: AppOptions): Promise<Hono<AuthEnv>> => {
     const app = new Hono<AuthEnv>()
 
     const deps: ServerDeps = {config, exec, runtimeDir, cdpOrigin, vncPort, tickets, locks: createSwayLocks(), log: message => stderr.write(`${message}\n`)}
@@ -74,7 +73,8 @@ export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cd
     app.route("/", createClipboardApp(deps))
 
     // Decided when the image is built: one that was not installed is not started either, and trying it would only time out.
-    if (config.apps.chrome) app.route("/", createChromeApp(deps))
+    // Imported only then, so an image without an application loads neither its code nor what that depends on.
+    if (config.apps.chrome) app.route("/", (await import("./chrome/chrome-api.ts")).createChromeApp(deps))
 
     // Said in words, so a caller does not take it for a path that was misspelled.
     app.all("/app/:name/*", c => {
