@@ -1,6 +1,8 @@
 import {Hono} from "hono"
 import type {WayuseClient} from "wayuse-client"
 import type {ServerDeps} from "../deps.ts"
+import {HttpError} from "../http-error.ts"
+import {clickSlot, keySlot} from "./slot-input.ts"
 import {captureSlot, clearSlot, getSlot, getSlots} from "./slot.ts"
 
 /**
@@ -22,6 +24,26 @@ export const createSlotApp = (deps: ServerDeps): Hono => {
     app.delete("/slot/:id", async c => {
         const id = c.req.param("id")
         await deps.locks.withSlot(id, () => clearSlot(deps, id))
+        return c.json(await getSlot(deps, id))
+    })
+
+    app.post("/slot/:id/click", async c => {
+        const id = c.req.param("id")
+        const {x, y, button = "button1"} = ((await c.req.json().catch(() => undefined)) ?? {}) as Record<string, unknown>
+        if (!Number.isInteger(x) || (x as number) < 0) throw new HttpError(400, `Invalid x: ${JSON.stringify(x)}`)
+        if (!Number.isInteger(y) || (y as number) < 0) throw new HttpError(400, `Invalid y: ${JSON.stringify(y)}`)
+        if (typeof button !== "string") throw new HttpError(400, `Invalid button: ${JSON.stringify(button)}`)
+
+        await deps.locks.withSlot(id, () => clickSlot(deps, id, x as number, y as number, button))
+        return c.json(await getSlot(deps, id))
+    })
+
+    app.post("/slot/:id/key", async c => {
+        const id = c.req.param("id")
+        const {keys} = ((await c.req.json().catch(() => undefined)) ?? {}) as {keys?: unknown}
+        if (typeof keys !== "string" || !keys.trim()) throw new HttpError(400, `Invalid keys: ${JSON.stringify(keys)}`)
+
+        await deps.locks.withSlot(id, () => keySlot(deps, id, keys))
         return c.json(await getSlot(deps, id))
     })
 

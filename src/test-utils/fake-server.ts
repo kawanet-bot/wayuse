@@ -20,6 +20,9 @@ export const fakeExec: Exec = async (file, args) => {
     if (command === "swaymsg -r -t get_outputs") return fixture("sway-get_outputs.json")
     if (/^wayvncctl --socket=\/run\/test\/wayvncctl-[12] --json client-list$/.test(command)) return Buffer.from("[]\n")
     if (/^grim -o HEADLESS-[12] -$/.test(command)) return PNG_SIGNATURE
+    // A seat with a pointer and a keyboard, as while a VNC client is connected.
+    if (command === "swaymsg -r -t get_seats") return Buffer.from(`[{"capabilities": 3}]`)
+    if (/^swaymsg -r focus output HEADLESS-[12]$/.test(command)) return Buffer.from(`[{"success": true}]`)
     if (file === "grim") throw new Error(`unknown output '${args[1]}'`)
     throw new Error(`unexpected command: ${command}`)
 }
@@ -37,9 +40,11 @@ export interface FakeServer {
 export interface FakeServerOptions {
     exec?: Exec
     config?: WayuseClient.Config
+    /** The port of a fake wayvnc, for the routes that send input. */
+    vncPort?: (n: number) => number
 }
 
-export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}})}: FakeServerOptions = {}): FakeServer => {
+export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}}), vncPort}: FakeServerOptions = {}): FakeServer => {
     const pair = generateKeyPair()
     const lines: string[] = []
 
@@ -51,6 +56,7 @@ export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps:
         exec,
         // Nothing listens there, so a route that reaches for Chrome answers that Chrome is not running.
         cdpOrigin: "http://127.0.0.1:9",
+        vncPort,
     })
 
     return {

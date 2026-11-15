@@ -51,6 +51,12 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
         getSlot: id => json(slotPath(id)),
         captureSlot: async id => new Uint8Array(await (await request(`${slotPath(id)}/capture.png`)).arrayBuffer()),
         clearSlot: id => json(slotPath(id), "DELETE"),
+        clickSlot: (id, request) => json(`${slotPath(id)}/click`, "POST", request),
+        keySlot: (id, keys) => json(`${slotPath(id)}/key`, "POST", {keys}),
+
+        getClipboard: async () => (await json<WayuseClient.Clipboard>("clipboard")).text,
+        setClipboard: async text => (await json<WayuseClient.Clipboard>("clipboard", "PUT", {text})).text,
+        getStatus: () => json("status/"),
 
         getChromeTabs: async () => (await json<WayuseClient.ChromeTabList>("app/chrome/tab/")).data,
         getChromeTab: id => json(tabPath(id)),

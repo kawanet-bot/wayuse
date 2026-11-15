@@ -17,6 +17,15 @@ The image [wayuse-builder](../wayuse-builder/README.md) builds installs and star
 | `GET /slot/HEADLESS-1` | One screen. |
 | `GET /slot/HEADLESS-1/capture.png` | A PNG of the whole screen. |
 | `DELETE /slot/HEADLESS-1` | Closes every window on the screen. |
+| `POST /slot/HEADLESS-1/click` | Clicks a pixel of the capture, whatever is there: `{"x": 100, "y": 200, "button": "ctrl+button1"}`. |
+| `POST /slot/HEADLESS-1/key` | Sends keys to the screen: `{"keys": "ctrl+l .. ctrl+v .. Return"}`. |
+| `GET /clipboard` | The text on the clipboard, as `{"text": "..."}`. |
+| `PUT /clipboard` | Puts `{"text": "..."}` on the clipboard. |
+| `GET /status/` | The load and the memory of the host. |
+
+`button` and `keys` are in the notation of sway's bindsym. A key is the name of an X11 keysym, such as `Return` or `at`, or the character itself.
+The modifiers are `shift`, `ctrl`, `mod1` (Alt) and `mod4` (Meta). In `keys`, two to ten dots pause for 100ms each.
+The input of `/slot/` goes through wayvnc, so it reaches whatever is on the screen, Chrome's own address bar included.
 
 An image with Chrome also has these. A tab's id is the targetId of the Chrome DevTools Protocol.
 

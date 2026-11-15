@@ -12,6 +12,8 @@ export interface ServerDeps {
     runtimeDir: string
     /** Where Chrome's DevTools Protocol is reached. */
     cdpOrigin: string
+    /** The port the wayvnc of HEADLESS-n listens on. */
+    vncPort(n: number): number
     locks: SwayLocks
     /** One line to the server's log, for what changes a screen. */
     log(message: string): void

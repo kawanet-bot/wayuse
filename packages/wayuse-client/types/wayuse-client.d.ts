@@ -63,6 +63,37 @@ export declare namespace WayuseClient {
         height: number
     }
 
+    /** The body of POST /slot/:id/click. */
+    interface SlotClickRequest {
+        /** A pixel of the slot's capture.png. */
+        x: number
+        y: number
+        /** In the notation of sway's bindsym: "button1" to "button8", with "shift+", "ctrl+", "mod1+" or "mod4+". Default: "button1". */
+        button?: string
+    }
+
+    /** The text on the clipboard: "" when it is empty or holds no text. */
+    interface Clipboard {
+        text: string
+    }
+
+    /** The load and the memory of the host. */
+    interface Status {
+        /** From node:os. The hostname is the host's when the container runs with --uts=host. */
+        os: {machine: string, hostname: string, loadavg: number[], uptime: number, availableParallelism: number}
+        meminfo: Meminfo
+    }
+
+    /** Lines of /proc/meminfo, in kB. */
+    interface Meminfo {
+        MemTotal: number
+        MemFree: number
+        MemAvailable: number
+        SwapCached: number
+        SwapTotal: number
+        SwapFree: number
+    }
+
     /** A tab of Chrome. Its id is the targetId of the Chrome DevTools Protocol. */
     interface ChromeTab {
         id: string
@@ -167,6 +198,15 @@ export declare namespace WayuseClient {
         captureSlot(id: string): Promise<Uint8Array>
         /** Closes every window on the screen. */
         clearSlot(id: string): Promise<Slot>
+        /** Clicks whatever is at the pixel, Chrome's own address bar included. The window clicked takes the focus. */
+        clickSlot(id: string, request: SlotClickRequest): Promise<Slot>
+        /** Sends keys in the notation of sway's bindsym, separated by spaces: "ctrl+l .. ctrl+v .. Return". Two to ten dots pause for 100ms each. */
+        keySlot(id: string, keys: string): Promise<Slot>
+
+        getClipboard(): Promise<string>
+        /** Resolves to the text as read back. Pasting it is keySlot() with "ctrl+v". */
+        setClipboard(text: string): Promise<string>
+        getStatus(): Promise<Status>
 
         getChromeTabs(): Promise<ChromeTab[]>
         getChromeTab(id: string): Promise<ChromeTab>

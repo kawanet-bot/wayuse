@@ -26,17 +26,17 @@ describe(TITLE, () => {
         assert.match(stdout, /^\[\n  \{\n    "id": "HEADLESS-1",/)
         assert.deepEqual(JSON.parse((await run(["config"])).stdout), server.config)
         assert.equal(JSON.parse((await run(["auth", "me"])).stdout).sub, "user@example.com")
-        assert.equal(JSON.parse((await run(["slot", "show", "HEADLESS-2"])).stdout).id, "HEADLESS-2")
+        assert.equal(JSON.parse((await run(["slot", "show", "--slot", "HEADLESS-2"])).stdout).id, "HEADLESS-2")
     })
 
     it("writes a capture to the standard output as bytes, or to the file -o names", async () => {
-        const {out} = await run(["slot", "capture", "HEADLESS-1"])
+        const {out} = await run(["slot", "capture", "--slot", "HEADLESS-1"])
         assert.deepEqual(Buffer.from(out[0] as Uint8Array), PNG_SIGNATURE)
 
         const dir = await mkdtemp(join(tmpdir(), "wayuse-"))
         try {
             const file = join(dir, "shot.png")
-            const saved = await run(["slot", "capture", "HEADLESS-1", "-o", file])
+            const saved = await run(["slot", "capture", "--slot", "HEADLESS-1", "-o", file])
             assert.equal(saved.stdout, "")
             assert.deepEqual(await readFile(file), PNG_SIGNATURE)
         } finally {
@@ -49,17 +49,17 @@ describe(TITLE, () => {
         assert.deepEqual(Buffer.from((await run(["slot", "capture"])).out[0] as Uint8Array), PNG_SIGNATURE)
     })
 
-    it("checks the arguments of a chrome command before it calls the server", async () => {
-        for (const args of [["chrome", "open"], ["chrome", "open", "about:blank", "--size", "1280"], ["chrome", "click", "10"], ["chrome", "click", "a", "b", "--tab", "x"], ["chrome", "eval", "--tab", "x"]]) {
+    it("checks the arguments of a command before it calls the server", async () => {
+        for (const args of [["chrome", "open"], ["chrome", "open", "about:blank", "--size", "1280"], ["chrome", "click", "10"], ["chrome", "click", "a", "b", "--tab", "x"], ["chrome", "eval", "--tab", "x"], ["slot", "click", "1"], ["slot", "key"], ["clipboard", "set"]]) {
             const {code, stderr} = await run(args)
             assert.equal(code, 2, args.join(" "))
-            assert.match(stderr, /^(chrome \w+|--size) takes /, args.join(" "))
+            assert.match(stderr, /^(chrome \w+|slot \w+|clipboard set|--size) takes /, args.join(" "))
         }
     })
 
     it("reports the server's refusal in one line, with exit code 1", async () => {
         assert.deepEqual(await run(["slot", "list"], {}), {code: 1, out: [], stdout: "", stderr: "403 invalid token\n"})
-        assert.equal((await run(["slot", "show", "HEADLESS-9"])).stderr, "404 Slot not found: HEADLESS-9\n")
+        assert.equal((await run(["slot", "show", "--slot", "HEADLESS-9"])).stderr, "404 Slot not found: HEADLESS-9\n")
     })
 
     it("reports a server it cannot reach in one line, with exit code 1", async () => {
