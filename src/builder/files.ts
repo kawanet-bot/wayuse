@@ -3,6 +3,7 @@ import {dirname, join} from "node:path"
 import {fileURLToPath} from "node:url"
 import type {WayuseClient} from "wayuse-client"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
+import {bundleNovnc} from "./novnc.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
 import {shellEnvOf} from "./shell-env.ts"
 import {swayConfigOf} from "./sway-config.ts"
@@ -45,6 +46,11 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     }
 
     const paths = Object.keys(files)
+
+    // Made here and never shipped in a wayuse package: noVNC comes from its own, under its own license.
+    const novnc = "rootfs/opt/wayuse/vendor/novnc.js"
+    await bundleNovnc(join(outdir, novnc))
+    paths.push(novnc)
 
     if (options.serverTarball != null) {
         const path = `rootfs/opt/wayuse/${SERVER_TARBALL}`

@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.1.8",
-    "@novnc/novnc": "^1.7.0",
     "hono": "^4.13.18",
     "html-slim": "^0.5.0",
     "ws": "^8.23.0"
@@ -28,7 +27,8 @@
   },
   "files": [
     "bin/wayuse-server.js",
-    "dist/",
+    "dist/wayuse-server.js",
+    "dist/console/",
     "htdocs/",
     "LICENSE",
     "README.md",

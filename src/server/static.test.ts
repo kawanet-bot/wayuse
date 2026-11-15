@@ -1,11 +1,19 @@
 import assert from "node:assert/strict"
-import {describe, it} from "node:test"
+import {mkdtempSync, rmSync, writeFileSync} from "node:fs"
+import {tmpdir} from "node:os"
+import {join} from "node:path"
+import {after, describe, it} from "node:test"
 import {createFakeServer} from "../test-utils/fake-server.ts"
 
 const TITLE = "server/static.test.ts"
 
 describe(TITLE, () => {
-    const server = createFakeServer()
+    // What wayuse-build would have put into the image.
+    const vendorDir = mkdtempSync(join(tmpdir(), "wayuse-"))
+    writeFileSync(join(vendorDir, "novnc.js"), "export default class RFB {}\n")
+    after(() => rmSync(vendorDir, {recursive: true, force: true}))
+
+    const server = createFakeServer({vendorDir})
     const get = (path: string, headers: Record<string, string> = {}) => server.fetch(new URL(path, "http://wayuse.test/"), {headers})
 
     it("serves the console's pages, styles and built scripts without a token", async () => {
@@ -23,15 +31,15 @@ describe(TITLE, () => {
         assert.equal(res.headers.get("location"), "console/")
     })
 
-    it("serves noVNC's own files as its package has them", async () => {
-        const res = await get("/vendor/novnc/core/rfb.js")
+    it("serves under /vendor/ what the image has in its vendor directory", async () => {
+        const res = await get("/vendor/novnc.js")
         assert.equal(res.status, 200)
-        assert.match(await res.text(), /Licensed under MPL 2\.0/)
-        assert.equal((await get("/vendor/novnc/vendor/pako/lib/zlib/inflate.js")).status, 200)
+        assert.match(res.headers.get("content-type") ?? "", /^text\/javascript/)
+        assert.equal(await res.text(), "export default class RFB {}\n")
     })
 
     it("serves nothing else of a package, and nothing above a directory it serves", async () => {
-        for (const path of ["/vendor/novnc/package.json", "/console/../package.json", "/console/%2e%2e/package.json", "/console/js/../../package.json", "/vendor/novnc/core/../package.json"]) {
+        for (const path of ["/vendor/../package.json", "/console/../package.json", "/console/%2e%2e/package.json", "/console/js/../../package.json", "/vendor/%2e%2e/wayuse-server.js", "/wayuse-server.js"]) {
             assert.equal((await get(path)).status, 403, path)
         }
         assert.equal((await get("/console/nosuch.html", {authorization: `Bearer ${server.jwt}`})).status, 404)

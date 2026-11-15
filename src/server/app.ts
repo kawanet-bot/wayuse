@@ -34,7 +34,11 @@ export interface AppOptions {
     vncPort?: (n: number) => number
     /** The tickets the WebSocket relay takes. Default: ones no relay shares. */
     tickets?: VncTickets
+    /** Where the image has what is served under /vendor/. Default: where wayuse-build puts it. */
+    vendorDir?: string
 }
+
+const VENDOR_DIR = "/opt/wayuse/vendor"
 
 /** Where the wayvnc of HEADLESS-n listens, as wayvnc-start.sh starts it. */
 export const defaultVncPort = (n: number): number => 5900 + n
@@ -42,7 +46,7 @@ export const defaultVncPort = (n: number): number => 5900 + n
 /**
  * The application apart from the socket it listens on, so a test reaches it without one.
  */
-export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cdpOrigin = CDP_ORIGIN, vncPort = defaultVncPort, tickets = createVncTickets()}: AppOptions): Hono<AuthEnv> => {
+export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cdpOrigin = CDP_ORIGIN, vncPort = defaultVncPort, tickets = createVncTickets(), vendorDir = VENDOR_DIR}: AppOptions): Hono<AuthEnv> => {
     const app = new Hono<AuthEnv>()
 
     const deps: ServerDeps = {config, exec, runtimeDir, cdpOrigin, vncPort, tickets, locks: createSwayLocks(), log: message => stderr.write(`${message}\n`)}
@@ -53,7 +57,7 @@ export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cd
     app.get("/ok", c => c.body(null, 200))
 
     // The console's pages come before the check: a browser sends no token when it loads a page.
-    app.route("/", createStaticApp())
+    app.route("/", createStaticApp(vendorDir))
 
     // Every route below needs a token, one that does not exist included.
     app.use(jwtCheck(auth))

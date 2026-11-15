@@ -45,9 +45,11 @@ export interface FakeServerOptions {
     vncPort?: (n: number) => number
     /** The tickets a test shares with the relay it stands up beside. */
     tickets?: VncTickets
+    /** A directory to serve under /vendor/. */
+    vendorDir?: string
 }
 
-export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}}), vncPort, tickets}: FakeServerOptions = {}): FakeServer => {
+export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}}), vncPort, tickets, vendorDir}: FakeServerOptions = {}): FakeServer => {
     const pair = generateKeyPair()
     const lines: string[] = []
 
@@ -61,6 +63,7 @@ export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps:
         cdpOrigin: "http://127.0.0.1:9",
         vncPort,
         tickets,
+        vendorDir,
     })
 
     return {

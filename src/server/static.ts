@@ -5,13 +5,10 @@ import {fileURLToPath} from "node:url"
 // Resolved by name, so the sources under test and the built copy serve the same files.
 const packageRoot = (): string => fileURLToPath(new URL("../", import.meta.resolve("wayuse-server")))
 
-// noVNC as npm installed it, beside this package: its own files, served as they are.
-const novncRoot = (): string => fileURLToPath(new URL("../", import.meta.resolve("@novnc/novnc")))
-
 /**
  * The console's pages and scripts. They carry no secret, and a browser cannot send a token to load a page.
  */
-export const createStaticApp = (): Hono => {
+export const createStaticApp = (vendorDir: string): Hono => {
     const app = new Hono()
     const root = packageRoot()
 
@@ -22,9 +19,8 @@ export const createStaticApp = (): Hono => {
     app.use("/console/js/*", serveStatic({root: `${root}dist/console`, rewriteRequestPath: path => path.replace(/^\/console\/js/, "")}))
     app.use("/console/*", serveStatic({root: `${root}htdocs`}))
 
-    // Only the two directories a browser loads, and nothing else of the package.
-    app.use("/vendor/novnc/core/*", serveStatic({root: novncRoot(), rewriteRequestPath: path => path.replace(/^\/vendor\/novnc/, "")}))
-    app.use("/vendor/novnc/vendor/*", serveStatic({root: novncRoot(), rewriteRequestPath: path => path.replace(/^\/vendor\/novnc/, "")}))
+    // What wayuse-build puts into the image from other packages for the pages: noVNC.
+    app.use("/vendor/*", serveStatic({root: vendorDir, rewriteRequestPath: path => path.replace(/^\/vendor/, "")}))
 
     return app
 }

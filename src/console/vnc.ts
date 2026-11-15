@@ -4,8 +4,8 @@ import {$, createConsoleClient} from "./console-client.ts"
 
 const client = createConsoleClient()
 
-// noVNC is served as its own package's files, unbundled, so it is loaded at run time and not built into this script.
-const NOVNC = new URL("../../vendor/novnc/core/rfb.js", import.meta.url).href
+// noVNC is no part of this package: wayuse-build bundles it into the image, and the page loads it from there.
+const NOVNC = new URL("../../vendor/novnc.js", import.meta.url).href
 
 // The slot is named after the "#": vnc/#slot=HEADLESS-1
 const SLOT = new URLSearchParams(location.hash.replace(/^#/, "")).get("slot") ?? ""

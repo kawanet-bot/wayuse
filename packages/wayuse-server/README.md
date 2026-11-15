@@ -71,8 +71,7 @@ The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
 A link of the form `/console/#jwt=<JWT>` signs in with the token after the `#`, which a browser sends to no server.
 The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
 
-The vnc page loads [noVNC](https://github.com/novnc/noVNC), which is under the MPL 2.0.
-It is a dependency of this package, served from its own files as npm installed them, and no part of it is in this package's own files.
+The vnc page loads [noVNC](https://github.com/novnc/noVNC) from `/vendor/novnc.js`. It is not in this package: wayuse-builder puts it into the image.
 
 ## VNC
 
@@ -82,8 +81,9 @@ The server relays the WebSocket to the wayvnc of the screen, which listens insid
 
 ## LICENSES
 
-The key tables in this package are made from X.Org's keysymdef.h and from keycodemapdb, the latter under its BSD license.
-Their notices are in [src/server/input/data/](../../src/server/input/data/).
+This package is under the MIT license, but for what it carries of others:
+
+- The key tables are made from X.Org's keysymdef.h and from keycodemapdb, the latter under its BSD license. Their notices are in [src/server/input/data/](../../src/server/input/data/).
 
 ## COMMAND
 
@@ -91,6 +91,7 @@ Their notices are in [src/server/input/data/](../../src/server/input/data/).
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: 3000)
   -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)
+  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)
   -v, --version        print this package's version
   -h, --help           print this usage
 ```

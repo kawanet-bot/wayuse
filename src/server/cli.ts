@@ -14,6 +14,7 @@ const USAGE = [
     "Usage: wayuse-server [options]",
     "  -p, --port <port>    the port to listen on (default: 3000)",
     "  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)",
+    "  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)",
     "  -v, --version        print this package's version",
     "  -h, --help           print this usage",
     "Environment:",
@@ -32,6 +33,7 @@ const readArgs = (args: string[]) => {
         options: {
             port: {type: "string", short: "p", default: "3000"},
             config: {type: "string", short: "c", default: "/etc/wayuse/wayuse.json"},
+            vendor: {type: "string", default: "/opt/wayuse/vendor"},
             version: {type: "boolean", short: "v"},
             help: {type: "boolean", short: "h"},
         },
@@ -70,7 +72,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
 
     const auth = {publicKey, audience: WAYUSE_JWT_AUDIENCE || DEFAULT_AUDIENCE}
     const tickets = createVncTickets()
-    const app = createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets})
+    const app = createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets, vendorDir: options.vendor})
 
     const server = serve({fetch: app.fetch, port: options.port}, ({port}) => {
         process.stderr.write(`wayuse-server ${VERSION} http://localhost:${port}/ok\n`)

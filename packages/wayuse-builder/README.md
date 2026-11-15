@@ -63,6 +63,8 @@ Usage: wayuse-build [options]
 ```
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
+`wayuse-build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `rootfs/opt/wayuse/vendor/novnc.js`, for the console's vnc page.
+noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
 The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
 
 ## CONTAINER
