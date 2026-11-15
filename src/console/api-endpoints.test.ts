@@ -77,7 +77,7 @@ describe(TITLE, () => {
             const {method, path, body} = requestOf(endpoint, VALUES)
             const res = await server.fetch(new URL(path, "http://wayuse.test/"), {method, headers: {authorization: `Bearer ${server.jwt}`, "content-type": "application/json"}, body: body && JSON.stringify(body)})
             assert.notEqual(res.status, 404, keyOf(endpoint))
-            assert.notEqual(res.status, 403, keyOf(endpoint))
+            assert.notEqual(res.status, 401, keyOf(endpoint))
         }
     })
 })

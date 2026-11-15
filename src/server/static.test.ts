@@ -40,7 +40,7 @@ describe(TITLE, () => {
 
     it("serves nothing else of a package, and nothing above a directory it serves", async () => {
         for (const path of ["/vendor/../package.json", "/console/../package.json", "/console/%2e%2e/package.json", "/console/js/../../package.json", "/vendor/%2e%2e/wayuse-server.js", "/wayuse-server.js"]) {
-            assert.equal((await get(path)).status, 403, path)
+            assert.equal((await get(path)).status, 401, path)
         }
         assert.equal((await get("/console/nosuch.html", {authorization: `Bearer ${server.jwt}`})).status, 404)
     })

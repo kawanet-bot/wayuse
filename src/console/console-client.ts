@@ -26,7 +26,7 @@ export const createConsoleClient = (): WayuseClient.Client => createClient({
     token: getToken,
     fetch: async (input, init) => {
         const res = await fetch(input, init)
-        if (res.status === 403) location.href = `${BASE}console/`
+        if (res.status === 401) location.href = `${BASE}console/`
         return res
     },
 })

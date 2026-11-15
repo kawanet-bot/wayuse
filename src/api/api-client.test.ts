@@ -48,8 +48,8 @@ describe(TITLE, () => {
 
     it("rejects with the server's own message when the token is refused", async () => {
         const anonymous = createClient({url: "http://wayuse.test/", fetch: server.fetch})
-        await assert.rejects(anonymous.getSlots(), refusal(403, /^invalid token$/))
-        await assert.rejects(anonymous.captureSlot("HEADLESS-1"), refusal(403, /^invalid token$/))
+        await assert.rejects(anonymous.getSlots(), refusal(401, /^invalid token$/))
+        await assert.rejects(anonymous.captureSlot("HEADLESS-1"), refusal(401, /^invalid token$/))
     })
 
     it("takes the token from a function, asked again for each request", async () => {

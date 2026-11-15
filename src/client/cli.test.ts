@@ -58,7 +58,7 @@ describe(TITLE, () => {
     })
 
     it("reports the server's refusal in one line, with exit code 1", async () => {
-        assert.deepEqual(await run(["slot", "list"], {}), {code: 1, out: [], stdout: "", stderr: "403 invalid token\n"})
+        assert.deepEqual(await run(["slot", "list"], {}), {code: 1, out: [], stdout: "", stderr: "401 invalid token\n"})
         assert.equal((await run(["slot", "show", "--slot", "HEADLESS-9"])).stderr, "404 Slot not found: HEADLESS-9\n")
     })
 

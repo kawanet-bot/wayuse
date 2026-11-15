@@ -14,7 +14,9 @@ export interface AuthOptions {
 /** The Hono environment of a route behind jwtCheck(). */
 export type AuthEnv = {Variables: {jwt: Claims}}
 
-const FORBIDDEN = 403
+// A 401 has to name the scheme the server wants.
+const UNAUTHORIZED = 401
+const CHALLENGE = {"WWW-Authenticate": "Bearer"}
 
 export const parsePublicKey = (base64: string): KeyObject => {
     const key = createPublicKey({key: Buffer.from(base64, "base64"), format: "der", type: "spki"})
@@ -55,7 +57,7 @@ export const verifyJwt = (jwt: string, {publicKey, audience}: AuthOptions, now: 
 export const jwtCheck = (options: AuthOptions): MiddlewareHandler<AuthEnv> => async (c, next) => {
     const jwt = c.req.header("authorization")?.match(/^Bearer\s+(\S+)$/)?.[1]
     const claims = jwt && verifyJwt(jwt, options)
-    if (!claims) return c.json({error: {message: "invalid token"}}, FORBIDDEN)
+    if (!claims) return c.json({error: {message: "invalid token"}}, UNAUTHORIZED, CHALLENGE)
     c.set("jwt", claims)
     await next()
 }

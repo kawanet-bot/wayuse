@@ -29,5 +29,5 @@ check /ok 200
 check /console/ 200
 check /console/js/monitor.js 200
 check /vendor/novnc.js 200
-check /wayuse/config 403
-check /app/chrome/tab/ 403
+check /wayuse/config 401
+check /app/chrome/tab/ 401

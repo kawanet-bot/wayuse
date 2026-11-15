@@ -47,7 +47,8 @@ describe(TITLE, () => {
         const cases: Record<string, string>[] = [{}, {authorization: "Bearer x.y.z"}, {authorization: jwt}]
         for (const headers of cases) {
             const {res} = await run("/wayuse/config", headers)
-            assert.equal(res.status, 403)
+            assert.equal(res.status, 401)
+            assert.equal(res.headers.get("www-authenticate"), "Bearer")
             assert.deepEqual(await res.json(), {error: {message: "invalid token"}})
         }
     })
@@ -55,7 +56,7 @@ describe(TITLE, () => {
     // Which paths exist is not told to a caller without a token.
     it("refuses every path but /ok without a token, one that does not exist among them", async () => {
         for (const path of ["/slot/", "/slot/HEADLESS-1", "/slot/HEADLESS-1/capture.png", "/auth/me", "/missing"]) {
-            assert.equal((await run(path)).res.status, 403, path)
+            assert.equal((await run(path)).res.status, 401, path)
         }
         const missing = (await run("/missing", bearer)).res
         assert.equal(missing.status, 404)
@@ -63,14 +64,14 @@ describe(TITLE, () => {
     })
 
     it("refuses every token while it has no public key", async () => {
-        assert.equal((await run("/wayuse/config", bearer, keyless)).res.status, 403)
+        assert.equal((await run("/wayuse/config", bearer, keyless)).res.status, 401)
         assert.equal((await run("/ok", {}, keyless)).res.status, 200)
     })
 
     it("logs one line per response, in morgan's tiny format", async () => {
         assert.match((await run("/ok")).lines.join(""), /^GET \/ok 200 0 - \d+\.\d+ ms\n$/)
         assert.match((await run("/wayuse/config?q=1", bearer)).lines.join(""), /^GET \/wayuse\/config\?q=1 200 (\d+|-) - \d+\.\d+ ms\n$/)
-        assert.match((await run("/wayuse/config")).lines.join(""), /^GET \/wayuse\/config 403 (\d+|-) - \d+\.\d+ ms\n$/)
+        assert.match((await run("/wayuse/config")).lines.join(""), /^GET \/wayuse\/config 401 (\d+|-) - \d+\.\d+ ms\n$/)
         assert.match((await run("/missing", bearer)).lines.join(""), /^GET \/missing 404 (\d+|-) - \d+\.\d+ ms\n$/)
     })
 

@@ -66,7 +66,7 @@ The server takes its routes from `/`. A reverse proxy may put a path ahead of th
 
 ## TOKENS
 
-Every API needs `Authorization: Bearer <JWT>`, and answers 403 without a valid one. Only `/ok` and the pages under `/console/` are open.
+Every API needs `Authorization: Bearer <JWT>`, and answers 401 without a valid one. Only `/ok` and the pages under `/console/` are open.
 
 The server verifies a token with a public key, which it reads from the environment of the container.
 The key is given when the container starts, not when the image is built, so one image serves any number of key pairs:
