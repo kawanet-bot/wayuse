@@ -23,9 +23,9 @@ const print = (io: CLIIO, value: unknown): void => {
     io.stdout.write(`${JSON.stringify(value, null, 2)}\n`)
 }
 
-// An image is written as bytes, to the file or else to the standard output for a pipe.
-const save = (io: CLIIO, file: string | undefined, image: Uint8Array): Promise<void> | void =>
-    (file ? writeFile(file, image) : void io.stdout.write(image))
+// A capture is written as it is, to the file or else to the standard output for a pipe.
+const save = (io: CLIIO, file: string | undefined, data: string | Uint8Array): Promise<void> | void =>
+    (file ? writeFile(file, data) : void io.stdout.write(data))
 
 // As the server does for a window it opens: without a name, the first screen.
 const slotIdOf = async (client: Client, id: string | undefined): Promise<string> => {
@@ -78,6 +78,8 @@ const runChrome = async (client: Client, command: string | undefined, args: stri
         if (videoGeometry) io.stderr.write(`video: ${videoGeometry}\n`)
         return save(io, values.output, jpeg)
     }
+
+    if (command === "html") return save(io, values.output, await client.captureChromeHtml(await tabIdOf(client, values.tab)))
 
     if (command === "click") {
         const [x, y] = args.map(Number)

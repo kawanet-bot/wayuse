@@ -62,6 +62,7 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
             const videoGeometry = res.headers.get("page-video-geometry") ?? undefined
             return {jpeg: new Uint8Array(await res.arrayBuffer()), videoGeometry}
         },
+        captureChromeHtml: async id => (await request(`${tabPath(id)}/capture.html`)).text(),
         clickChromeTab: (id, request) => json(`${tabPath(id)}/click`, "POST", request),
         evaluateChromeTab: async (id, expression) => (await json<WayuseClient.ChromeEvaluateResponse>(`${tabPath(id)}/evaluate`, "POST", {expression})).result,
     }

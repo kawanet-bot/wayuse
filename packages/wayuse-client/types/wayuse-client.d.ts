@@ -177,6 +177,8 @@ export declare namespace WayuseClient {
         /** Resolves to the tab as it was before it closed. */
         closeChromeTab(id: string): Promise<ChromeTab>
         captureChromeTab(id: string): Promise<ChromeCapture>
+        /** The tab's DOM as it is now, as HTML without scripts, styles and what else a reader has no use for. */
+        captureChromeHtml(id: string): Promise<string>
         clickChromeTab(id: string, request: ChromeClickRequest): Promise<ChromeTab>
         /** Rejects with an ApiError of status 400 when the expression throws. */
         evaluateChromeTab(id: string, expression: string): Promise<ChromeEvaluateResult>

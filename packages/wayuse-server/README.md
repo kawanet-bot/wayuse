@@ -28,6 +28,7 @@ An image with Chrome also has these. A tab's id is the targetId of the Chrome De
 | `GET /app/chrome/tab/:id` | One tab. |
 | `DELETE /app/chrome/tab/:id` | Closes the tab, and returns it as it was. |
 | `GET /app/chrome/tab/:id/capture.jpg` | A JPEG of what the tab shows. `Page-Video-Geometry` tells where the page's main video is, as `880x495+16-427`. |
+| `GET /app/chrome/tab/:id/capture.html` | The tab's DOM as it is now, as HTML lightened by [html-slim](https://github.com/kawanet/html-slim): no scripts, styles or comments. Structured data (`application/ld+json`) stays. |
 | `POST /app/chrome/tab/:id/click` | Clicks a pixel of the capture: `{"x": 100, "y": 200, "button": "ctrl+button1"}`. |
 | `POST /app/chrome/tab/:id/evaluate` | Evaluates `{"expression": "document.title"}` in the page, and returns `{"result": {"type": "string", "value": "..."}}`. An exception is a 400. |
 

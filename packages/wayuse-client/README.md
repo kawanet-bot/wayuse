@@ -47,6 +47,8 @@ Usage: wayuse <command> [options]
   chrome close [--tab <id>]       close one tab
   chrome capture [--tab <id>] [-o <file>]
                                   write a JPEG of what one tab shows
+  chrome html [--tab <id>] [-o <file>]
+                                  write the tab's DOM as lightened HTML
   chrome click <x> <y> [--tab <id>] [--button <button>]
                                   click a pixel of the tab's capture
   chrome eval <expression> [--tab <id>]

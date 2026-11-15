@@ -134,6 +134,7 @@ describe(TITLE, () => {
     it("refuses a wrong request to Chrome before it reaches for Chrome", async () => {
         await assert.rejects(client.getChromeTab("nosuch"), refusal(400, /^Invalid tab: nosuch$/))
         await assert.rejects(client.captureChromeTab("nosuch"), refusal(400, /^Invalid tab/))
+        await assert.rejects(client.captureChromeHtml("nosuch"), refusal(400, /^Invalid tab/))
         await assert.rejects(client.evaluateChromeTab("0".repeat(32), " "), refusal(400, /^Invalid expression/))
         await assert.rejects(client.clickChromeTab("0".repeat(32), {x: -1, y: 0}), refusal(400, /^Invalid x/))
         await assert.rejects(client.openChromeTab({url: "file:///etc/passwd"}), refusal(400, /^Invalid url/))

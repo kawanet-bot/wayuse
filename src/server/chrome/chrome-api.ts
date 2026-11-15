@@ -6,7 +6,7 @@ import {getSwayOutputs, getSwayWindows} from "../sway/swaymsg.ts"
 import {waitFor} from "../utils/wait-for.ts"
 import {createBrowserContexts} from "./browser-context.ts"
 import {withCDP} from "./cdp.ts"
-import {captureChromeTab} from "./chrome-capture.ts"
+import {captureChromeHtml, captureChromeTab} from "./chrome-capture.ts"
 import {evaluateChromeTab} from "./chrome-evaluate.ts"
 import {clickChromeTab} from "./chrome-input.ts"
 import {type OpenMode, openChromeTab} from "./chrome-open.ts"
@@ -77,6 +77,12 @@ export const createChromeApp = (deps: ServerDeps): Hono => {
         const headers: Record<string, string> = {"content-type": "image/jpeg", "cache-control": "no-store"}
         if (videoGeometry) headers["page-video-geometry"] = videoGeometry
         return c.body(new Uint8Array(jpeg), 200, headers)
+    })
+
+    app.get("/app/chrome/tab/:id/capture.html", async c => {
+        const html = await captureChromeHtml(cdpOrigin, checkTabId(c.req.param("id")))
+        // Another site's HTML served from this origin: sandboxed, it runs no script and reads no storage when opened in a browser.
+        return c.body(html, 200, {"content-type": "text/html; charset=utf-8", "cache-control": "no-store", "content-security-policy": "sandbox"})
     })
 
     // click and evaluate touch nothing of sway, so they wait in no queue: the order on one tab is the caller's to keep.
