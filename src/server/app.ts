@@ -68,7 +68,7 @@ export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cd
     app.get("/wayuse/config", c => c.json(config))
 
     // Read anew each time, and a figure from a cache would pass for the present one.
-    app.get("/status/", async c => c.json(await getStatus(), 200, {"cache-control": "no-store"}))
+    app.get("/wayuse/status", async c => c.json(await getStatus(), 200, {"cache-control": "no-store"}))
 
     app.route("/", createSlotApp(deps))
     app.route("/", createClipboardApp(deps))

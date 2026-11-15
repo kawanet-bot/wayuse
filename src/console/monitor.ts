@@ -112,7 +112,7 @@ const createTile = (slot: WayuseClient.Slot): Tile => {
 
     el.querySelector(".monitor-name")!.textContent = slot.id
     // The target names the server and the slot, so opening the same screen twice returns to its tab.
-    Object.assign(el.querySelector("a")!, {href: `${BASE}console/vnc/#slot=${encodeURIComponent(slot.id)}`, target: `vnc:${BASE}${slot.id}`})
+    Object.assign(el.querySelector("a")!, {href: `${BASE}console/vnc/#!?slot=${encodeURIComponent(slot.id)}`, target: `vnc:${BASE}${slot.id}`})
     tile.image.addEventListener("click", event => void clickImage(tile, event))
 
     // The tile takes the screen's place before its first picture arrives.

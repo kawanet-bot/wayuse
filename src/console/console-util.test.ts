@@ -12,15 +12,18 @@ describe(TITLE, () => {
         assert.equal(basePathOf("/screen/self/console/api/"), "/screen/self/")
     })
 
-    it("reads the parameters after the #, in either of the two ways they are written", () => {
-        assert.equal(hashParams("#slot=HEADLESS-2").get("slot"), "HEADLESS-2")
+    it("reads the parameters of a hash that starts with #!?, and none of any other", () => {
         assert.equal(hashParams("#!?slot=HEADLESS-2").get("slot"), "HEADLESS-2")
-        assert.equal(hashParams("").get("slot"), null)
+        assert.equal(hashParams("#!?slot=HEADLESS-2&x=1").get("x"), "1")
+        for (const hash of ["#slot=HEADLESS-2", "#?slot=HEADLESS-2", "#!slot=HEADLESS-2", "#section", ""]) {
+            assert.equal([...hashParams(hash)].length, 0, hash)
+        }
     })
 
     it("reads a token from a login link's fragment", () => {
-        assert.equal(tokenOfHash("#jwt=a.b.c"), "a.b.c")
-        assert.equal(tokenOfHash("#slot=HEADLESS-1"), undefined)
+        assert.equal(tokenOfHash("#!?jwt=a.b.c"), "a.b.c")
+        assert.equal(tokenOfHash("#jwt=a.b.c"), undefined)
+        assert.equal(tokenOfHash("#!?slot=HEADLESS-1"), undefined)
         assert.equal(tokenOfHash(""), undefined)
     })
 

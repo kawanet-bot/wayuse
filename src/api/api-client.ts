@@ -69,7 +69,7 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
 
         getClipboard: async () => (await json<WayuseClient.Clipboard>("clipboard")).text,
         setClipboard: async text => (await json<WayuseClient.Clipboard>("clipboard", "PUT", {text})).text,
-        getStatus: () => json("status/"),
+        getStatus: () => json("wayuse/status"),
 
         getChromeTabs: async () => (await json<WayuseClient.ChromeTabList>("app/chrome/tab/")).data,
         getChromeTab: id => json(tabPath(id)),

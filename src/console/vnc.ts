@@ -8,7 +8,7 @@ const client = createConsoleClient()
 // noVNC is no part of this package: wayuse-build bundles it into the image, and the page loads it from there.
 const NOVNC = new URL("../../vendor/novnc.js", import.meta.url).href
 
-// The slot is named after the "#": vnc/#slot=HEADLESS-1
+// The slot is named in the hash: vnc/#!?slot=HEADLESS-1
 const SLOT = hashParams(location.hash).get("slot") ?? ""
 
 // The state shows as an emoji in the title, where a browser's tab keeps it in view.
@@ -46,7 +46,7 @@ const openIfEmpty = async (): Promise<void> => {
 }
 
 const connect = async (): Promise<void> => {
-    if (!SLOT) return setState("disconnected", "Name the slot as vnc/#slot=HEADLESS-1")
+    if (!SLOT) return setState("disconnected", "Name the slot as vnc/#!?slot=HEADLESS-1")
     setState("connecting")
 
     const {default: RFB} = await import(NOVNC)

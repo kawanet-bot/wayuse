@@ -80,7 +80,7 @@ The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
 | `-e WAYUSE_JWT_PUBLIC_KEY=<key>` | The key wayuse-server verifies tokens with. Without it, every API that needs a token is refused. |
 | `-e WAYUSE_JWT_AUDIENCE=<string>` | The `aud` a token must carry. Default: `wayuse`. |
 | `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |
-| `--uts=host` | Optional. `GET /status/` then reports the host's name in place of the container's id. |
+| `--uts=host` | Optional. `GET /wayuse/status` then reports the host's name in place of the container's id. |
 
 The container runs as the user `wayuse` (uid 1000).
 It keeps a session D-Bus, sway, wayvnc, Chrome and wayuse-server running: one that exits is started again.

@@ -13,6 +13,7 @@ The image [wayuse-builder](../wayuse-builder/README.md) builds installs and star
 | `GET /ok` | An empty 200, for a health check. No token needed. |
 | `GET /auth/me` | The claims of the token, as `{"me": {...}}`. |
 | `GET /wayuse/config` | The resolved configuration the image was built from, as JSON. |
+| `GET /wayuse/status` | The load and the memory of the host. |
 | `GET /slot/` | Every screen, as `{"data": [...]}`: its sway output, the windows on it, and the number of VNC clients. |
 | `GET /slot/HEADLESS-1` | One screen. |
 | `GET /slot/HEADLESS-1/capture.png` | A PNG of the whole screen. |
@@ -22,7 +23,6 @@ The image [wayuse-builder](../wayuse-builder/README.md) builds installs and star
 | `POST /slot/HEADLESS-1/vnc-ticket` | Issues a ticket to connect by VNC once: `{"path": "wayvnc/<UUID>", "expires_in": 30}`. |
 | `GET /clipboard` | The text on the clipboard, as `{"text": "..."}`. |
 | `PUT /clipboard` | Puts `{"text": "..."}` on the clipboard. |
-| `GET /status/` | The load and the memory of the host. |
 
 `button` and `keys` are in the notation of sway's bindsym. A key is the name of an X11 keysym, such as `Return` or `at`, or the character itself.
 The modifiers are `shift`, `ctrl`, `mod1` (Alt) and `mod4` (Meta). In `keys`, two to ten dots pause for 100ms each.
@@ -101,11 +101,11 @@ The server has pages for a person, at `/console/`:
 |---|---|
 | `/console/` | The entry. It goes on to the monitor with a token the server accepts, and asks for one otherwise. |
 | `/console/monitor/` | Every screen as a still picture, with the host's load. A click on a picture is sent as a click. |
-| `/console/vnc/#slot=HEADLESS-1` | One screen over VNC, seen and operated in the browser. `#!?slot=HEADLESS-1` is read the same. |
+| `/console/vnc/#!?slot=HEADLESS-1` | One screen over VNC, seen and operated in the browser. |
 | `/console/api/` | A form that tries each API, and shows its URL and the `wayuse` command that does the same. |
 
 The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
-A link of the form `/console/#jwt=<JWT>` signs in with the token after the `#`, which a browser sends to no server.
+A link of the form `/console/#!?jwt=<JWT>` signs in with the token in it. A browser sends what follows the `#` to no server.
 The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
 
 The vnc page loads [noVNC](https://github.com/novnc/noVNC) from `/vendor/novnc.js`. It is not in this package: wayuse-builder puts it into the image.
