@@ -1,0 +1,16 @@
+# npx wayuse-build && docker compose up --build -d
+
+name: wayuse-sample
+
+volumes:
+  config-volume: # Chrome's profile outlives the image
+
+services:
+  wayuse:
+    build:
+      context: "./.wayuse/"
+    shm_size: "256mb" # sway dies of a bus error on the 64MB Docker gives by default
+    environment:
+      WAYUSE_OUTPUTS: "2"
+    volumes:
+      - "config-volume:/home/wayuse/.config"
