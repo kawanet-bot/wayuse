@@ -3,7 +3,9 @@ import {readFileSync} from "node:fs"
 import {parseArgs} from "node:util"
 import type {WayuseClient} from "wayuse-client"
 import type * as declared from "wayuse-server"
+import {DEFAULT_AUDIENCE} from "../jwt/jwt-format.ts"
 import {createApp} from "./app.ts"
+import {parsePublicKey} from "./jwt-verify.ts"
 import {VERSION} from "./version.ts"
 
 const USAGE = [
@@ -12,6 +14,9 @@ const USAGE = [
     "  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)",
     "  -v, --version        print this package's version",
     "  -h, --help           print this usage",
+    "Environment:",
+    "  WAYUSE_JWT_PUBLIC_KEY  the key tokens are verified with: without it, every API that needs a token is refused",
+    "  WAYUSE_JWT_AUDIENCE    the aud a token must carry (default: wayuse)",
 ].map(line => `${line}\n`).join("")
 
 const EXIT_USAGE = 2
@@ -57,7 +62,12 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     }
 
     const config = JSON.parse(readFileSync(options.config, "utf8")) as WayuseClient.Config
-    const app = createApp({config, stderr: process.stderr})
+    const {WAYUSE_JWT_PUBLIC_KEY, WAYUSE_JWT_AUDIENCE} = process.env
+    const publicKey = WAYUSE_JWT_PUBLIC_KEY ? parsePublicKey(WAYUSE_JWT_PUBLIC_KEY) : undefined
+    if (!publicKey) process.stderr.write("WAYUSE_JWT_PUBLIC_KEY is not set: every API that needs a token is refused\n")
+
+    const auth = {publicKey, audience: WAYUSE_JWT_AUDIENCE || DEFAULT_AUDIENCE}
+    const app = createApp({config, stderr: process.stderr, auth})
 
     const server = serve({fetch: app.fetch, port: options.port}, ({port}) => {
         process.stderr.write(`wayuse-server ${VERSION} http://localhost:${port}/ok\n`)

@@ -1,4 +1,5 @@
 # make -C ../builder/pack && npx wayuse-build --server-tarball ../builder/pack/server.tgz && docker compose up --build -d
+# npx wayuse jwt keygen > .env  # once: compose reads .env, and only the public key below reaches the container
 
 name: wayuse-sample
 
@@ -14,5 +15,6 @@ services:
       - "127.0.0.1:3000:3000"
     environment:
       WAYUSE_OUTPUTS: "2"
+      WAYUSE_JWT_PUBLIC_KEY: "${WAYUSE_JWT_PUBLIC_KEY:-}"
     volumes:
       - "config-volume:/home/wayuse/.config"

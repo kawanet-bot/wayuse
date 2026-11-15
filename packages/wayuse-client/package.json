@@ -3,6 +3,9 @@
   "description": "The API client and CLI for a wayuse container.",
   "version": "0.0.0",
   "author": "Kawanet",
+  "bin": {
+    "wayuse": "bin/wayuse.js"
+  },
   "bugs": {
     "url": "https://github.com/kawanet/wayuse/issues"
   },
@@ -11,10 +14,14 @@
   },
   "exports": {
     ".": {
-      "types": "./types/wayuse-client.d.ts"
+      "types": "./types/wayuse-client.d.ts",
+      "module-sync": "./dist/wayuse-client.js",
+      "import": "./dist/wayuse-client.js"
     }
   },
   "files": [
+    "bin/wayuse.js",
+    "dist/wayuse-client.js",
     "LICENSE",
     "README.md",
     "types/*.d.ts"

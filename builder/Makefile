@@ -7,16 +7,20 @@ SHELL := bash
 
 BUILDER_SRC := $(shell find ../src/builder -name '*.ts' -not -name '*.test.ts')
 SERVER_SRC := $(shell find ../src/server -name '*.ts' -not -name '*.test.ts')
+CLIENT_SRC := $(shell find ../src/client -name '*.ts' -not -name '*.test.ts')
+SHARED_SRC := $(shell find ../src/jwt -name '*.ts' -not -name '*.test.ts')
 TYPES := $(wildcard ../packages/*/types/*.d.ts)
 ROLLUP_SRC := $(wildcard ./*.ts)
 
 BUILDER_DST := ../packages/wayuse-builder/dist/wayuse-builder.js
 SERVER_DST := ../packages/wayuse-server/dist/wayuse-server.js
+CLIENT_DST := ../packages/wayuse-client/dist/wayuse-client.js
 
 BUILDER_CONFIG := ./rollup-builder.config.ts
 SERVER_CONFIG := ./rollup-server.config.ts
+CLIENT_CONFIG := ./rollup-client.config.ts
 
-ALL := $(BUILDER_DST) $(SERVER_DST)
+ALL := $(BUILDER_DST) $(SERVER_DST) $(CLIENT_DST)
 
 ####
 
@@ -30,7 +34,14 @@ $(BUILDER_DST): $(BUILDER_CONFIG) $(BUILDER_SRC) $(ROLLUP_SRC) ../packages/wayus
 	@echo ""
 
 # Node strips no types under node_modules, so the image runs this file and never the sources.
-$(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(ROLLUP_SRC) ../packages/wayuse-server/package.json
+$(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/wayuse-server/package.json
+	@mkdir -p $(dir $@)
+	../node_modules/.bin/rollup -c $<
+	@ls -l $@
+	@echo ""
+
+# The signer's half of the JWT code: the verifier's half is in the server, and src/jwt/ is what both bundle.
+$(CLIENT_DST): $(CLIENT_CONFIG) $(CLIENT_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/wayuse-client/package.json
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@

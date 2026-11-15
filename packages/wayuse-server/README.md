@@ -10,8 +10,17 @@ The image [wayuse-builder](../wayuse-builder/README.md) builds installs and star
 
 | Request | Response |
 |---|---|
-| `GET /ok` | An empty 200, for a health check. |
+| `GET /ok` | An empty 200, for a health check. No token needed. |
+| `GET /auth/me` | The claims of the token, as `{"me": {...}}`. |
 | `GET /config` | The resolved configuration the image was built from, as JSON. |
+
+Every API but `/ok` needs `Authorization: Bearer <JWT>`, and answers 403 without a valid one.
+The server holds the public key alone. [wayuse-client](../wayuse-client/README.md) makes the key pair and signs the tokens.
+
+| Environment variable | Meaning |
+|---|---|
+| `WAYUSE_JWT_PUBLIC_KEY` | The key tokens are verified with. Without it, every API that needs a token is refused. |
+| `WAYUSE_JWT_AUDIENCE` | The `aud` a token must carry. Default: `wayuse`. |
 
 ## COMMAND
 

@@ -72,6 +72,8 @@ The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
 | `--shm-size 256m` | Required. sway dies of a bus error on the 64MB Docker gives by default. |
 | `-e WAYUSE_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: 1. |
 | `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: Chrome's own. |
+| `-e WAYUSE_JWT_PUBLIC_KEY=<key>` | The key wayuse-server verifies tokens with. Without it, every API that needs a token is refused. |
+| `-e WAYUSE_JWT_AUDIENCE=<string>` | The `aud` a token must carry. Default: `wayuse`. |
 | `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |
 
 The container runs as the user `wayuse` (uid 1000).
