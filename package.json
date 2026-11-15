@@ -6,6 +6,7 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-sucrase": "^5.1.0",
     "@types/node": "^24.19.2",
+    "@types/ws": "^8.18.2",
     "rollup": "^4.68.2",
     "ts-refine": "^0.6.3",
     "typescript": "^6.0.3"

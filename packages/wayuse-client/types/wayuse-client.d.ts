@@ -72,6 +72,14 @@ export declare namespace WayuseClient {
         button?: string
     }
 
+    /** A ticket to connect to a screen once, by VNC over a WebSocket. */
+    interface VncTicket {
+        /** Where the WebSocket connects, relative to the server's URL: "wayvnc/<UUID>". */
+        path: string
+        /** Seconds until an unused ticket expires. */
+        expires_in: number
+    }
+
     /** The text on the clipboard: "" when it is empty or holds no text. */
     interface Clipboard {
         text: string
@@ -202,6 +210,9 @@ export declare namespace WayuseClient {
         clickSlot(id: string, request: SlotClickRequest): Promise<Slot>
         /** Sends keys in the notation of sway's bindsym, separated by spaces: "ctrl+l .. ctrl+v .. Return". Two to ten dots pause for 100ms each. */
         keySlot(id: string, keys: string): Promise<Slot>
+
+        /** A ticket with the WebSocket's URL made from it. A browser cannot send a token with a WebSocket, and the ticket stands in. */
+        createVncTicket(id: string): Promise<VncTicket & {url: string}>
 
         getClipboard(): Promise<string>
         /** Resolves to the text as read back. Pasting it is keySlot() with "ctrl+v". */

@@ -11,6 +11,7 @@ import {type Writer, logger} from "./logger.ts"
 import {createSlotApp} from "./slot/slot-api.ts"
 import {getStatus} from "./status/status.ts"
 import {createSwayLocks} from "./sway/sway-lock.ts"
+import {type VncTickets, createVncTickets} from "./wayvnc/vnc-ticket.ts"
 
 // The port chrome-start.sh gives Chrome, reachable inside the container alone.
 const CDP_ORIGIN = "http://127.0.0.1:9222"
@@ -30,15 +31,20 @@ export interface AppOptions {
     cdpOrigin?: string
     /** Default: 5900 + n, where wayvnc-start.sh puts the wayvnc of HEADLESS-n. */
     vncPort?: (n: number) => number
+    /** The tickets the WebSocket relay takes. Default: ones no relay shares. */
+    tickets?: VncTickets
 }
+
+/** Where the wayvnc of HEADLESS-n listens, as wayvnc-start.sh starts it. */
+export const defaultVncPort = (n: number): number => 5900 + n
 
 /**
  * The application apart from the socket it listens on, so a test reaches it without one.
  */
-export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cdpOrigin = CDP_ORIGIN, vncPort = n => 5900 + n}: AppOptions): Hono<AuthEnv> => {
+export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cdpOrigin = CDP_ORIGIN, vncPort = defaultVncPort, tickets = createVncTickets()}: AppOptions): Hono<AuthEnv> => {
     const app = new Hono<AuthEnv>()
 
-    const deps: ServerDeps = {config, exec, runtimeDir, cdpOrigin, vncPort, locks: createSwayLocks(), log: message => stderr.write(`${message}\n`)}
+    const deps: ServerDeps = {config, exec, runtimeDir, cdpOrigin, vncPort, tickets, locks: createSwayLocks(), log: message => stderr.write(`${message}\n`)}
 
     app.use(logger({stderr}))
 

@@ -1,6 +1,7 @@
 import type {WayuseClient} from "wayuse-client"
 import type {Exec} from "./exec.ts"
 import type {SwayLocks} from "./sway/sway-lock.ts"
+import type {VncTickets} from "./wayvnc/vnc-ticket.ts"
 
 /** What the routes share: everything outside the process they reach, and the state of this one server. */
 export interface ServerDeps {
@@ -15,6 +16,8 @@ export interface ServerDeps {
     /** The port the wayvnc of HEADLESS-n listens on. */
     vncPort(n: number): number
     locks: SwayLocks
+    /** Shared with the WebSocket relay, which takes the tickets the routes issue. */
+    tickets: VncTickets
     /** One line to the server's log, for what changes a screen. */
     log(message: string): void
 }

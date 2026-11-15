@@ -66,6 +66,8 @@ const runSlot = async (client: Client, command: string | undefined, args: string
     if (command === "clear") return print(io, await client.clearSlot(await id()))
     if (command === "click") return print(io, await client.clickSlot(await id(), {...pointOf(args, "slot click takes <x> <y>"), button: values.button}))
 
+    if (command === "vnc") return print(io, await client.createVncTicket(await id()))
+
     if (command === "key") {
         const [keys] = args
         if (!keys) throw new UsageError("slot key takes the keys as one argument")

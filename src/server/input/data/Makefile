@@ -1,6 +1,6 @@
 # The tables behind the key API. They do not change, so the JSON files are kept in git and made here by hand.
 
-ALL := keysymdef.json keymaps.json
+ALL := keysymdef.json keymaps.json LICENSE.xorgproto LICENSE.keycodemapdb
 
 all: $(ALL)
 
@@ -11,6 +11,14 @@ keysymdef.json: keysymdef.h
 # Where each key is on a keyboard, as an XT scancode: column 13 is the keysym's name and column 5 the AT set 1 keycode.
 keymaps.json: keymaps.csv
 	node -e 'const fs = require("fs"); const out = {}; for (const line of fs.readFileSync(process.argv[1], "utf8").split("\n").slice(1)) { const f = line.split(","); const name = /^XK_(\w+)$$/.exec(f[12] || "")?.[1]; if (name && f[4] && !(name in out)) out[name] = f[4] } fs.writeFileSync(process.argv[2], JSON.stringify(out, null, 2) + "\n")' $< $@
+
+# The notices of keysymdef.h, which ask to be kept with every copy: the comment the file opens with.
+LICENSE.xorgproto: keysymdef.h
+	node -e 'const fs = require("fs"); const text = fs.readFileSync(process.argv[1], "utf8"); fs.writeFileSync(process.argv[2], text.slice(0, text.indexOf("*/") + 2) + "\n")' $< $@
+
+# keycodemapdb offers the GPL or this license, and the tables here are taken under this one.
+LICENSE.keycodemapdb:
+	curl -sSfo $@ "https://gitlab.com/keycodemap/keycodemapdb/-/raw/54788039c0b3486a8883090d6736c2500177af29/LICENSE.BSD"
 
 # The version Ubuntu 26.04 ships in x11proto-dev.
 keysymdef.h:

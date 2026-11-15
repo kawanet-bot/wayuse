@@ -2,8 +2,9 @@ import {Hono} from "hono"
 import type {WayuseClient} from "wayuse-client"
 import type {ServerDeps} from "../deps.ts"
 import {HttpError} from "../http-error.ts"
+import {VNC_TICKET_TTL} from "../wayvnc/vnc-ticket.ts"
 import {clickSlot, keySlot} from "./slot-input.ts"
-import {captureSlot, clearSlot, getSlot, getSlots} from "./slot.ts"
+import {captureSlot, clearSlot, getSlot, getSlots, slotNumberOf} from "./slot.ts"
 
 /**
  * The routes of /slot/: what sway, wayvnc and grim do for a screen, whatever application is on it.
@@ -45,6 +46,13 @@ export const createSlotApp = (deps: ServerDeps): Hono => {
 
         await deps.locks.withSlot(id, () => keySlot(deps, id, keys))
         return c.json(await getSlot(deps, id))
+    })
+
+    // The path is relative, so a prefix a reverse proxy puts ahead of the routes applies to it as to any other.
+    app.post("/slot/:id/vnc-ticket", async c => {
+        const {id} = await getSlot(deps, c.req.param("id"))
+        const ticket = deps.tickets.issue(slotNumberOf(id))
+        return c.json({path: `wayvnc/${ticket}`, expires_in: VNC_TICKET_TTL} satisfies WayuseClient.VncTicket)
     })
 
     return app

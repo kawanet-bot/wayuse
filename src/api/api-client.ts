@@ -54,6 +54,13 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
         clickSlot: (id, request) => json(`${slotPath(id)}/click`, "POST", request),
         keySlot: (id, keys) => json(`${slotPath(id)}/key`, "POST", {keys}),
 
+        createVncTicket: async id => {
+            const ticket = await json<WayuseClient.VncTicket>(`${slotPath(id)}/vnc-ticket`, "POST")
+            const url = new URL(ticket.path, base)
+            url.protocol = url.protocol === "https:" ? "wss:" : "ws:"
+            return {...ticket, url: url.href}
+        },
+
         getClipboard: async () => (await json<WayuseClient.Clipboard>("clipboard")).text,
         setClipboard: async text => (await json<WayuseClient.Clipboard>("clipboard", "PUT", {text})).text,
         getStatus: () => json("status/"),

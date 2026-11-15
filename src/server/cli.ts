@@ -4,9 +4,11 @@ import {parseArgs} from "node:util"
 import type {WayuseClient} from "wayuse-client"
 import type * as declared from "wayuse-server"
 import {DEFAULT_AUDIENCE} from "../jwt/jwt-format.ts"
-import {createApp} from "./app.ts"
+import {createApp, defaultVncPort} from "./app.ts"
 import {parsePublicKey} from "./jwt-verify.ts"
 import {VERSION} from "./version.ts"
+import {createVncTickets} from "./wayvnc/vnc-ticket.ts"
+import {createWayvncProxy} from "./wayvnc/wayvnc-proxy.ts"
 
 const USAGE = [
     "Usage: wayuse-server [options]",
@@ -67,11 +69,15 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     if (!publicKey) process.stderr.write("WAYUSE_JWT_PUBLIC_KEY is not set: every API that needs a token is refused\n")
 
     const auth = {publicKey, audience: WAYUSE_JWT_AUDIENCE || DEFAULT_AUDIENCE}
-    const app = createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? ""})
+    const tickets = createVncTickets()
+    const app = createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets})
 
     const server = serve({fetch: app.fetch, port: options.port}, ({port}) => {
         process.stderr.write(`wayuse-server ${VERSION} http://localhost:${port}/ok\n`)
     })
+
+    // A WebSocket never reaches the application: the relay answers the upgrade itself, by the ticket in its path.
+    server.on("upgrade", createWayvncProxy({tickets, vncPort: defaultVncPort, log: message => process.stderr.write(`${message}\n`)}))
 
     // The exit code comes only once the server is closed: until then the process is the server.
     return new Promise<number>((resolve, reject) => {

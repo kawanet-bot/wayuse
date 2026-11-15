@@ -18,6 +18,7 @@ const USAGE = [
     "  slot click <x> <y> [--slot <slot>] [--button <button>]",
     "                                  click a pixel of the screen's capture, whatever is there",
     "  slot key <keys> [--slot <slot>] send keys to the screen: \"ctrl+l .. ctrl+v .. Return\"",
+    "  slot vnc [--slot <slot>]        issue a one-time ticket, and print the WebSocket URL a VNC client connects to",
     "  clipboard get                   print the text on the clipboard",
     "  clipboard set <text>            put the text on the clipboard",
     "  status                          print the load and the memory of the host",

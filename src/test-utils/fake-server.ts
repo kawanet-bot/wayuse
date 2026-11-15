@@ -7,6 +7,7 @@ import {generateKeyPair, signJwt} from "../client/jwt-sign.ts"
 import {createApp} from "../server/app.ts"
 import type {Exec} from "../server/exec.ts"
 import {parsePublicKey} from "../server/jwt-verify.ts"
+import type {VncTickets} from "../server/wayvnc/vnc-ticket.ts"
 
 const fixture = (name: string): Buffer => readFileSync(new URL(`./fixtures/${name}`, import.meta.url))
 
@@ -42,9 +43,11 @@ export interface FakeServerOptions {
     config?: WayuseClient.Config
     /** The port of a fake wayvnc, for the routes that send input. */
     vncPort?: (n: number) => number
+    /** The tickets a test shares with the relay it stands up beside. */
+    tickets?: VncTickets
 }
 
-export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}}), vncPort}: FakeServerOptions = {}): FakeServer => {
+export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}}), vncPort, tickets}: FakeServerOptions = {}): FakeServer => {
     const pair = generateKeyPair()
     const lines: string[] = []
 
@@ -57,6 +60,7 @@ export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps:
         // Nothing listens there, so a route that reaches for Chrome answers that Chrome is not running.
         cdpOrigin: "http://127.0.0.1:9",
         vncPort,
+        tickets,
     })
 
     return {

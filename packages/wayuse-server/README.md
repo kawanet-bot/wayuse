@@ -19,6 +19,7 @@ The image [wayuse-builder](../wayuse-builder/README.md) builds installs and star
 | `DELETE /slot/HEADLESS-1` | Closes every window on the screen. |
 | `POST /slot/HEADLESS-1/click` | Clicks a pixel of the capture, whatever is there: `{"x": 100, "y": 200, "button": "ctrl+button1"}`. |
 | `POST /slot/HEADLESS-1/key` | Sends keys to the screen: `{"keys": "ctrl+l .. ctrl+v .. Return"}`. |
+| `POST /slot/HEADLESS-1/vnc-ticket` | Issues a ticket to connect by VNC once: `{"path": "wayvnc/<UUID>", "expires_in": 30}`. |
 | `GET /clipboard` | The text on the clipboard, as `{"text": "..."}`. |
 | `PUT /clipboard` | Puts `{"text": "..."}` on the clipboard. |
 | `GET /status/` | The load and the memory of the host. |
@@ -54,6 +55,17 @@ The server holds the public key alone. [wayuse-client](../wayuse-client/README.m
 |---|---|
 | `WAYUSE_JWT_PUBLIC_KEY` | The key tokens are verified with. Without it, every API that needs a token is refused. |
 | `WAYUSE_JWT_AUDIENCE` | The `aud` a token must carry. Default: `wayuse`. |
+
+## VNC
+
+A screen is reached by VNC over a WebSocket, as noVNC speaks it, at the path a ticket gives: `ws://<host>/wayvnc/<UUID>`.
+A browser cannot send a token with a WebSocket, so the path's ticket stands in for it. A ticket connects once, and expires in 30 seconds unused.
+The server relays the WebSocket to the wayvnc of the screen, which listens inside the container alone.
+
+## LICENSES
+
+The key tables in this package are made from X.Org's keysymdef.h and from keycodemapdb, the latter under its BSD license.
+Their notices are in [src/server/input/data/](../../src/server/input/data/).
 
 ## COMMAND
 
