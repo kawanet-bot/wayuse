@@ -16,6 +16,24 @@ The image [wayuse-builder](../wayuse-builder/README.md) builds installs and star
 | `GET /slot/` | Every screen, as `{"data": [...]}`: its sway output, the windows on it, and the number of VNC clients. |
 | `GET /slot/HEADLESS-1` | One screen. |
 | `GET /slot/HEADLESS-1/capture.png` | A PNG of the whole screen. |
+| `DELETE /slot/HEADLESS-1` | Closes every window on the screen. |
+
+An image with Chrome also has these. A tab's id is the targetId of the Chrome DevTools Protocol.
+
+| Request | Response |
+|---|---|
+| `GET /app/chrome/tab/` | Every tab, as `{"data": [...]}`. |
+| `PUT /app/chrome/tab/` | Closes every window on the slot, sets the screen to the size, and opens the URL in a window that fills it. Returns the new tab. |
+| `POST /app/chrome/tab/` | Opens the URL in one more window of the size, over what is on the slot. Returns the new tab. |
+| `GET /app/chrome/tab/:id` | One tab. |
+| `DELETE /app/chrome/tab/:id` | Closes the tab, and returns it as it was. |
+| `GET /app/chrome/tab/:id/capture.jpg` | A JPEG of what the tab shows. `Page-Video-Geometry` tells where the page's main video is, as `880x495+16-427`. |
+| `POST /app/chrome/tab/:id/click` | Clicks a pixel of the capture: `{"x": 100, "y": 200, "button": "ctrl+button1"}`. |
+| `POST /app/chrome/tab/:id/evaluate` | Evaluates `{"expression": "document.title"}` in the page, and returns `{"result": {"type": "string", "value": "..."}}`. An exception is a 400. |
+
+The body of PUT and POST is `{"url": "https://...", "slot": "HEADLESS-1", "width": 1920, "height": 1080, "context": "temporary"}`.
+Only `url` is required. `slot` is the first screen when left out, and the size is that of the image's configuration.
+`"context": "temporary"` opens the window in a context of its own, which shares no login and no cookie with any other.
 
 Every API but `/ok` needs `Authorization: Bearer <JWT>`, and answers 403 without a valid one.
 An error is answered as `{"error": {"message": "..."}}` with its status.

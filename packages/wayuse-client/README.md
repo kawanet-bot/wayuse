@@ -10,9 +10,11 @@ The API client and CLI for a wayuse container.
 export WAYUSE_URL=http://127.0.0.1:3000/    # where wayuse-server is reached
 export WAYUSE_JWT=...                       # see TOKENS below
 
-npx wayuse slot list                        # every screen, as JSON
+npx wayuse chrome open https://example.com/ # open the URL in Chrome, filling the screen
 npx wayuse slot capture -o screen.png       # a PNG of the screen
-npx wayuse slot capture HEADLESS-2 -o 2.png # of one screen, when the container has more
+npx wayuse chrome eval 'document.title'     # run JavaScript in the page
+npx wayuse chrome capture -o page.jpg       # a JPEG of the page alone
+npx wayuse slot list                        # every screen, as JSON
 ```
 
 The same from a program. It uses web standards alone, so it runs in Node.js and in a browser:
@@ -21,8 +23,9 @@ The same from a program. It uses web standards alone, so it runs in Node.js and 
 import {createClient} from "wayuse-client"
 
 const client = createClient({url: "http://127.0.0.1:3000/", token: process.env.WAYUSE_JWT})
-const slots = await client.getSlots()
-const png = await client.captureSlot(slots[0].id)
+const tab = await client.openChromeTab({url: "https://example.com/"})
+const {value} = await client.evaluateChromeTab(tab.id, "document.title")
+const png = await client.captureSlot(tab.sway.output)
 ```
 
 ## COMMAND
@@ -35,6 +38,19 @@ Usage: wayuse <command> [options]
   slot show [<slot>]              print one screen
   slot capture [<slot>] [-o <file>]
                                   write a PNG of one screen (default: to the standard output)
+  slot clear [<slot>]             close every window on one screen
+  chrome list                     print every tab of Chrome
+  chrome open <url> [--slot <slot>] [--size <width>x<height>] [--context temporary] [--add]
+                                  open the URL in a new window that replaces what is on the slot,
+                                  or with --add in one more window over it
+  chrome show [--tab <id>]        print one tab
+  chrome close [--tab <id>]       close one tab
+  chrome capture [--tab <id>] [-o <file>]
+                                  write a JPEG of what one tab shows
+  chrome click <x> <y> [--tab <id>] [--button <button>]
+                                  click a pixel of the tab's capture
+  chrome eval <expression> [--tab <id>]
+                                  evaluate JavaScript in the tab's page, and print the result
   jwt keygen                      print a new key pair, as lines for an .env file
   jwt public-key                  print the public key of WAYUSE_JWT_PRIVATE_KEY
   jwt sign --sub <subject> [--claim <name>[=<value>]]...
@@ -43,7 +59,7 @@ Usage: wayuse <command> [options]
   -h, --help                      print this usage
 ```
 
-`<slot>` may be left out while the container has one screen.
+`<slot>` is the first screen when left out. `--tab` may be left out while Chrome has one tab.
 
 ## TOKENS
 

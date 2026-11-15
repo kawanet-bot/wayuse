@@ -36,9 +36,13 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
         return res
     }
 
-    const json = async <T>(path: string): Promise<T> => (await request(path)).json() as Promise<T>
+    const json = async <T>(path: string, method = "GET", body?: unknown): Promise<T> => {
+        const init = body === undefined ? {method} : {method, body: JSON.stringify(body), headers: {"content-type": "application/json"}}
+        return (await request(path, init)).json() as Promise<T>
+    }
 
     const slotPath = (id: string): string => `slot/${encodeURIComponent(id)}`
+    const tabPath = (id: string): string => `app/chrome/tab/${encodeURIComponent(id)}`
 
     return {
         getMe: async () => (await json<{me: WayuseClient.JwtClaims}>("auth/me")).me,
@@ -46,5 +50,19 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
         getSlots: async () => (await json<WayuseClient.SlotList>("slot/")).data,
         getSlot: id => json(slotPath(id)),
         captureSlot: async id => new Uint8Array(await (await request(`${slotPath(id)}/capture.png`)).arrayBuffer()),
+        clearSlot: id => json(slotPath(id), "DELETE"),
+
+        getChromeTabs: async () => (await json<WayuseClient.ChromeTabList>("app/chrome/tab/")).data,
+        getChromeTab: id => json(tabPath(id)),
+        openChromeTab: request => json("app/chrome/tab/", "PUT", request),
+        addChromeTab: request => json("app/chrome/tab/", "POST", request),
+        closeChromeTab: id => json(tabPath(id), "DELETE"),
+        captureChromeTab: async id => {
+            const res = await request(`${tabPath(id)}/capture.jpg`)
+            const videoGeometry = res.headers.get("page-video-geometry") ?? undefined
+            return {jpeg: new Uint8Array(await res.arrayBuffer()), videoGeometry}
+        },
+        clickChromeTab: (id, request) => json(`${tabPath(id)}/click`, "POST", request),
+        evaluateChromeTab: async (id, expression) => (await json<WayuseClient.ChromeEvaluateResponse>(`${tabPath(id)}/evaluate`, "POST", {expression})).result,
     }
 }

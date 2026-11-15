@@ -34,8 +34,12 @@ export interface FakeServer {
     fetch: NonNullable<WayuseClient.ClientOptions["fetch"]>
 }
 
-export const createFakeServer = (exec: Exec = fakeExec): FakeServer => {
-    const config = resolveConfig({apps: {chrome: {}}})
+export interface FakeServerOptions {
+    exec?: Exec
+    config?: WayuseClient.Config
+}
+
+export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}})}: FakeServerOptions = {}): FakeServer => {
     const pair = generateKeyPair()
     const lines: string[] = []
 
@@ -45,6 +49,8 @@ export const createFakeServer = (exec: Exec = fakeExec): FakeServer => {
         auth: {publicKey: parsePublicKey(pair.publicKey), audience: "wayuse"},
         runtimeDir: "/run/test",
         exec,
+        // Nothing listens there, so a route that reaches for Chrome answers that Chrome is not running.
+        cdpOrigin: "http://127.0.0.1:9",
     })
 
     return {

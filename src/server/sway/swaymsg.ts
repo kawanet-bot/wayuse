@@ -26,11 +26,29 @@ export const swaymsg = async <T>(exec: Exec, args: string[]): Promise<T> => {
     try {
         stdout = await exec("swaymsg", ["-r", ...args])
     } catch (error) {
+        const {message} = error as Error
+        // swaymsg also fails when sway refuses a command, and then its output is the results as JSON.
+        if (message.startsWith("[")) throw new Error(`sway: ${message}`)
         // sway is started again by the supervisor, so the client may try again.
-        throw new HttpError(503, `sway: ${(error as Error).message}`)
+        throw new HttpError(503, `sway: ${message}`)
     }
     return JSON.parse(stdout.toString())
 }
+
+/**
+ * Runs sway commands, and fails when any one of them did.
+ */
+export const swayCommand = async (exec: Exec, command: string): Promise<void> => {
+    const results = await swaymsg<{success: boolean, error?: string}[]>(exec, [command])
+    const failed = results.find(result => !result.success)
+    if (failed) throw new Error(`sway: ${failed.error}: ${command}`)
+}
+
+export const getSwayWindows = async (exec: Exec): Promise<Map<string, Window[]>> =>
+    windowsOf(await swaymsg<SwayNode>(exec, ["-t", "get_tree"]))
+
+export const getSwayOutputs = async (exec: Exec): Promise<Output[]> =>
+    outputsOf(await swaymsg<SwayNode[]>(exec, ["-t", "get_outputs"]))
 
 /**
  * The windows of each output, by the output's name.

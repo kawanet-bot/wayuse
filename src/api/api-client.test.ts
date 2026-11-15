@@ -1,5 +1,6 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
+import {resolveConfig} from "../builder/config.ts"
 import {PNG_SIGNATURE, createFakeServer, fakeExec} from "../test-utils/fake-server.ts"
 import {ApiError, createClient} from "./api-client.ts"
 
@@ -75,20 +76,72 @@ describe(TITLE, () => {
     })
 
     it("answers 503 while sway cannot be reached", async () => {
-        const broken = createFakeServer(async () => {
-            throw new Error("Unable to connect")
+        const broken = createFakeServer({
+            exec: async () => {
+                throw new Error("Unable to connect")
+            },
         })
         const of = createClient({url: "http://wayuse.test/", token: broken.jwt, fetch: broken.fetch})
         await assert.rejects(of.getSlots(), refusal(503, /sway: Unable to connect/))
     })
 
     it("answers an error it did not expect with a 500, and logs the stack", async () => {
-        const broken = createFakeServer(async (file, args) => {
-            if (file === "wayvncctl") throw new Error("boom")
-            return fakeExec(file, args)
+        const broken = createFakeServer({
+            exec: async (file, args) => {
+                if (file === "wayvncctl") throw new Error("boom")
+                return fakeExec(file, args)
+            },
         })
         const of = createClient({url: "http://wayuse.test/", token: broken.jwt, fetch: broken.fetch})
         await assert.rejects(of.getSlots(), refusal(500, /boom/))
         assert.match(broken.lines.join(""), /^Error: boom\n {4}at /m)
+    })
+
+    it("clearSlot() asks sway to close each window of the slot, and returns the slot once it is empty", async () => {
+        const commands: string[] = []
+        let killed = false
+        const sway = createFakeServer({
+            exec: async (file, args) => {
+                if (args[1]?.startsWith("[con_id=")) {
+                    commands.push(args[1])
+                    killed = true
+                    return Buffer.from(`[{"success": true}]`)
+                }
+                const stdout = await fakeExec(file, args)
+                // Once killed, the same tree without its one window.
+                return killed && args.includes("get_tree") ? Buffer.from(stdout.toString().replace(/"pid": \d+/, `"pid": null`)) : stdout
+            },
+        })
+        const of = createClient({url: "http://wayuse.test/", token: sway.jwt, fetch: sway.fetch})
+
+        const slot = await of.clearSlot("HEADLESS-2")
+        assert.equal(commands.length, 1)
+        assert.match(commands[0]!, /^\[con_id=\d+\] kill$/)
+        assert.deepEqual(slot.sway.windows, [])
+        assert.match(sway.lines.join(""), /^HEADLESS-2 kill \d+ google-chrome Example Domain - Google Chrome$/m)
+
+        await assert.rejects(of.clearSlot("HEADLESS-9"), refusal(404, /Slot not found/))
+    })
+
+    it("has no route under /app/chrome/ in an image without Chrome", async () => {
+        const bare = createFakeServer({config: resolveConfig({})})
+        const of = createClient({url: "http://wayuse.test/", token: bare.jwt, fetch: bare.fetch})
+        await assert.rejects(of.getChromeTabs(), refusal(404, /Not Found/))
+        await assert.rejects(of.openChromeTab({url: "about:blank"}), refusal(404, /Not Found/))
+        assert.equal((await of.getSlots()).length, 2)
+    })
+
+    it("refuses a wrong request to Chrome before it reaches for Chrome", async () => {
+        await assert.rejects(client.getChromeTab("nosuch"), refusal(400, /^Invalid tab: nosuch$/))
+        await assert.rejects(client.captureChromeTab("nosuch"), refusal(400, /^Invalid tab/))
+        await assert.rejects(client.evaluateChromeTab("0".repeat(32), " "), refusal(400, /^Invalid expression/))
+        await assert.rejects(client.clickChromeTab("0".repeat(32), {x: -1, y: 0}), refusal(400, /^Invalid x/))
+        await assert.rejects(client.openChromeTab({url: "file:///etc/passwd"}), refusal(400, /^Invalid url/))
+        await assert.rejects(client.addChromeTab({url: "about:blank", width: 100, height: 100}), refusal(400, /^Invalid width/))
+    })
+
+    it("answers 503 while Chrome cannot be reached", async () => {
+        await assert.rejects(client.getChromeTabs(), refusal(503, /^Chrome is not running/))
+        await assert.rejects(client.evaluateChromeTab("0".repeat(32), "1 + 1"), refusal(503, /^Chrome is not running/))
     })
 })

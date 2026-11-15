@@ -44,11 +44,17 @@ describe(TITLE, () => {
         }
     })
 
-    // The fake server has two screens, so the one to act on cannot be guessed.
-    it("asks for the slot's name when the container has more than one screen", async () => {
-        const {code, stderr} = await run(["slot", "show"])
-        assert.equal(code, 2)
-        assert.match(stderr, /^a slot must be named: HEADLESS-1, HEADLESS-2\n/)
+    it("takes the first screen when no slot is named", async () => {
+        assert.equal(JSON.parse((await run(["slot", "show"])).stdout).id, "HEADLESS-1")
+        assert.deepEqual(Buffer.from((await run(["slot", "capture"])).out[0] as Uint8Array), PNG_SIGNATURE)
+    })
+
+    it("checks the arguments of a chrome command before it calls the server", async () => {
+        for (const args of [["chrome", "open"], ["chrome", "open", "about:blank", "--size", "1280"], ["chrome", "click", "10"], ["chrome", "click", "a", "b", "--tab", "x"], ["chrome", "eval", "--tab", "x"]]) {
+            const {code, stderr} = await run(args)
+            assert.equal(code, 2, args.join(" "))
+            assert.match(stderr, /^(chrome \w+|--size) takes /, args.join(" "))
+        }
     })
 
     it("reports the server's refusal in one line, with exit code 1", async () => {

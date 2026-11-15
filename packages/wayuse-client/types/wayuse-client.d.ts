@@ -63,6 +63,68 @@ export declare namespace WayuseClient {
         height: number
     }
 
+    /** A tab of Chrome. Its id is the targetId of the Chrome DevTools Protocol. */
+    interface ChromeTab {
+        id: string
+        target: {type: string, url: string, title: string, context: ChromeContext}
+        /** The size alone: on Wayland Chrome does not know where its window is. */
+        window: {windowId: number, bounds: {width: number, height: number, windowState: string}}
+        /** The renderer has crashed, and the tab shows Chrome's error page. */
+        crashed?: true
+        /** Missing for a crashed tab and for a page that does not answer. A tab behind another is "hidden". */
+        document?: {visibilityState: string}
+        /** The sway window, known only for a window the server opened. */
+        sway?: {id: number, output: string}
+    }
+
+    interface ChromeTabList {
+        data: ChromeTab[]
+    }
+
+    /** "temporary" is a context the server made for one window. "other" is any it did not make, such as an incognito window. */
+    type ChromeContext = "default" | "temporary" | "other"
+
+    /** The body of PUT and POST /app/chrome/tab/. */
+    interface ChromeOpenRequest {
+        /** http:, https: or about: */
+        url: string
+        /** Default: the first slot. */
+        slot?: string
+        /** 768 to 2560, given together with height. Default: the size in the image's configuration. */
+        width?: number
+        height?: number
+        /** "temporary" shares no login and no cookie with any other window. Default: "default". */
+        context?: "default" | "temporary"
+    }
+
+    /** The body of POST /app/chrome/tab/:id/click. */
+    interface ChromeClickRequest {
+        /** A pixel of the tab's capture.jpg. */
+        x: number
+        y: number
+        /** In the notation of sway's bindsym: "button1" to "button3", with "shift+", "ctrl+", "mod1+" or "mod4+". Default: "button1". */
+        button?: string
+    }
+
+    /** The result of the Protocol's Runtime.evaluate, by value: a DOM element or a function has none. */
+    interface ChromeEvaluateResult {
+        type: string
+        subtype?: string
+        value?: unknown
+        description?: string
+    }
+
+    interface ChromeEvaluateResponse {
+        result: ChromeEvaluateResult
+    }
+
+    /** A JPEG of what a tab shows. */
+    interface ChromeCapture {
+        jpeg: Uint8Array
+        /** Where the page's main video is in the image, as "880x495+16-427", when it has one. */
+        videoGeometry?: string
+    }
+
     /** The claims wayuse-server reads. Any other claim passes through to GET /auth/me. */
     interface JwtClaims {
         /** Must equal the server's WAYUSE_JWT_AUDIENCE. */
@@ -103,6 +165,21 @@ export declare namespace WayuseClient {
         getSlot(id: string): Promise<Slot>
         /** A PNG of the whole screen. */
         captureSlot(id: string): Promise<Uint8Array>
+        /** Closes every window on the screen. */
+        clearSlot(id: string): Promise<Slot>
+
+        getChromeTabs(): Promise<ChromeTab[]>
+        getChromeTab(id: string): Promise<ChromeTab>
+        /** Closes every window on the slot, sets the screen to the size, and opens the URL in a window that fills it. */
+        openChromeTab(request: ChromeOpenRequest): Promise<ChromeTab>
+        /** Opens the URL in one more window of the size, over what is on the slot. */
+        addChromeTab(request: ChromeOpenRequest): Promise<ChromeTab>
+        /** Resolves to the tab as it was before it closed. */
+        closeChromeTab(id: string): Promise<ChromeTab>
+        captureChromeTab(id: string): Promise<ChromeCapture>
+        clickChromeTab(id: string, request: ChromeClickRequest): Promise<ChromeTab>
+        /** Rejects with an ApiError of status 400 when the expression throws. */
+        evaluateChromeTab(id: string, expression: string): Promise<ChromeEvaluateResult>
     }
 
     interface CLIOptions {
