@@ -60,18 +60,18 @@ describe(TITLE, () => {
         assert.equal(asked, 2)
     })
 
-    // A reverse proxy may serve the routes under a prefix, as /screen/self/ does for one deployment.
+    // A reverse proxy may serve the routes under a prefix.
     it("keeps a path ahead of the routes, with or without its last slash", async () => {
-        for (const url of ["http://wayuse.test/screen/self/", "http://wayuse.test/screen/self"]) {
+        for (const url of ["http://wayuse.test/some/prefix/", "http://wayuse.test/some/prefix"]) {
             const paths: string[] = []
             const prefixed = createClient({
                 url, token: server.jwt, fetch: (input, init) => {
                     paths.push(input.pathname)
-                    return server.fetch(new URL(input.pathname.replace("/screen/self", ""), input), init)
+                    return server.fetch(new URL(input.pathname.replace("/some/prefix", ""), input), init)
                 },
             })
             await prefixed.getSlot("HEADLESS-1")
-            assert.deepEqual(paths, ["/screen/self/slot/HEADLESS-1"])
+            assert.deepEqual(paths, ["/some/prefix/slot/HEADLESS-1"])
         }
     })
 

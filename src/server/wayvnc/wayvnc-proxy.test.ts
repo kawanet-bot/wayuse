@@ -106,11 +106,11 @@ describe(TITLE, () => {
 
         // Behind a reverse proxy the prefix and the scheme follow the server's URL.
         const prefixed = createClient({
-            url: "https://wayuse.test/screen/self/", token: server.jwt,
-            fetch: (input, init) => server.fetch(new URL(input.pathname.replace("/screen/self", ""), input), init),
+            url: "https://wayuse.test/some/prefix/", token: server.jwt,
+            fetch: (input, init) => server.fetch(new URL(input.pathname.replace("/some/prefix", ""), input), init),
         })
         const secure = await prefixed.createVncTicket("HEADLESS-1")
-        assert.equal(secure.url, `wss://wayuse.test/screen/self/${secure.path}`)
+        assert.equal(secure.url, `wss://wayuse.test/some/prefix/${secure.path}`)
 
         const refused = createClient({url: "http://wayuse.test/", token: server.jwt, fetch: server.fetch}).createVncTicket("HEADLESS-9")
         await assert.rejects(refused, (error: unknown) => error instanceof ApiError && error.status === 404)

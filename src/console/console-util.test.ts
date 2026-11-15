@@ -9,7 +9,7 @@ describe(TITLE, () => {
         assert.equal(basePathOf("/console/"), "/")
         assert.equal(basePathOf("/console/monitor/"), "/")
         assert.equal(basePathOf("/console/vnc/index.html"), "/")
-        assert.equal(basePathOf("/screen/self/console/api/"), "/screen/self/")
+        assert.equal(basePathOf("/some/prefix/console/api/"), "/some/prefix/")
     })
 
     it("reads the parameters of a hash that starts with #!?, and none of any other", () => {
