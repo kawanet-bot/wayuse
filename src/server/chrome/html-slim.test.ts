@@ -56,14 +56,17 @@ describe(TITLE, () => {
     })
 
     it("takes out what a reader has no use for", () => {
-        assert.doesNotMatch(result, /<link rel="icon"/)
-        assert.doesNotMatch(result, /twitter:card/)
         assert.doesNotMatch(result, /<svg/)
         assert.doesNotMatch(result, /data:image/)
         assert.doesNotMatch(result, /<iframe/)
         assert.doesNotMatch(result, /<noscript/)
-        assert.doesNotMatch(result, /next-route-announcer/)
-        assert.doesNotMatch(result, /<!-- comment -->/)
+    })
+
+    it("keeps what a reader may still have a use for", () => {
+        assert.match(result, /<link rel="icon"/)
+        assert.match(result, /twitter:card/)
+        assert.match(result, /next-route-announcer/)
+        assert.match(result, /<!-- comment -->/)
     })
 
     it("drops generated class names and keeps the others, and folds runs of spaces", () => {
