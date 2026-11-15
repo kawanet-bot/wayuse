@@ -21,7 +21,7 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
         "Dockerfile": dockerfileOf(config, options),
         "rootfs/etc/wayuse/wayuse.json": JSON.stringify(config, null, 2) + "\n",
         "rootfs/etc/wayuse/sway/config": swayConfigOf(config),
-        "rootfs/opt/wayuse/package.json": npmPackageOf(options.serverTarball != null),
+        "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
     }
 
     const {chrome} = config.apps

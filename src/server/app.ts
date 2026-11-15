@@ -9,8 +9,8 @@ import {type AuthEnv, type AuthOptions, jwtCheck} from "./jwt-verify.ts"
 import {type Writer, logger} from "./logger.ts"
 import {createSlotApp} from "./slot/slot-api.ts"
 import {createStaticApp} from "./static.ts"
-import {getStatus} from "./status/status.ts"
 import {createSwayLocks} from "./sway/sway-lock.ts"
+import {createWayuseApp} from "./wayuse/wayuse-api.ts"
 import {type VncTickets, createVncTickets} from "./wayvnc/vnc-ticket.ts"
 
 // The port chrome-start.sh gives Chrome, reachable inside the container alone.
@@ -63,12 +63,7 @@ export const createApp = async ({config, stderr, auth, runtimeDir, exec = realEx
 
     app.get("/auth/me", c => c.json({me: c.get("jwt")}))
 
-    // Which applications are installed and the size a screen starts at: a client cannot learn these from the screens.
-    app.get("/wayuse/config", c => c.json(config))
-
-    // Read anew each time, and a figure from a cache would pass for the present one.
-    app.get("/wayuse/status", async c => c.json(await getStatus(), 200, {"cache-control": "no-store"}))
-
+    app.route("/", createWayuseApp(deps))
     app.route("/", createSlotApp(deps))
     app.route("/", createClipboardApp(deps))
 

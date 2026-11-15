@@ -1,10 +1,12 @@
 import assert from "node:assert/strict"
+import {readFileSync} from "node:fs"
 import {mkdtemp, readFile, rm, stat, writeFile} from "node:fs/promises"
 import {tmpdir} from "node:os"
 import {join} from "node:path"
 import {describe, it} from "node:test"
 import {resolveConfig} from "./config.ts"
 import {generatedFilesOf, writeBuildDir} from "./files.ts"
+import {APP_PACKAGES} from "./npm-package.ts"
 import {shellEnvOf} from "./shell-env.ts"
 
 const TITLE = "builder/files.test.ts"
@@ -31,10 +33,24 @@ describe(TITLE, () => {
         assert.deepEqual(JSON.parse(files["rootfs/etc/wayuse/wayuse.json"]!), config)
     })
 
-    it("leaves Chrome out of an image without it", () => {
+    it("leaves Chrome out of an image without it, and what only Chrome needs", () => {
         const files = generatedFilesOf(resolveConfig({}))
         assert.doesNotMatch(files["Dockerfile"]!, /chrome/)
         assert.equal(files["rootfs/etc/wayuse/chrome.env"], undefined)
+        assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "^0.0.0"})
+    })
+
+    it("installs what the server needs for Chrome beside the server", () => {
+        const files = generatedFilesOf(config, {serverTarball: "server.tgz"})
+        assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "file:wayuse-server.tgz", "html-slim": "^0.5.0"})
+    })
+
+    // The builder does not depend on the server, so nothing but this test holds the two lists together.
+    it("names for the applications exactly the server's optional peers, at the same ranges", () => {
+        const server = JSON.parse(readFileSync(new URL("../../packages/wayuse-server/package.json", import.meta.url), "utf8"))
+        assert.deepEqual(Object.assign({}, ...Object.values(APP_PACKAGES)), server.peerDependencies)
+        assert.deepEqual(Object.keys(server.peerDependenciesMeta), Object.keys(server.peerDependencies))
+        for (const meta of Object.values(server.peerDependenciesMeta)) assert.deepEqual(meta, {optional: true})
     })
 
     // A settings-only change must rebuild nothing above the COPY.
