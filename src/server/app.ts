@@ -65,7 +65,7 @@ export const createApp = ({config, stderr, auth, runtimeDir, exec = realExec, cd
     app.get("/auth/me", c => c.json({me: c.get("jwt")}))
 
     // Which applications are installed and the size a screen starts at: a client cannot learn these from the screens.
-    app.get("/config", c => c.json(config))
+    app.get("/wayuse/config", c => c.json(config))
 
     // Read anew each time, and a figure from a cache would pass for the present one.
     app.get("/status/", async c => c.json(await getStatus(), 200, {"cache-control": "no-store"}))

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {basePathOf, buttonOf, imagePixelOf, loadLineOf, tokenOfHash} from "./console-util.ts"
+import {basePathOf, buttonOf, hashParams, imagePixelOf, loadLineOf, tokenOfHash} from "./console-util.ts"
 
 const TITLE = "console/console-util.test.ts"
 
@@ -10,6 +10,12 @@ describe(TITLE, () => {
         assert.equal(basePathOf("/console/monitor/"), "/")
         assert.equal(basePathOf("/console/vnc/index.html"), "/")
         assert.equal(basePathOf("/screen/self/console/api/"), "/screen/self/")
+    })
+
+    it("reads the parameters after the #, in either of the two ways they are written", () => {
+        assert.equal(hashParams("#slot=HEADLESS-2").get("slot"), "HEADLESS-2")
+        assert.equal(hashParams("#!?slot=HEADLESS-2").get("slot"), "HEADLESS-2")
+        assert.equal(hashParams("").get("slot"), null)
     })
 
     it("reads a token from a login link's fragment", () => {

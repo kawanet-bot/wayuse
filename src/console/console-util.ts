@@ -5,8 +5,11 @@ import type {WayuseClient} from "wayuse-client"
 /** The server's root as the page sees it: everything ahead of "console/", a reverse proxy's prefix included. */
 export const basePathOf = (pathname: string): string => pathname.replace(/console\/.*$/, "")
 
-/** A login link carries the token after the "#", which a browser sends to no server. */
-export const tokenOfHash = (hash: string): string | undefined => new URLSearchParams(hash.replace(/^#/, "")).get("jwt") || undefined
+/** The parameters after the "#", which a browser sends to no server. Written as "#slot=..." or, as other consoles link here, "#!?slot=...". */
+export const hashParams = (hash: string): URLSearchParams => new URLSearchParams(hash.replace(/^#(!\?)?/, ""))
+
+/** The token of a login link. */
+export const tokenOfHash = (hash: string): string | undefined => hashParams(hash).get("jwt") || undefined
 
 interface ModifierKeys {
     shiftKey: boolean

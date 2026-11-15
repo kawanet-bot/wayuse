@@ -52,7 +52,7 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
         fetch: raw,
 
         getMe: async () => (await json<{me: WayuseClient.JwtClaims}>("auth/me")).me,
-        getConfig: () => json("config"),
+        getConfig: () => json("wayuse/config"),
         getSlots: async () => (await json<WayuseClient.SlotList>("slot/")).data,
         getSlot: id => json(slotPath(id)),
         captureSlot: async id => new Uint8Array(await (await request(`${slotPath(id)}/capture.png`)).arrayBuffer()),

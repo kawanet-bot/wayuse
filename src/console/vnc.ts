@@ -1,6 +1,7 @@
 // One screen over VNC, seen and operated in the browser through noVNC.
 
 import {$, createConsoleClient} from "./console-client.ts"
+import {hashParams} from "./console-util.ts"
 
 const client = createConsoleClient()
 
@@ -8,7 +9,7 @@ const client = createConsoleClient()
 const NOVNC = new URL("../../vendor/novnc.js", import.meta.url).href
 
 // The slot is named after the "#": vnc/#slot=HEADLESS-1
-const SLOT = new URLSearchParams(location.hash.replace(/^#/, "")).get("slot") ?? ""
+const SLOT = hashParams(location.hash).get("slot") ?? ""
 
 // The state shows as an emoji in the title, where a browser's tab keeps it in view.
 const STATES: Record<string, {icon: string, message?: string, reload?: string}> = {

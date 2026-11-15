@@ -1,6 +1,6 @@
 {
   "name": "wayuse-server",
-  "description": "The HTTP and MCP server that runs inside the wayuse container.",
+  "description": "The HTTP server that runs inside the wayuse container.",
   "version": "0.0.0",
   "author": "Kawanet",
   "bin": {
@@ -36,7 +36,6 @@
   ],
   "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-server#readme",
   "keywords": [
-    "mcp",
     "server",
     "wayland",
     "wayuse"

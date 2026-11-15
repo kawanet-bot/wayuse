@@ -44,7 +44,7 @@ export const ENDPOINTS: Endpoint[] = [
     {method: "GET", path: "clipboard", cli: ["clipboard", "get"], note: "The text on the clipboard, which all screens share."},
     {method: "PUT", path: "clipboard", body: ["text"], cli: ["clipboard", "set", ":text"], note: "Puts the text on the clipboard. Pasting it is a key press: ctrl+v."},
     {method: "GET", path: "status/", cli: ["status"], note: "The load and the memory of the host."},
-    {method: "GET", path: "config", cli: ["config"], note: "The configuration the image was built from."},
+    {method: "GET", path: "wayuse/config", cli: ["config"], note: "The configuration the image was built from."},
     {method: "GET", path: "auth/me", cli: ["auth", "me"], note: "The claims of the token, as the server reads them."},
     {method: "GET", path: "ok", note: "An empty 200, for a health check. It needs no token."},
 ]

@@ -33,7 +33,7 @@ describe(TITLE, () => {
     })
 
     it("returns the resolved configuration as the builder wrote it", async () => {
-        const {res} = await run("/config", bearer)
+        const {res} = await run("/wayuse/config", bearer)
         assert.equal(res.status, 200)
         assert.deepEqual(await res.json(), config)
     })
@@ -46,7 +46,7 @@ describe(TITLE, () => {
     it("refuses a request without a valid token", async () => {
         const cases: Record<string, string>[] = [{}, {authorization: "Bearer x.y.z"}, {authorization: jwt}]
         for (const headers of cases) {
-            const {res} = await run("/config", headers)
+            const {res} = await run("/wayuse/config", headers)
             assert.equal(res.status, 403)
             assert.deepEqual(await res.json(), {error: {message: "invalid token"}})
         }
@@ -63,14 +63,14 @@ describe(TITLE, () => {
     })
 
     it("refuses every token while it has no public key", async () => {
-        assert.equal((await run("/config", bearer, keyless)).res.status, 403)
+        assert.equal((await run("/wayuse/config", bearer, keyless)).res.status, 403)
         assert.equal((await run("/ok", {}, keyless)).res.status, 200)
     })
 
     it("logs one line per response, in morgan's tiny format", async () => {
         assert.match((await run("/ok")).lines.join(""), /^GET \/ok 200 0 - \d+\.\d+ ms\n$/)
-        assert.match((await run("/config?q=1", bearer)).lines.join(""), /^GET \/config\?q=1 200 (\d+|-) - \d+\.\d+ ms\n$/)
-        assert.match((await run("/config")).lines.join(""), /^GET \/config 403 (\d+|-) - \d+\.\d+ ms\n$/)
+        assert.match((await run("/wayuse/config?q=1", bearer)).lines.join(""), /^GET \/wayuse\/config\?q=1 200 (\d+|-) - \d+\.\d+ ms\n$/)
+        assert.match((await run("/wayuse/config")).lines.join(""), /^GET \/wayuse\/config 403 (\d+|-) - \d+\.\d+ ms\n$/)
         assert.match((await run("/missing", bearer)).lines.join(""), /^GET \/missing 404 (\d+|-) - \d+\.\d+ ms\n$/)
     })
 

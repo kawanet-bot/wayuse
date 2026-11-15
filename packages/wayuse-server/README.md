@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/wayuse-server)](https://www.npmjs.com/package/wayuse-server)
 
-The HTTP and MCP server that runs inside the wayuse container.
+The HTTP server that runs inside the wayuse container.
 
 The image [wayuse-builder](../wayuse-builder/README.md) builds installs and starts it. It listens on port 3000 there.
 
@@ -12,7 +12,7 @@ The image [wayuse-builder](../wayuse-builder/README.md) builds installs and star
 |---|---|
 | `GET /ok` | An empty 200, for a health check. No token needed. |
 | `GET /auth/me` | The claims of the token, as `{"me": {...}}`. |
-| `GET /config` | The resolved configuration the image was built from, as JSON. |
+| `GET /wayuse/config` | The resolved configuration the image was built from, as JSON. |
 | `GET /slot/` | Every screen, as `{"data": [...]}`: its sway output, the windows on it, and the number of VNC clients. |
 | `GET /slot/HEADLESS-1` | One screen. |
 | `GET /slot/HEADLESS-1/capture.png` | A PNG of the whole screen. |
@@ -42,14 +42,51 @@ An image with Chrome also has these. In one without, they answer 404 with `Appli
 | `POST /app/chrome/tab/:id/click` | Clicks a pixel of the capture: `{"x": 100, "y": 200, "button": "ctrl+button1"}`. |
 | `POST /app/chrome/tab/:id/evaluate` | Evaluates `{"expression": "document.title"}` in the page, and returns `{"result": {"type": "string", "value": "..."}}`. An exception is a 400. |
 
-The body of PUT and POST is `{"url": "https://...", "slot": "HEADLESS-1", "width": 1920, "height": 1080, "context": "temporary"}`.
-Only `url` is required. `slot` is the first screen when left out, and the size is that of the image's configuration.
-`"context": "temporary"` opens the window in a context of its own, which shares no login and no cookie with any other.
+The body of PUT and POST:
 
-Every API needs `Authorization: Bearer <JWT>`, and answers 403 without a valid one. Only `/ok` and the pages under `/console/` are open.
+```json
+{
+  "url": "https://example.com/",
+  "slot": "HEADLESS-1",
+  "width": 1920,
+  "height": 1080,
+  "context": "temporary"
+}
+```
+
+| Item | Default | Meaning |
+|---|---|---|
+| `url` | required | `http:`, `https:` or `about:`. |
+| `slot` | the first screen | The screen the window opens on. |
+| `width`, `height` | the size in the image's configuration | 768 to 2560, given together. |
+| `context` | `"default"` | `"temporary"` opens the window in a context of its own, which shares no login and no cookie with any other. |
+
 An error is answered as `{"error": {"message": "..."}}` with its status.
 The server takes its routes from `/`. A reverse proxy may put a path ahead of them.
-The server holds the public key alone. [wayuse-client](../wayuse-client/README.md) makes the key pair and signs the tokens.
+
+## TOKENS
+
+Every API needs `Authorization: Bearer <JWT>`, and answers 403 without a valid one. Only `/ok` and the pages under `/console/` are open.
+
+The server verifies a token with a public key, which it reads from the environment of the container.
+The key is given when the container starts, not when the image is built, so one image serves any number of key pairs:
+
+```sh
+npx wayuse jwt keygen > .env    # once: WAYUSE_JWT_PRIVATE_KEY= and WAYUSE_JWT_PUBLIC_KEY=
+set -a; . ./.env; set +a
+docker run -e WAYUSE_JWT_PUBLIC_KEY ... my-wayuse
+```
+
+In a `docker-compose.yml`, which reads `.env` by itself:
+
+```yaml
+services:
+  wayuse:
+    environment:
+      WAYUSE_JWT_PUBLIC_KEY: "${WAYUSE_JWT_PUBLIC_KEY}"
+```
+
+The private key never goes to the container. [wayuse-client](../wayuse-client/README.md) makes the key pair and signs the tokens with it.
 
 | Environment variable | Meaning |
 |---|---|
@@ -64,7 +101,7 @@ The server has pages for a person, at `/console/`:
 |---|---|
 | `/console/` | The entry. It goes on to the monitor with a token the server accepts, and asks for one otherwise. |
 | `/console/monitor/` | Every screen as a still picture, with the host's load. A click on a picture is sent as a click. |
-| `/console/vnc/#slot=HEADLESS-1` | One screen over VNC, seen and operated in the browser. |
+| `/console/vnc/#slot=HEADLESS-1` | One screen over VNC, seen and operated in the browser. `#!?slot=HEADLESS-1` is read the same. |
 | `/console/api/` | A form that tries each API, and shows its URL and the `wayuse` command that does the same. |
 
 The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
