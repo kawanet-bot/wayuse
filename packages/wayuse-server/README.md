@@ -96,7 +96,7 @@ The private key never goes to the container. [wayuse-client](../wayuse-client/RE
 ## HTDOCS
 
 The server serves the files of one directory without a token, the one `--htdocs` names.
-In an image it is `/opt/wayuse/htdocs`, where wayuse-build puts the [console](https://github.com/kawanet/wayuse/blob/main/packages/wayuse-build/docs/console.md). Its pages are at `/console/`.
+In an image it is `/opt/wayuse/htdocs`, where wayuse-build puts the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md). Its pages are at `/console/`.
 
 A file answers before the API does, so the directory takes no file at a path of the API, such as `slot/`.
 Without the directory, the server has its API alone.

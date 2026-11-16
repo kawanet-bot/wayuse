@@ -16,7 +16,7 @@ The pages and their scripts need no token to load, as they carry no secret. Ever
 ## FILES
 
 `wayuse-build` writes the console into the build directory as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are.
-The image has it as `/opt/wayuse/htdocs/console/`, and [wayuse-server](../../wayuse-server/README.md) serves that `htdocs/`.
+The image has it as `/opt/wayuse/htdocs/console/`, and [wayuse-server](../packages/wayuse-server/README.md) serves that `htdocs/`.
 
 | Under `console/` | What it is |
 |---|---|
