@@ -40,7 +40,7 @@ docker build -t my-wayuse .wayuse
 docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
 
-The package ships that `wayuse.config.ts` in [sample/](sample/), with a [docker-compose.yml](sample/docker-compose.yml) that runs its image.
+The package ships a `wayuse.config.ts` in [sample/](sample/) that writes out the defaults too, with a [docker-compose.yml](sample/docker-compose.yml) that runs its image.
 Copy them, make the keys once, and start the container:
 
 ```sh
@@ -62,6 +62,7 @@ Every item may be left out.
 | `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
 | `apps.chrome.env` | `{}` | Environment variables for the Chrome process alone. `LANGUAGE` sets Chrome's language. No secrets: they are baked into the image. |
+| `apps.chrome.policies` | the two of the [sample](sample/wayuse.config.ts) | Chrome's [managed policies](https://chromeenterprise.google/policies/), under Chrome's own names. Given, they replace the defaults, which keep Chrome to one profile. |
 | `apps.redir` | not installed | Installs [redir](https://github.com/troglobit/redir) and keeps it running. It forwards TCP ports inside the container. |
 | `apps.redir.ports` | required | The ports to listen on, from 1024 up, each with where it forwards to. `{9223: "127.0.0.1:9222"}` forwards port 9223 to Chrome DevTools Protocol. |
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |

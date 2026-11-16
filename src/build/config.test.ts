@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
 import type {WayuseBuild} from "wayuse-build"
-import {ConfigError, resolveConfig} from "./config.ts"
+import {ConfigError, DEFAULT_POLICIES, resolveConfig} from "./config.ts"
 
 const TITLE = "build/config.test.ts"
 
@@ -17,7 +17,7 @@ describe(TITLE, () => {
     })
 
     it("installs Chrome only when its key is present", () => {
-        assert.deepEqual(resolveConfig({apps: {chrome: {}}}).apps, {chrome: {channel: "stable", env: {}}})
+        assert.deepEqual(resolveConfig({apps: {chrome: {}}}).apps, {chrome: {channel: "stable", env: {}, policies: DEFAULT_POLICIES}})
         assert.deepEqual(resolveConfig({apps: {}}).apps, {})
     })
 
@@ -29,16 +29,30 @@ describe(TITLE, () => {
     it("keeps what is given", () => {
         const config = resolveConfig({
             node: {version: "24.11.1"},
-            apps: {chrome: {channel: "beta", env: {LANGUAGE: "ja"}}},
+            apps: {chrome: {channel: "beta", env: {LANGUAGE: "ja"}, policies: {AutoplayAllowlist: ["https://www.youtube.com"]}}},
             timezone: "Asia/Tokyo",
             screen: {width: 1920, height: 1080},
             packages: ["fonts-noto-cjk"],
         })
         assert.equal(config.node.version, "24.11.1")
-        assert.deepEqual(config.apps.chrome, {channel: "beta", env: {LANGUAGE: "ja"}})
+        // The policies given are all there is: the defaults are not kept beside them.
+        assert.deepEqual(config.apps.chrome, {channel: "beta", env: {LANGUAGE: "ja"}, policies: {AutoplayAllowlist: ["https://www.youtube.com"]}})
         assert.equal(config.timezone, "Asia/Tokyo")
         assert.deepEqual(config.screen, {width: 1920, height: 1080})
         assert.deepEqual(config.packages, ["fonts-noto-cjk"])
+    })
+
+    it("gives Chrome no policy for an empty object, and the defaults for no value", () => {
+        assert.deepEqual(resolveConfig({apps: {chrome: {policies: {}}}}).apps.chrome?.policies, {})
+        const policies = null as unknown as undefined
+        assert.deepEqual(resolveConfig({apps: {chrome: {policies}}}).apps.chrome?.policies, DEFAULT_POLICIES)
+    })
+
+    // The sample names the defaults for a reader to change, so it has to name them as they are.
+    it("has in the sample the defaults it would fill in", async () => {
+        const {default: sample} = await import("../../packages/wayuse-build/sample/wayuse.config.ts")
+        assert.deepEqual(sample.apps?.chrome?.policies, DEFAULT_POLICIES)
+        assert.deepEqual(sample.screen, resolveConfig({}).screen)
     })
 
     it("leaves out a package without a value", () => {
@@ -55,6 +69,8 @@ describe(TITLE, () => {
         ["an unknown channel", {apps: {chrome: {channel: "canary"}}}],
         ["an environment name with a space", {apps: {chrome: {env: {"A B": "1"}}}}],
         ["an environment value that is not a string", {apps: {chrome: {env: {A: 1}}}}],
+        ["policies in a list", {apps: {chrome: {policies: ["AutoplayAllowlist"]}}}],
+        ["policies as the name of a file", {apps: {chrome: {policies: "./chrome-policies.json"}}}],
         ["redir without ports", {apps: {redir: {}}}],
         ["redir with no port", {apps: {redir: {ports: {}}}}],
         ["a redir port that is not a number", {apps: {redir: {ports: {cdp: "127.0.0.1:9222"}}}}],

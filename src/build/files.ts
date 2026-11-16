@@ -32,6 +32,8 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
 
     const {chrome, redir} = config.apps
     if (chrome) files["rootfs/etc/wayuse/chrome.env"] = shellEnvOf(chrome.env)
+    // One file holds every policy. Chrome does not say which wins when two files name the same one.
+    if (chrome) files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"] = JSON.stringify(chrome.policies, null, 2) + "\n"
     // One line per redir, for the start script to read: the port to listen on, then where it forwards to.
     if (redir) files["rootfs/etc/wayuse/redir.conf"] = Object.entries(redir.ports).map(([port, target]) => `${port} ${target}\n`).join("")
 
