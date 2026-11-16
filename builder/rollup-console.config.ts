@@ -12,11 +12,17 @@ const rollupConfig: RollupOptions = {
         vnc: "../src/console/vnc.ts",
     },
 
+    // Bare specifiers stay external; only relative paths are bundled.
+    external: [/^[^.\/]/],
+
     output: {
         dir: "../packages/wayuse-server/dist/console",
         format: "esm",
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
+
+        // noVNC is no part of this package. wayuse-build bundles it into the image, and the page loads it from there.
+        paths: {"@novnc/novnc": "../../vendor/novnc.js"},
     },
 
     plugins: [

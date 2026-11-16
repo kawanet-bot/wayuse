@@ -9,6 +9,11 @@
   "bugs": {
     "url": "https://github.com/kawanet/wayuse/issues"
   },
+  "dependencies": {
+    "@novnc/novnc": "^1.7.0",
+    "@rollup/plugin-terser": "^1.0.2",
+    "rollup": "^4.68.3"
+  },
   "engines": {
     "node": ">=22.18.0"
   },
@@ -40,10 +45,5 @@
     "directory": "packages/wayuse-builder"
   },
   "type": "module",
-  "types": "./types/wayuse-builder.d.ts",
-  "dependencies": {
-    "@novnc/novnc": "^1.7.0",
-    "@rollup/plugin-terser": "^1.0.2",
-    "rollup": "^4.68.3"
-  }
+  "types": "./types/wayuse-builder.d.ts"
 }
