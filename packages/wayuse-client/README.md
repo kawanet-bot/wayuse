@@ -7,7 +7,7 @@ The API client and CLI for a wayuse container.
 ## SYNOPSIS
 
 ```sh
-export WAYUSE_URL=http://127.0.0.1:3000/    # where wayuse-server is reached
+export WAYUSE_URL=http://127.0.0.1:9580/    # where wayuse-server is reached
 export WAYUSE_JWT=...                       # see TOKENS below
 
 npx wayuse chrome open https://example.com/ # open the URL in Chrome, filling the screen
@@ -25,7 +25,7 @@ The same from a program. It uses web standards alone, so it runs in Node.js and 
 ```ts
 import {createClient} from "wayuse-client"
 
-const client = createClient({url: "http://127.0.0.1:3000/", token: process.env.WAYUSE_JWT})
+const client = createClient({url: "http://127.0.0.1:9580/", token: process.env.WAYUSE_JWT})
 const tab = await client.openChromeTab({url: "https://example.com/"})
 const {value} = await client.evaluateChromeTab(tab.id, "document.title")
 const png = await client.captureSlot(tab.sway.output)

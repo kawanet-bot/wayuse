@@ -37,7 +37,7 @@ export default defineConfig({
 ```sh
 npx wayuse-build
 docker build -t my-wayuse .wayuse
-docker run --rm --shm-size 256m -p 127.0.0.1:3000:3000 -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
+docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
 
 ## CONFIGURATION
@@ -90,7 +90,7 @@ tini is PID 1 in the image, so `--init` is not needed.
 
 | Port | Listener |
 |---|---|
-| 3000 | wayuse-server. Publish it with `-p` to reach the container from outside |
+| 9580 | wayuse-server. Publish it with `-p` to reach the container from outside |
 | 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
 | 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
 
@@ -112,7 +112,7 @@ redir listens on every address of the container, one redir for each port.
 Publish that port to the host's `127.0.0.1` only. The host may give it any number, 9222 included:
 
 ```sh
-docker run --rm --shm-size 256m -p 127.0.0.1:3000:3000 -p 127.0.0.1:9222:9223 my-wayuse
+docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -p 127.0.0.1:9222:9223 my-wayuse
 curl http://127.0.0.1:9222/json/version
 ```
 
@@ -162,7 +162,7 @@ redir: {ports: {8787: "host.docker.internal:8787"}},
 redir looks the name up when it starts. Without `--add-host`, it ends at once and the supervisor keeps starting it again, every redir with it.
 
 `docker run --network host` is another way: the container then shares the host's network, `127.0.0.1` included.
-Its own ports are then the host's as well: 3000, on every address of the host, and 9222 and 5900 + n.
+Its own ports are then the host's as well: 9580, on every address of the host, and 9222 and 5900 + n.
 
 ## SEE ALSO
 

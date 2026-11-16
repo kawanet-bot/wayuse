@@ -6,14 +6,14 @@ import {ConfigError, resolveConfig} from "./config.ts"
 import {writeBuildDir} from "./files.ts"
 import {VERSION} from "./version.ts"
 
-const USAGE = [
-    "Usage: wayuse-build [options]",
-    "  -c, --config <file>      the configuration to read (default: wayuse.config.ts)",
-    "  -o, --outdir <dir>       the build directory to write, emptied first (default: .wayuse)",
-    "  --server-tarball <file>  a wayuse-server tarball to install in place of the one on npm",
-    "  -v, --version            print this package's version",
-    "  -h, --help               print this usage",
-].map(line => `${line}\n`).join("")
+const USAGE = `
+Usage: wayuse-build [options]
+  -c, --config <file>      the configuration to read (default: wayuse.config.ts)
+  -o, --outdir <dir>       the build directory to write, emptied first (default: .wayuse)
+  --server-tarball <file>  a wayuse-server tarball to install in place of the one on npm
+  -v, --version            print this package's version
+  -h, --help               print this usage
+`.trimStart()
 
 const EXIT_USAGE = 2
 
