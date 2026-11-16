@@ -1,6 +1,6 @@
 import type {Context, MiddlewareHandler} from "hono"
 import type {WayuseClient} from "wayuse-client"
-import {type AuthOptions, verifyJwt} from "../jwt/jwt-verify.ts"
+import {type AuthOptions, verifyJwt} from "./jwt-verify.ts"
 
 /** The Hono environment of a route behind jwtCheck(). */
 export type AuthEnv = {Variables: {jwt: WayuseClient.JwtClaims}}
