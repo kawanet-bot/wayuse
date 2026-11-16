@@ -1,4 +1,3 @@
-import type {MiddlewareHandler} from "hono"
 import {type KeyObject, createPublicKey, verify} from "node:crypto"
 import type {WayuseClient} from "wayuse-client"
 import {JWT_HEADER} from "../jwt/jwt-format.ts"
@@ -10,13 +9,6 @@ export interface AuthOptions {
     publicKey?: KeyObject
     audience: string
 }
-
-/** The Hono environment of a route behind jwtCheck(). */
-export type AuthEnv = {Variables: {jwt: Claims}}
-
-// A 401 has to name the scheme the server wants.
-const UNAUTHORIZED = 401
-const CHALLENGE = {"WWW-Authenticate": "Bearer"}
 
 export const parsePublicKey = (base64: string): KeyObject => {
     const key = createPublicKey({key: Buffer.from(base64, "base64"), format: "der", type: "spki"})
@@ -49,15 +41,4 @@ export const verifyJwt = (jwt: string, {publicKey, audience}: AuthOptions, now: 
     if (claims.exp != null && !(typeof claims.exp === "number" && now < claims.exp * 1000)) return
 
     return claims
-}
-
-/**
- * Lets a request through only with a valid Bearer token, whose claims the handler reads as c.get("jwt").
- */
-export const jwtCheck = (options: AuthOptions): MiddlewareHandler<AuthEnv> => async (c, next) => {
-    const jwt = c.req.header("authorization")?.match(/^Bearer\s+(\S+)$/)?.[1]
-    const claims = jwt && verifyJwt(jwt, options)
-    if (!claims) return c.json({error: {message: "invalid token"}}, UNAUTHORIZED, CHALLENGE)
-    c.set("jwt", claims)
-    await next()
 }
