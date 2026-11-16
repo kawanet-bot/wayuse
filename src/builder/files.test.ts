@@ -108,6 +108,10 @@ describe(TITLE, () => {
             const novnc = await readFile(join(outdir, "rootfs/opt/wayuse/vendor/novnc.js"), "utf8")
             assert.match(novnc, /Licensed under MPL 2\.0/)
             assert.match(novnc, /export\s*\{\s*\w+ as default\s*\}/)
+
+            // html-ele under the name the console's scripts import it by.
+            const htmlEle = await readFile(join(outdir, "rootfs/opt/wayuse/vendor/html-ele.mjs"), "utf8")
+            assert.match(htmlEle, /export\s*\{[^}]*\bELE\b[^}]*\}/)
         } finally {
             await rm(outdir, {recursive: true, force: true})
         }

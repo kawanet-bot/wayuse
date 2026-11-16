@@ -41,6 +41,11 @@ describe(TITLE, () => {
         assert.deepEqual(config.packages, ["fonts-noto-cjk"])
     })
 
+    it("leaves out a package without a value", () => {
+        const packages = ["curl", null, undefined, "git"] as string[]
+        assert.deepEqual(resolveConfig({packages}).packages, ["curl", "git"])
+    })
+
     // Each case is a value that would otherwise reach a Dockerfile or a shell script.
     const refused: [string, unknown][] = [
         ["a misspelled key", {timezome: "Asia/Tokyo"}],

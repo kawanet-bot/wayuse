@@ -54,6 +54,11 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     await bundleNovnc(join(outdir, novnc))
     paths.push(novnc)
 
+    // One file as npm installed it, which the console's pages import to build their elements.
+    const htmlEle = "rootfs/opt/wayuse/vendor/html-ele.mjs"
+    await copyFile(fileURLToPath(import.meta.resolve("html-ele")), join(outdir, htmlEle))
+    paths.push(htmlEle)
+
     if (options.serverTarball != null) {
         const path = `rootfs/opt/wayuse/${SERVER_TARBALL}`
         await copyFile(options.serverTarball, join(outdir, path))

@@ -1,5 +1,7 @@
 // The APIs the console's form offers, each with the wayuse command that does the same.
 
+import {type ENode, EN} from "html-ele"
+
 /** The form's fields. A path takes them as `:name`, a body as its items, a command as its arguments. */
 export type Field = "slot" | "id" | "url" | "width" | "height" | "context" | "x" | "y" | "button" | "keys" | "text" | "expression"
 
@@ -56,6 +58,22 @@ export const keyOf = (endpoint: Endpoint): string => `${endpoint.method} ${endpo
 export const CLICKABLE: Record<string, {field: "slot" | "id", click: string}> = {
     "slot/:slot/capture.png": {field: "slot", click: "POST slot/:slot/click"},
     "app/chrome/tab/:id/capture.jpg": {field: "id", click: "POST app/chrome/tab/:id/click"},
+}
+
+/** The choices of a pull-down, each a value and the words shown for it. A tab's title is among the words, so they are escaped. */
+export const optionsOf = (items: [string, string][]): ENode[] =>
+    items.map(([value, label]) => EN`<option value="${value}">${label}</option>`)
+
+/** The endpoints as the choices of a pull-down, grouped by the first part of the path, as the server's routes are. */
+export const endpointGroupsOf = (endpoints: Endpoint[], base: string): ENode[] => {
+    const groups = new Map<string, ENode[]>()
+    endpoints.forEach((endpoint, i) => {
+        const name = endpoint.path.split("/")[0]!
+        const options = groups.get(name) ?? []
+        groups.set(name, options)
+        options.push(EN`<option value="${i}">${endpoint.method.padEnd(6, " ")} ${base}${endpoint.path}</option>`)
+    })
+    return [...groups].map(([name, options]) => EN`<optgroup label="${name}">${options}</optgroup>`)
 }
 
 /** Every field the endpoint takes, in its path or in its body. */

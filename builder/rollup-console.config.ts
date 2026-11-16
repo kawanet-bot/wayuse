@@ -21,8 +21,11 @@ const rollupConfig: RollupOptions = {
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
 
-        // noVNC is no part of this package. wayuse-build bundles it into the image, and the page loads it from there.
-        paths: {"@novnc/novnc": "../../vendor/novnc.js"},
+        // Neither is part of this package. wayuse-build puts them into the image, and the pages load them from there.
+        paths: {
+            "@novnc/novnc": "../../vendor/novnc.js",
+            "html-ele": "../../vendor/html-ele.mjs",
+        },
     },
 
     plugins: [

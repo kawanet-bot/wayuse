@@ -1,7 +1,8 @@
 // One screen of the monitor, as a tile. It shows the screen's picture, and sends a click on it to the screen.
 
+import {ELE} from "html-ele"
 import type {WayuseClient} from "wayuse-client"
-import {$, BASE, createConsoleClient} from "./console-client.ts"
+import {BASE, createConsoleClient} from "./console-client.ts"
 import {buttonOf, imagePixelOf} from "./console-util.ts"
 
 const client = createConsoleClient()
@@ -93,7 +94,26 @@ const clickImage = async (tile: Tile, event: MouseEvent): Promise<void> => {
 }
 
 export const createTile = (slot: WayuseClient.Slot): Tile => {
-    const el = ($<HTMLTemplateElement>("tile").content.firstElementChild as HTMLElement).cloneNode(true) as HTMLElement
+    const clients = `VNC ${slot.wayvnc.clients}`
+    const {width, height} = slot.sway.output.rect
+
+    // The link's target names the server and the slot, so opening the same screen twice returns to its tab.
+    // A drag takes the picture to another application.
+    // language=HTML
+    const el = ELE`
+        <section class="monitor-tile">
+            <div class="monitor-tile-head">
+                <span class="monitor-name">${slot.id}</span>
+                <span class="monitor-meta">${width}x${height} · ${clients}</span>
+                <span class="status"></span>
+                <a title="Open over VNC" href="${BASE}console/vnc/#!?slot=${encodeURIComponent(slot.id)}" target="vnc:${BASE}${slot.id}">↗</a>
+            </div>
+            <div class="monitor-frame">
+                <img class="monitor-image" alt="" draggable="true">
+            </div>
+        </section>
+    `
+
     const tile: Tile = {
         id: slot.id,
         el,
@@ -101,19 +121,14 @@ export const createTile = (slot: WayuseClient.Slot): Tile => {
         image: el.querySelector(".monitor-image")!,
         meta: el.querySelector(".monitor-meta")!,
         status: el.querySelector(".status")!,
-        clients: `VNC ${slot.wayvnc.clients}`,
+        clients,
         capturing: false,
         captureFailed: false,
     }
 
-    el.querySelector(".monitor-name")!.textContent = slot.id
-    // The target names the server and the slot, so opening the same screen twice returns to its tab.
-    Object.assign(el.querySelector("a")!, {href: `${BASE}console/vnc/#!?slot=${encodeURIComponent(slot.id)}`, target: `vnc:${BASE}${slot.id}`})
     tile.image.addEventListener("click", event => void clickImage(tile, event))
 
     // The tile takes the screen's place before its first picture arrives.
-    const {width, height} = slot.sway.output.rect
     resize(tile, width, height)
-    tile.meta.textContent = `${width}x${height} · ${tile.clients}`
     return tile
 }

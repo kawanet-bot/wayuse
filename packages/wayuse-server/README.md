@@ -109,6 +109,7 @@ A link of the form `/console/#!?jwt=<JWT>` signs in with the token in it. A brow
 The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
 
 The vnc page loads [noVNC](https://github.com/novnc/noVNC) from `/vendor/novnc.js`. It is not in this package: wayuse-builder puts it into the image.
+The monitor and the API form load [html-ele](https://github.com/kawanet/html-ele) from `/vendor/html-ele.mjs`, which wayuse-builder puts there as well.
 
 ## VNC
 

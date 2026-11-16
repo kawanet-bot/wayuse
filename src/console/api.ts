@@ -1,7 +1,8 @@
 // The form that tries each API: it shows the request, the wayuse command that does the same, and the response.
 
+import {HTML} from "html-ele"
 import {INPUTS, SELECTS, clearImage, control, copy, fill, image, pretty, setStatus, showImage, values} from "./api-controls.ts"
-import {type Endpoint, type Field, CLICKABLE, ENDPOINTS, cliOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
+import {type Endpoint, type Field, CLICKABLE, ENDPOINTS, cliOf, endpointGroupsOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
 import {$, BASE, createConsoleClient} from "./console-client.ts"
 import {imagePixelOf} from "./console-util.ts"
 
@@ -127,15 +128,7 @@ const init = async (): Promise<void> => {
     control("width").setAttribute("placeholder", String(config.screen.width))
     control("height").setAttribute("placeholder", String(config.screen.height))
 
-    // Grouped by the first part of the path, as the server's routes are.
-    const groups = new Map<string, HTMLOptGroupElement>()
-    endpoints.forEach((endpoint, i) => {
-        const name = endpoint.path.split("/")[0]!
-        const group = groups.get(name) ?? Object.assign(document.createElement("optgroup"), {label: name})
-        groups.set(name, group)
-        group.append(new Option(`${endpoint.method.padEnd(6, " ")} ${BASE}${endpoint.path}`, String(i)))
-    })
-    control("endpoint").append(...groups.values())
+    control("endpoint").append(HTML`${endpointGroupsOf(endpoints, BASE)}`)
 
     const saved = restore()
     const index = endpoints.findIndex(endpoint => keyOf(endpoint) === saved.endpoint)

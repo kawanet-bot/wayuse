@@ -1,6 +1,7 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {basePathOf, buttonOf, hashParams, imagePixelOf, loadLineOf, tokenOfHash} from "./console-util.ts"
+import {ApiError} from "../api/api-client.ts"
+import {basePathOf, buttonOf, failureOf, hashParams, imagePixelOf, isRefusal, loadLineOf, tokenOfHash} from "./console-util.ts"
 
 const TITLE = "console/console-util.test.ts"
 
@@ -18,6 +19,21 @@ describe(TITLE, () => {
         for (const hash of ["#slot=HEADLESS-2", "#?slot=HEADLESS-2", "#!slot=HEADLESS-2", "#section", ""]) {
             assert.equal([...hashParams(hash)].length, 0, hash)
         }
+    })
+
+    // A token is shared by every server under one origin, and one that is down must not take it away.
+    it("takes the server's own 401 alone as a refusal of the token", () => {
+        assert.equal(isRefusal(new ApiError(401, "invalid token")), true)
+        assert.equal(isRefusal(new ApiError(502, "Bad Gateway")), false)
+        assert.equal(isRefusal(new ApiError(403, "Forbidden")), false)
+        assert.equal(isRefusal(new TypeError("fetch failed")), false)
+        assert.equal(isRefusal(undefined), false)
+    })
+
+    it("names a failure by its status, or by its own words when it has none", () => {
+        assert.equal(failureOf(new ApiError(502, "Bad Gateway")), "502")
+        assert.equal(failureOf(new TypeError("fetch failed")), "fetch failed")
+        assert.equal(failureOf("plain"), "plain")
     })
 
     it("reads a token from a login link's fragment", () => {
