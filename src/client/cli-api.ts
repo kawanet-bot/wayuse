@@ -44,7 +44,7 @@ const tabIdOf = async (client: Client, id: string | undefined): Promise<string> 
 }
 
 const sizeOf = (size: string | undefined): {width?: number, height?: number} => {
-    if (size === undefined) return {}
+    if (size == null) return {}
     const [, width, height] = /^(\d+)x(\d+)$/.exec(size) ?? []
     if (!width || !height) throw new UsageError(`--size takes <width>x<height>: ${size}`)
     return {width: Number(width), height: Number(height)}
@@ -83,7 +83,7 @@ const runClipboard = async (client: Client, command: string | undefined, args: s
 
     if (command === "set") {
         const [text] = args
-        if (text === undefined) throw new UsageError("clipboard set takes the text")
+        if (text == null) throw new UsageError("clipboard set takes the text")
         return void await client.setClipboard(text)
     }
 

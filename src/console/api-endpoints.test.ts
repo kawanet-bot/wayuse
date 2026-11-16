@@ -10,7 +10,7 @@ const find = (key: string) => ENDPOINTS.find(endpoint => keyOf(endpoint) === key
 
 // Splits a command as a POSIX shell would, for the words cliOf() writes: bare, or in single quotes.
 const shellSplit = (command: string): string[] =>
-    [...command.matchAll(/(?:'((?:[^']|'\\'')*)'|(\S+))/g)].map(([, quoted, bare]) => (quoted !== undefined ? quoted.replaceAll(`'\\''`, "'") : bare!))
+    [...command.matchAll(/(?:'((?:[^']|'\\'')*)'|(\S+))/g)].map(([, quoted, bare]) => (quoted != null ? quoted.replaceAll(`'\\''`, "'") : bare!))
 
 const VALUES: Values = {
     slot: "HEADLESS-2", id: "0123456789ABCDEF0123456789ABCDEF", url: "https://example.com/?a=1&b=2", width: "1024", height: "768", context: "temporary",

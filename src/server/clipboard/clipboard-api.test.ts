@@ -19,7 +19,7 @@ describe(TITLE, () => {
             }
             if (file === "wl-paste") {
                 calls.push(`${file} ${args.join(" ")}`)
-                if (clipboard === undefined) throw new Error("Nothing is copied")
+                if (clipboard == null) throw new Error("Nothing is copied")
                 return Buffer.from(clipboard)
             }
             return fakeExec(file, args)

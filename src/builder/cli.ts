@@ -31,7 +31,7 @@ const readArgs = (args: string[]) => parseArgs({
 // Node strips the types of a .ts file outside node_modules, so the file is imported as it is.
 const loadConfig = async (file: string): Promise<unknown> => {
     const module = await import(pathToFileURL(resolve(file)).href) as {default?: unknown}
-    if (module.default === undefined) throw new ConfigError(`${file} has no default export`)
+    if (module.default == null) throw new ConfigError(`${file} has no default export`)
     return module.default
 }
 

@@ -41,7 +41,7 @@ export const createClient: typeof declared.createClient = ({url, token, fetch: f
     }
 
     const json = async <T>(path: string, method = "GET", body?: unknown): Promise<T> => {
-        const init = body === undefined ? {method} : {method, body: JSON.stringify(body), headers: {"content-type": "application/json"}}
+        const init = body == null ? {method} : {method, body: JSON.stringify(body), headers: {"content-type": "application/json"}}
         return (await request(path, init)).json() as Promise<T>
     }
 
