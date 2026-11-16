@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
 import {ApiError} from "../api/api-client.ts"
-import {basePathOf, buttonOf, failureOf, hashParams, imagePixelOf, isRefusal, loadLineOf, tokenOfHash} from "./console-util.ts"
+import {basePathOf, buttonOf, failureOf, hashParams, imagePixelOf, isRefusal, loadLineOf, signInUrlOf, tokenOfHash} from "./console-util.ts"
 
 const TITLE = "console/console-util.test.ts"
 
@@ -19,6 +19,13 @@ describe(TITLE, () => {
         for (const hash of ["#slot=HEADLESS-2", "#?slot=HEADLESS-2", "#!slot=HEADLESS-2", "#section", ""]) {
             assert.equal([...hashParams(hash)].length, 0, hash)
         }
+    })
+
+    // The "#" has to be escaped, or the browser would take what follows it as the hash of the sign-in address.
+    it("adds to the sign-in address where the token is to be brought back", () => {
+        const url = signInUrlOf("/front/screen-sign-in/?next=", "/screen/tokyo-1/console/")
+        assert.equal(url, "/front/screen-sign-in/?next=%2Fscreen%2Ftokyo-1%2Fconsole%2F%23!%3Fjwt%3D")
+        assert.equal(new URL(url, "https://example.com/").searchParams.get("next") + "JWT", "/screen/tokyo-1/console/#!?jwt=JWT")
     })
 
     // A token is shared by every server under one origin, and one that is down must not take it away.

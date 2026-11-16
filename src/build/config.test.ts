@@ -14,6 +14,7 @@ describe(TITLE, () => {
         assert.equal(config.timezone, "Etc/UTC")
         assert.deepEqual(config.screen, {width: 1280, height: 960})
         assert.deepEqual(config.packages, [])
+        assert.deepEqual(config.console, {})
     })
 
     it("installs Chrome only when its key is present", () => {
@@ -33,6 +34,7 @@ describe(TITLE, () => {
             timezone: "Asia/Tokyo",
             screen: {width: 1920, height: 1080},
             packages: ["fonts-noto-cjk"],
+            console: {signIn: "../../front/screen-sign-in/?next="},
         })
         assert.equal(config.node.version, "24.11.1")
         // The policies given are all there is: the defaults are not kept beside them.
@@ -40,6 +42,7 @@ describe(TITLE, () => {
         assert.equal(config.timezone, "Asia/Tokyo")
         assert.deepEqual(config.screen, {width: 1920, height: 1080})
         assert.deepEqual(config.packages, ["fonts-noto-cjk"])
+        assert.deepEqual(config.console, {signIn: "../../front/screen-sign-in/?next="})
     })
 
     it("gives Chrome no policy for an empty object, and the defaults for no value", () => {
@@ -84,6 +87,11 @@ describe(TITLE, () => {
         ["a time zone that climbs out of zoneinfo", {timezone: "../../etc/passwd"}],
         ["a package with shell syntax", {packages: ["curl && true"]}],
         ["packages that are not an array", {packages: "fonts-noto-cjk"}],
+        ["a sign-in address on another origin", {console: {signIn: "https://example.com/sign-in/?next="}}],
+        ["a sign-in address that starts with two slashes", {console: {signIn: "//example.com/sign-in/?next="}}],
+        ["a sign-in address that runs a script", {console: {signIn: "javascript:alert(1)//"}}],
+        ["a sign-in address with a space", {console: {signIn: "/sign in/?next="}}],
+        ["a sign-in address that is not a string", {console: {signIn: true}}],
         ["a screen with a fraction", {screen: {width: 1280.5}}],
         ["a screen too large", {screen: {height: 100000}}],
     ]

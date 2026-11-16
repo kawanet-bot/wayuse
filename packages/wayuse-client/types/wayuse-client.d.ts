@@ -15,6 +15,7 @@ export declare namespace WayuseClient {
         /** The size a screen has until a client resizes it. */
         screen: {width: number, height: number}
         packages: string[]
+        console: ConsoleConfig
     }
 
     interface ChromeConfig {
@@ -26,6 +27,11 @@ export declare namespace WayuseClient {
 
     interface RedirConfig {
         ports: Record<number, string>
+    }
+
+    interface ConsoleConfig {
+        /** Where the entry sends a visitor without a token. Without it, the entry asks for one. */
+        signIn?: string
     }
 
     /** A screen: one sway output, HEADLESS-1 and up. */

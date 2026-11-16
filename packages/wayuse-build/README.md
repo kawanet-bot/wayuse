@@ -68,6 +68,7 @@ Every item may be left out.
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |
 | `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
 | `packages` | `[]` | Additional apt packages, fonts among them. |
+| `console.signIn` | none | Where the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s entry sends a visitor without a token, on the console's own origin. Without it, the entry asks for a token. |
 
 ## COMMAND
 
