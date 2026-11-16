@@ -1,6 +1,7 @@
 // The form that tries each API: it shows the request, the wayuse command that does the same, and the response.
 
-import {type Endpoint, type Field, type Values, ENDPOINTS, cliOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
+import {CLICKABLE, INPUTS, SELECTS, clearImage, control, copy, fill, image, pretty, setStatus, showImage, values} from "./api-controls.ts"
+import {type Endpoint, type Field, ENDPOINTS, cliOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
 import {$, BASE, createConsoleClient} from "./console-client.ts"
 import {imagePixelOf} from "./console-util.ts"
 
@@ -8,33 +9,13 @@ const client = createConsoleClient()
 
 const STORAGE_KEY = "wayuse:api"
 
-const SELECTS: Field[] = ["slot", "id", "context"]
-const INPUTS: Field[] = ["url", "width", "height", "x", "y", "button", "keys", "text", "expression"]
-
-// The capture a click on the shown picture is sent to, by the path of the capture it came from.
-const CLICKABLE: Record<string, {field: "slot" | "id", click: string}> = {
-    "slot/:slot/capture.png": {field: "slot", click: "POST slot/:slot/click"},
-    "app/chrome/tab/:id/capture.jpg": {field: "id", click: "POST app/chrome/tab/:id/click"},
-}
-
 // A click takes a moment to show on the screen, and the capture after it waits that long.
 const RECAPTURE_DELAY = 500
-
-type Control = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-
-const control = (id: string): Control => $<Control>(id)
 
 // Filled once the server says which applications its image has.
 let endpoints: Endpoint[] = []
 
 const chosen = (): Endpoint => endpoints[Number(control("endpoint").value)] ?? endpoints[0]!
-
-const values = (): Values => Object.fromEntries([...SELECTS, ...INPUTS].map(field => [field, control(field).value]))
-
-const setStatus = (text: string, ok?: boolean): void => {
-    $("status").textContent = text
-    $("status").className = `status ${ok == null ? "" : ok ? "ok" : "ng"}`
-}
 
 // The choice and the inputs worth keeping are remembered in this browser. Storage that refuses is not an error.
 const save = (): void => {
@@ -71,13 +52,6 @@ const update = (): void => {
     save()
 }
 
-// Replaces a pull-down's choices, and keeps the one chosen when it is still there.
-const fill = (select: HTMLSelectElement, items: [string, string][]): void => {
-    const current = select.value
-    select.replaceChildren(...items.map(([value, label]) => new Option(label, value)))
-    if (items.some(([value]) => value === current)) select.value = current
-}
-
 const loadOptions = async (hasChrome: boolean): Promise<void> => {
     const [slots, tabs] = await Promise.all([client.getSlots(), hasChrome ? client.getChromeTabs() : []])
     // An empty slot is a choice of its own for opening a window: the server then takes the first.
@@ -85,34 +59,6 @@ const loadOptions = async (hasChrome: boolean): Promise<void> => {
     // A tab outside the default context looks the same on the screen, so the list says which it is.
     const context = (kind: string): string => (kind === "default" ? "" : `[${kind}] `)
     fill($<HTMLSelectElement>("id"), tabs.map(tab => [tab.id, `${tab.sway?.output ?? "-"}  ${context(tab.target.context)}${tab.target.title || tab.target.url}`]))
-}
-
-const pretty = (text: string): string => {
-    if (!text) return "(no body)"
-    try {
-        return JSON.stringify(JSON.parse(text), null, 2)
-    } catch {
-        return text
-    }
-}
-
-const image = (): HTMLImageElement => $<HTMLImageElement>("image")
-
-const showImage = (blob: Blob, path: string, target: string | undefined): void => {
-    if (image().src) URL.revokeObjectURL(image().src)
-    image().src = URL.createObjectURL(blob)
-    const clickable = !!(CLICKABLE[path] && target)
-    image().dataset.path = clickable ? path : ""
-    image().dataset.target = clickable ? target : ""
-    image().classList.toggle("clickable", clickable)
-}
-
-const clearImage = (): void => {
-    if (image().src) URL.revokeObjectURL(image().src)
-    image().removeAttribute("src")
-    image().dataset.path = ""
-    image().dataset.target = ""
-    image().classList.remove("clickable")
 }
 
 let hasChrome = false
@@ -170,21 +116,6 @@ const clickImage = async (event: MouseEvent): Promise<void> => {
     await new Promise(resolve => setTimeout(resolve, RECAPTURE_DELAY))
     const res = await client.fetch(path.replace(`:${clickable.field}`, encodeURIComponent(target)))
     if (res.ok) showImage(await res.blob(), path, target)
-}
-
-const copy = async (): Promise<void> => {
-    const cli = $<HTMLTextAreaElement>("cli")
-    cli.select()
-    try {
-        await navigator.clipboard.writeText(cli.value)
-    } catch {
-        // navigator.clipboard is there only over https or on localhost.
-        document.execCommand("copy")
-    }
-    const button = $("copy")
-    const label = button.textContent
-    button.textContent = "✓ Copied"
-    setTimeout(() => button.textContent = label, 1200)
 }
 
 const init = async (): Promise<void> => {
