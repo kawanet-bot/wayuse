@@ -37,7 +37,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 // A misspelled key would otherwise be dropped in silence and the default taken.
 const recordOf = (value: unknown, path: string, keys: readonly string[]): Record<string, unknown> => {
-    if (value === undefined) return {}
+    if (value == null) return {}
     if (!isRecord(value)) throw new ConfigError(`${path} must be an object`)
     for (const key of Object.keys(value)) {
         if (!keys.includes(key)) throw new ConfigError(`${path}.${key} is not a known item`)
@@ -46,13 +46,13 @@ const recordOf = (value: unknown, path: string, keys: readonly string[]): Record
 }
 
 const stringOf = (value: unknown, path: string, pattern: RegExp, fallback: string): string => {
-    if (value === undefined) return fallback
+    if (value == null) return fallback
     if (typeof value !== "string" || !pattern.test(value)) throw new ConfigError(`${path} is not valid: ${JSON.stringify(value)}`)
     return value
 }
 
 const sizeOf = (value: unknown, path: string, fallback: number): number => {
-    if (value === undefined) return fallback
+    if (value == null) return fallback
     if (!Number.isInteger(value) || (value as number) < SCREEN_MIN || (value as number) > SCREEN_MAX) {
         throw new ConfigError(`${path} must be an integer from ${SCREEN_MIN} to ${SCREEN_MAX}: ${JSON.stringify(value)}`)
     }
@@ -107,8 +107,8 @@ export const resolveConfig = (input: Input): Resolved => {
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])
 
     const installed: Resolved["apps"] = {}
-    if (apps.chrome !== undefined) installed.chrome = chromeOf(apps.chrome)
-    if (apps.redir !== undefined) installed.redir = redirOf(apps.redir)
+    if (apps.chrome != null) installed.chrome = chromeOf(apps.chrome)
+    if (apps.redir != null) installed.redir = redirOf(apps.redir)
 
     const packages = config.packages ?? []
     if (!Array.isArray(packages)) throw new ConfigError("config.packages must be an array")

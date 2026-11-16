@@ -46,7 +46,7 @@ export const verifyJwt = (jwt: string, {publicKey, audience}: AuthOptions, now: 
     if (claims?.aud !== audience || typeof claims.sub !== "string" || !claims.sub) return
 
     // exp is optional, but one that is given is honored, as any JWT library would.
-    if (claims.exp !== undefined && !(typeof claims.exp === "number" && now < claims.exp * 1000)) return
+    if (claims.exp != null && !(typeof claims.exp === "number" && now < claims.exp * 1000)) return
 
     return claims
 }

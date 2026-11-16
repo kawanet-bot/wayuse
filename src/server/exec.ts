@@ -14,7 +14,7 @@ const feed = (file: string, args: string[], input: string) => new Promise<Buffer
     child.stdin.end(input)
 })
 
-export const exec: Exec = (file, args, input) => (input !== undefined ? feed(file, args, input) : new Promise((resolve, reject) => {
+export const exec: Exec = (file, args, input) => (input != null ? feed(file, args, input) : new Promise((resolve, reject) => {
     execFile(file, args, {encoding: "buffer", maxBuffer: MAX_BUFFER}, (err, stdout, stderr) => {
         if (!err) return resolve(stdout)
         // The command's own words say more than Node's "Command failed".

@@ -39,18 +39,18 @@ export const resolveOpenRequest = (body: unknown, config: Config, slotIds: strin
     if (!CONTEXTS.includes(context as string)) throw new HttpError(400, `Invalid context: ${JSON.stringify(context)}`)
 
     // One of the two alone leaves the aspect ratio open.
-    if ((width === undefined) !== (height === undefined)) throw new HttpError(400, "Specify both width and height")
+    if ((width == null) !== (height == null)) throw new HttpError(400, "Specify both width and height")
 
     // Without a slot the window still goes to a definite one: the first, not wherever sway's focus happens to be.
     const first = slotIds[0]
-    if (first === undefined) throw new HttpError(503, "sway has no output")
-    if (slot !== undefined && typeof slot !== "string") throw new HttpError(400, `Invalid slot: ${JSON.stringify(slot)}`)
+    if (first == null) throw new HttpError(503, "sway has no output")
+    if (slot != null && typeof slot !== "string") throw new HttpError(400, `Invalid slot: ${JSON.stringify(slot)}`)
 
     return {
         url,
         slot: slot ?? first,
-        width: width === undefined ? config.screen.width : checkSize("width", width),
-        height: height === undefined ? config.screen.height : checkSize("height", height),
+        width: width == null ? config.screen.width : checkSize("width", width),
+        height: height == null ? config.screen.height : checkSize("height", height),
         context: context as OpenRequest["context"],
     }
 }
