@@ -1,18 +1,24 @@
-# make -C ../builder/pack && npx wayuse-build --server-tarball ../builder/pack/server.tgz && docker compose up --build -d
-# npx wayuse jwt keygen > .env  # once: compose reads .env, and only the public key below reaches the container
+# Once, make the keys. Docker Compose reads .env, and only the public key below reaches the container.
+#   npx wayuse jwt keygen > .env
+#
+# Then build the image and start the container.
+#   make -C ../builder/pack && npx wayuse-build --server-tarball ../builder/pack/server.tgz && docker compose up --build -d
 
 name: wayuse-sample
 
 volumes:
-  config-volume: # Chrome's profile outlives the image
+  # Chrome's profile outlives the image.
+  config-volume:
 
 services:
   wayuse:
     build:
       context: "./.wayuse/"
-    shm_size: "256mb" # sway dies of a bus error on the 64MB Docker gives by default
+    # sway dies of a bus error on the 64MB Docker gives by default.
+    shm_size: "256mb"
     extra_hosts:
-      - "host.docker.internal:host-gateway" # a server on this host is http://host.docker.internal:<port>/
+      # A server on this host is http://host.docker.internal:<port>/
+      - "host.docker.internal:host-gateway"
     ports:
       # Reached from this host alone, unless .env says otherwise: WAYUSE_PUBLISH=0.0.0.0:9580
       - "${WAYUSE_PUBLISH:-127.0.0.1:9580}:9580"
