@@ -66,7 +66,7 @@ The server takes its routes from `/`. A reverse proxy may put a path ahead of th
 
 ## TOKENS
 
-Every API needs `Authorization: Bearer <JWT>`, and answers 401 without a valid one. Only `/ok` and the pages under `/console/` are open.
+Every API needs `Authorization: Bearer <JWT>`, and answers 401 without a valid one. Only `/ok` and the files of `--htdocs` are open.
 
 The server verifies a token with a public key, which it reads from the environment of the container.
 The key is given when the container starts, not when the image is built, so one image serves any number of key pairs:
@@ -93,23 +93,13 @@ The private key never goes to the container. [wayuse-client](../wayuse-client/RE
 | `WAYUSE_JWT_PUBLIC_KEY` | The key tokens are verified with. Without it, every API that needs a token is refused. |
 | `WAYUSE_JWT_AUDIENCE` | The `aud` a token must carry. Default: `wayuse`. |
 
-## CONSOLE
+## HTDOCS
 
-The server has pages for a person, at `/console/`:
+The server serves the files of one directory without a token, the one `--htdocs` names.
+In an image it is `/opt/wayuse/htdocs`, where wayuse-build puts the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md). Its pages are at `/console/`.
 
-| Page | What it is |
-|---|---|
-| `/console/` | The entry. It goes on to the monitor with a token the server accepts, and asks for one otherwise. |
-| `/console/monitor/` | Every screen as a still picture, with the host's load. A click on a picture is sent as a click. |
-| `/console/vnc/#!?slot=HEADLESS-1` | One screen over VNC, seen and operated in the browser. |
-| `/console/api/` | A form that tries each API, and shows its URL and the `wayuse` command that does the same. |
-
-The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
-A link of the form `/console/#!?jwt=<JWT>` signs in with the token in it. A browser sends what follows the `#` to no server.
-The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
-
-The vnc page loads [noVNC](https://github.com/novnc/noVNC) from `/vendor/novnc.js`. It is not in this package: wayuse-build puts it into the image.
-The monitor and the API form load [html-ele](https://github.com/kawanet/html-ele) from `/vendor/html-ele.mjs`, which wayuse-build puts there as well.
+A file answers before the API does, so the directory takes no file at a path of the API, such as `slot/`.
+Without the directory, the server has its API alone.
 
 ## VNC
 
@@ -129,7 +119,7 @@ This package is under the MIT license, but for what it carries of others:
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: 9580)
   -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)
-  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)
+  --htdocs <dir>       the files a browser loads without a token (default: /opt/wayuse/htdocs)
   -v, --version        print this package's version
   -h, --help           print this usage
 ```

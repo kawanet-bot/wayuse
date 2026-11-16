@@ -13,11 +13,14 @@ import {createWayvncProxy} from "./wayvnc/wayvnc-proxy.ts"
 // Assigned to nothing at IANA and no development server's own, so it seldom meets another server on a host.
 export const DEFAULT_PORT = 9580
 
+// Where wayuse-build puts the console in the image.
+export const DEFAULT_HTDOCS = "/opt/wayuse/htdocs"
+
 const USAGE = `
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: ${DEFAULT_PORT})
   -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)
-  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)
+  --htdocs <dir>       the files a browser loads without a token (default: ${DEFAULT_HTDOCS})
   -v, --version        print this package's version
   -h, --help           print this usage
 Environment:
@@ -36,7 +39,7 @@ const readArgs = (args: string[]) => {
         options: {
             port: {type: "string", short: "p", default: String(DEFAULT_PORT)},
             config: {type: "string", short: "c", default: "/etc/wayuse/wayuse.json"},
-            vendor: {type: "string", default: "/opt/wayuse/vendor"},
+            htdocs: {type: "string", default: DEFAULT_HTDOCS},
             version: {type: "boolean", short: "v"},
             help: {type: "boolean", short: "h"},
         },
@@ -75,7 +78,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
 
     const auth = {publicKey, audience: WAYUSE_JWT_AUDIENCE || DEFAULT_AUDIENCE}
     const tickets = createVncTickets()
-    const app = await createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets, vendorDir: options.vendor})
+    const app = await createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets, htdocsDir: options.htdocs})
 
     const server = serve({fetch: app.fetch, port: options.port}, ({port}) => {
         process.stderr.write(`wayuse-server ${VERSION} http://localhost:${port}/ok\n`)

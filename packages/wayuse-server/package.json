@@ -27,9 +27,7 @@
   "files": [
     "bin/wayuse-server.js",
     "dist/wayuse-server.js",
-    "dist/console/",
     "dist/server/",
-    "htdocs/",
     "LICENSE",
     "README.md",
     "types/*.d.ts"

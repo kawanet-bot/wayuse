@@ -8,6 +8,10 @@ Three packages, one repository:
 - [wayuse-server](packages/wayuse-server/README.md): The HTTP server that runs inside the wayuse container.
 - [wayuse-client](packages/wayuse-client/README.md): The API client and CLI for a wayuse container.
 
+More in [docs/](docs/):
+
+- [The console](docs/console.md): The pages an image has for a person.
+
 ## SEE ALSO
 
 - https://www.npmjs.com/package/wayuse-build

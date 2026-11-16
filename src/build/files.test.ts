@@ -5,7 +5,7 @@ import {tmpdir} from "node:os"
 import {join} from "node:path"
 import {describe, it} from "node:test"
 import {DEFAULT_URL} from "../client/cli-api.ts"
-import {DEFAULT_PORT} from "../server/cli.ts"
+import {DEFAULT_HTDOCS, DEFAULT_PORT} from "../server/cli.ts"
 import {resolveConfig} from "./config.ts"
 import {generatedFilesOf, writeBuildDir} from "./files.ts"
 import {APP_PACKAGES} from "./npm-package.ts"
@@ -104,13 +104,21 @@ describe(TITLE, () => {
             const script = await stat(join(outdir, "rootfs/opt/wayuse/bin/supervise.sh"))
             assert.equal(script.mode & 0o111, 0o111)
 
+            // The console as its URLs lay it out, where the server looks for it by default.
+            const console = join(outdir, "rootfs", DEFAULT_HTDOCS, "console")
+            assert.match(await readFile(join(console, "index.html"), "utf8"), /<script type="module" src="js\/login\.js">/)
+            assert.match(await readFile(join(console, "vnc/index.html"), "utf8"), /<script type="module" src="\.\.\/js\/vnc\.js">/)
+            assert.match(await readFile(join(console, "js/login.js"), "utf8"), /from '\.\/console-client\.js'/)
+            assert.match(await readFile(join(console, "js/vnc.js"), "utf8"), /from '\.\.\/vendor\/novnc\.js'/)
+            assert.match(await readFile(join(console, "js/monitor.js"), "utf8"), /from '\.\.\/vendor\/html-ele\.mjs'/)
+
             // noVNC as one module for the vnc page, with the notices its license asks to keep.
-            const novnc = await readFile(join(outdir, "rootfs/opt/wayuse/vendor/novnc.js"), "utf8")
+            const novnc = await readFile(join(console, "vendor/novnc.js"), "utf8")
             assert.match(novnc, /Licensed under MPL 2\.0/)
             assert.match(novnc, /export\s*\{\s*\w+ as default\s*\}/)
 
             // html-ele under the name the console's scripts import it by.
-            const htmlEle = await readFile(join(outdir, "rootfs/opt/wayuse/vendor/html-ele.mjs"), "utf8")
+            const htmlEle = await readFile(join(console, "vendor/html-ele.mjs"), "utf8")
             assert.match(htmlEle, /export\s*\{[^}]*\bELE\b[^}]*\}/)
         } finally {
             await rm(outdir, {recursive: true, force: true})

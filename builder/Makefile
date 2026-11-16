@@ -16,7 +16,7 @@ ROLLUP_SRC := $(wildcard ./*.ts)
 BUILD_DST := ../packages/wayuse-build/dist/wayuse-build.js
 SERVER_DST := ../packages/wayuse-server/dist/wayuse-server.js
 CLIENT_DST := ../packages/wayuse-client/dist/wayuse-client.js
-CONSOLE_DST := ../packages/wayuse-server/dist/console/login.js
+CONSOLE_DST := ../packages/wayuse-build/dist/console/login.js
 
 BUILD_CONFIG := ./rollup-build.config.ts
 SERVER_CONFIG := ./rollup-server.config.ts
