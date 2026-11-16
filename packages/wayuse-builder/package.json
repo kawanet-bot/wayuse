@@ -31,6 +31,8 @@
     "dist/wayuse-builder.js",
     "LICENSE",
     "README.md",
+    "sample/docker-compose.yml",
+    "sample/wayuse.config.ts",
     "types/*.d.ts"
   ],
   "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-builder#readme",

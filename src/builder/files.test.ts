@@ -79,7 +79,7 @@ describe(TITLE, () => {
         assert.equal(start.match(/ --port=(\d+)$/m)?.[1], port)
 
         // The sample publishes the port under its own number, which is where the client's default looks.
-        const sample = readFileSync(new URL("../../sample/docker-compose.yml", import.meta.url), "utf8")
+        const sample = readFileSync(new URL("../../packages/wayuse-builder/sample/docker-compose.yml", import.meta.url), "utf8")
         assert.equal(sample.match(/^ +- "\$\{WAYUSE_PUBLISH:-127\.0\.0\.1:(\d+)\}:(\d+)"$/m)?.slice(1).join(), `${port},${port}`)
     })
 
