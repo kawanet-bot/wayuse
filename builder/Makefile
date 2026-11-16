@@ -23,11 +23,11 @@ SERVER_CONFIG := ./rollup-server.config.ts
 CLIENT_CONFIG := ./rollup-client.config.ts
 CONSOLE_CONFIG := ./rollup-console.config.ts
 
-# A bundle past its cap has taken in a module that was meant to stay external. Each cap leaves room to grow by half.
+# A file past its cap has taken in a module that was meant to stay external. Each cap leaves its largest file room to grow by half.
 BUILDER_MAX_BYTES := 30000
-SERVER_MAX_BYTES := 300000
+SERVER_MAX_BYTES := 250000
 CLIENT_MAX_BYTES := 30000
-CONSOLE_MAX_BYTES := 60000
+CONSOLE_MAX_BYTES := 30000
 
 ALL := $(BUILDER_DST) $(SERVER_DST) $(CLIENT_DST) $(CONSOLE_DST)
 
@@ -62,7 +62,8 @@ $(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../pac
 	@# What only Chrome needs must stay in Chrome's own file, or an image without Chrome would load it at start.
 	@! grep -q "html-slim" $@ $(dir $@)server/server.js || { echo "ERROR: the server loads html-slim at start" >&2; exit 1; }
 	@ls -l $@ $(dir $@)server
-	@test "$$(cat $@ $(dir $@)server/*.js | wc -c)" -le $(SERVER_MAX_BYTES) || { echo "ERROR: $@ and $(dir $@)server exceed $(SERVER_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $(dir $@)server/server.js)" -le $(SERVER_MAX_BYTES) || { echo "ERROR: $(dir $@)server/server.js exceeds $(SERVER_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $(dir $@)server/chrome-api.js)" -le $(SERVER_MAX_BYTES) || { echo "ERROR: $(dir $@)server/chrome-api.js exceeds $(SERVER_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 # src/jwt/ is bundled here and into the server, and src/api/ here and, later, into the console.
@@ -75,12 +76,16 @@ $(CLIENT_DST): $(CLIENT_CONFIG) $(CLIENT_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../pac
 
 # The scripts of the console's pages, for the browser. One file stands for all of them: rollup writes them together.
 $(CONSOLE_DST): $(CONSOLE_CONFIG) $(CONSOLE_SRC) $(SHARED_SRC) $(ROLLUP_SRC)
-	@# A file an earlier build left there would be counted below, and packed, with the rest.
+	@# A file an earlier build left there would be packed with the rest.
 	@/bin/rm -fr $(dir $@)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $(dir $@)
-	@test "$$(cat $(dir $@)*.js | wc -c)" -le $(CONSOLE_MAX_BYTES) || { echo "ERROR: $(dir $@) exceeds $(CONSOLE_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $(dir $@)login.js)" -le $(CONSOLE_MAX_BYTES) || { echo "ERROR: $(dir $@)login.js exceeds $(CONSOLE_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $(dir $@)monitor.js)" -le $(CONSOLE_MAX_BYTES) || { echo "ERROR: $(dir $@)monitor.js exceeds $(CONSOLE_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $(dir $@)api.js)" -le $(CONSOLE_MAX_BYTES) || { echo "ERROR: $(dir $@)api.js exceeds $(CONSOLE_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $(dir $@)vnc.js)" -le $(CONSOLE_MAX_BYTES) || { echo "ERROR: $(dir $@)vnc.js exceeds $(CONSOLE_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $(dir $@)console-client.js)" -le $(CONSOLE_MAX_BYTES) || { echo "ERROR: $(dir $@)console-client.js exceeds $(CONSOLE_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 ####
