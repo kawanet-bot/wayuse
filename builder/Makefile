@@ -25,7 +25,7 @@ CONSOLE_CONFIG := ./rollup-console.config.ts
 
 # A file past its cap has taken in a module that was meant to stay external. Each cap leaves its largest file room to grow by half.
 BUILDER_MAX_BYTES := 30000
-SERVER_MAX_BYTES := 250000
+SERVER_MAX_BYTES := 150000
 CLIENT_MAX_BYTES := 30000
 CONSOLE_MAX_BYTES := 30000
 
