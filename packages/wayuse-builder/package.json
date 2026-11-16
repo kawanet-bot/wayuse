@@ -12,6 +12,7 @@
   "dependencies": {
     "@novnc/novnc": "^1.7.0",
     "@rollup/plugin-terser": "^1.0.2",
+    "html-ele": "^0.2.2",
     "rollup": "^4.68.3"
   },
   "engines": {

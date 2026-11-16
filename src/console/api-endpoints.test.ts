@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import {describe, it} from "node:test"
 import {runCLI} from "../client/cli.ts"
 import {createFakeServer} from "../test-utils/fake-server.ts"
-import {type Values, CLICKABLE, ENDPOINTS, cliOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
+import {type Values, CLICKABLE, ENDPOINTS, cliOf, endpointGroupsOf, fieldsOf, keyOf, optionsOf, requestOf} from "./api-endpoints.ts"
 
 const TITLE = "console/api-endpoints.test.ts"
 
@@ -62,6 +62,22 @@ describe(TITLE, () => {
             assert.ok(fieldsOf(target).includes("x"), click)
             assert.ok(fieldsOf(target).includes("y"), click)
         }
+    })
+
+    // A tab's title comes from whatever page is open, and must stay words in the pull-down.
+    it("writes the choices of a pull-down with their words escaped", () => {
+        const [first, second] = optionsOf([["1", "plain"], ["2", `<b> & "quoted"`]]).map(node => node.outerHTML)
+        assert.equal(first, `<option value="1">plain</option>`)
+        assert.ok(second!.startsWith(`<option value="2">`), second)
+        assert.ok(!second!.includes("<b>"), second)
+        assert.ok(second!.includes("&lt;b&gt; &amp; "), second)
+    })
+
+    it("groups the endpoints by the first part of the path, each under its place in the list", () => {
+        const endpoints = [find("GET slot/"), find("GET clipboard"), find("POST slot/:slot/click")]
+        const [slot, clipboard] = endpointGroupsOf(endpoints, "/base/").map(node => node.outerHTML)
+        assert.equal(slot, `<optgroup label="slot"><option value="0">GET    /base/slot/</option><option value="2">POST   /base/slot/:slot/click</option></optgroup>`)
+        assert.equal(clipboard, `<optgroup label="clipboard"><option value="1">GET    /base/clipboard</option></optgroup>`)
     })
 
     // The form promises that the command does what the request does, so each command is run and its request compared.

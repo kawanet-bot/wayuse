@@ -1,6 +1,7 @@
 // The controls of the API form. They hold what is entered, and show the status, the response and the picture.
 
-import {type Field, type Values, CLICKABLE} from "./api-endpoints.ts"
+import {HTML} from "html-ele"
+import {type Field, type Values, CLICKABLE, optionsOf} from "./api-endpoints.ts"
 import {$} from "./console-client.ts"
 
 export const SELECTS: Field[] = ["slot", "id", "context"]
@@ -20,7 +21,7 @@ export const setStatus = (text: string, ok?: boolean): void => {
 // Replaces a pull-down's choices, and keeps the one chosen when it is still there.
 export const fill = (select: HTMLSelectElement, items: [string, string][]): void => {
     const current = select.value
-    select.replaceChildren(...items.map(([value, label]) => new Option(label, value)))
+    select.replaceChildren(HTML`${optionsOf(items)}`)
     if (items.some(([value]) => value === current)) select.value = current
 }
 

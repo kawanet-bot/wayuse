@@ -49,6 +49,7 @@ test-build:
 	[ -s tmp/Dockerfile ]
 	[ -x tmp/rootfs/opt/wayuse/bin/supervise.sh ]
 	grep -q "Licensed under MPL 2.0" tmp/rootfs/opt/wayuse/vendor/novnc.js
+	[ -s tmp/rootfs/opt/wayuse/vendor/html-ele.mjs ]
 	grep -q '"html-slim"' tmp/rootfs/opt/wayuse/package.json
 
 # What the image does, without Docker: install the generated package.json, start the server, and ask it.
