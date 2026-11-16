@@ -8,7 +8,7 @@ const TITLE = "build/config.test.ts"
 describe(TITLE, () => {
     it("fills in every default", () => {
         const config = resolveConfig({})
-        assert.match(config.builder.version, /^\d+\.\d+\.\d+/)
+        assert.match(config.wayuse.build.version, /^\d+\.\d+\.\d+/)
         assert.equal(config.node.version, process.versions.node)
         assert.deepEqual(config.apps, {})
         assert.equal(config.timezone, "Etc/UTC")

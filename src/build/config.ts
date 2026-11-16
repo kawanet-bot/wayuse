@@ -120,7 +120,7 @@ export const resolveConfig = (input: Input): Resolved => {
     })
 
     return {
-        builder: {version: VERSION},
+        wayuse: {build: {version: VERSION}},
         // The default is checked like a given value: a nightly build of Node.js has no release to download.
         node: {version: stringOf(node.version ?? DEFAULT_NODE_VERSION, "config.node.version", NODE_VERSION, "")},
         apps: installed,
