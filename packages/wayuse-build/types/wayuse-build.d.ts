@@ -2,7 +2,7 @@
 
 export {} // external module indicator
 
-export declare namespace WayuseBuilder {
+export declare namespace WayuseBuild {
 
     /** The default export of wayuse.config.ts. Every item may be left out. */
     interface Config {
@@ -54,7 +54,7 @@ export declare namespace WayuseBuilder {
 }
 
 /** Returns the configuration as given. It only brings the types to wayuse.config.ts. */
-export declare function defineConfig(config: WayuseBuilder.Config): WayuseBuilder.Config
+export declare function defineConfig(config: WayuseBuild.Config): WayuseBuild.Config
 
 /** Runs the command line once per process and resolves to its exit code. The caller ends the process. */
-export declare function CLI(options: WayuseBuilder.CLIOptions): Promise<number>
+export declare function CLI(options: WayuseBuild.CLIOptions): Promise<number>

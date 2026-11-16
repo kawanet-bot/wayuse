@@ -1,6 +1,6 @@
 import type {WayuseClient} from "wayuse-client"
 
-// The wayuse-server this builder was written against. A tarball stands in while that is not on npm.
+// The wayuse-server that wayuse-build was written against. A tarball stands in while that is not on npm.
 const SERVER_RANGE = "^0.0.0"
 
 /** The tarball's name in the image: fixed, so the generated files do not change with its version. */

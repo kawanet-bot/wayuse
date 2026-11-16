@@ -5,7 +5,7 @@ SHELL := bash
 # Sequential by design: the bundles are quick, and -j only interleaves their output.
 .NOTPARALLEL:
 
-BUILDER_SRC := $(shell find ../src/builder -name '*.ts' -not -name '*.test.ts')
+BUILD_SRC := $(shell find ../src/build -name '*.ts' -not -name '*.test.ts')
 SERVER_SRC := $(shell find ../src/server -name '*.ts' -not -name '*.test.ts')
 CLIENT_SRC := $(shell find ../src/client -name '*.ts' -not -name '*.test.ts')
 SHARED_SRC := $(shell find ../src/jwt ../src/api -name '*.ts' -not -name '*.test.ts')
@@ -13,24 +13,24 @@ CONSOLE_SRC := $(shell find ../src/console -name '*.ts' -not -name '*.test.ts')
 TYPES := $(wildcard ../packages/*/types/*.d.ts)
 ROLLUP_SRC := $(wildcard ./*.ts)
 
-BUILDER_DST := ../packages/wayuse-builder/dist/wayuse-builder.js
+BUILD_DST := ../packages/wayuse-build/dist/wayuse-build.js
 SERVER_DST := ../packages/wayuse-server/dist/wayuse-server.js
 CLIENT_DST := ../packages/wayuse-client/dist/wayuse-client.js
 CONSOLE_DST := ../packages/wayuse-server/dist/console/login.js
 
-BUILDER_CONFIG := ./rollup-builder.config.ts
+BUILD_CONFIG := ./rollup-build.config.ts
 SERVER_CONFIG := ./rollup-server.config.ts
 CLIENT_CONFIG := ./rollup-client.config.ts
 CONSOLE_CONFIG := ./rollup-console.config.ts
 
 # A bundle past its cap has taken in a module that was meant to stay external. Each cap leaves room to grow by half.
 # The files of one bundle count together. Rollup decides which of them a module goes into.
-BUILDER_MAX_BYTES := 30000
+BUILD_MAX_BYTES := 30000
 SERVER_MAX_BYTES := 200000
 CLIENT_MAX_BYTES := 30000
 CONSOLE_MAX_BYTES := 60000
 
-ALL := $(BUILDER_DST) $(SERVER_DST) $(CLIENT_DST) $(CONSOLE_DST)
+ALL := $(BUILD_DST) $(SERVER_DST) $(CLIENT_DST) $(CONSOLE_DST)
 
 # The build and the tests run .ts as it is, which takes Node's own type stripping: 22.18 and up.
 BUILDABLE := $(shell node -e 'console.log(process.features.typescript ? "YES" : "NO")')
@@ -48,11 +48,11 @@ is-not-buildable:
 	@ [ "$(BUILDABLE)" != "YES" ] || [ ! -f ../node_modules/.bin/rollup ]
 
 # The package name resolves to this file, for bin/wayuse-build.js and for a wayuse.config.ts alike.
-$(BUILDER_DST): $(BUILDER_CONFIG) $(BUILDER_SRC) $(ROLLUP_SRC) ../packages/wayuse-builder/package.json
+$(BUILD_DST): $(BUILD_CONFIG) $(BUILD_SRC) $(ROLLUP_SRC) ../packages/wayuse-build/package.json
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
-	@test "$$(wc -c < $@)" -le $(BUILDER_MAX_BYTES) || { echo "ERROR: $@ exceeds $(BUILDER_MAX_BYTES) byte cap" >&2; exit 1; }
+	@test "$$(wc -c < $@)" -le $(BUILD_MAX_BYTES) || { echo "ERROR: $@ exceeds $(BUILD_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 # Node strips no types under node_modules, so the image runs this file and never the sources.

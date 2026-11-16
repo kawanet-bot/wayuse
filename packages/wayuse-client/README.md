@@ -18,7 +18,7 @@ npx wayuse slot list                        # every screen, as JSON
 ```
 
 A server on the host, such as `wrangler dev`, is opened as `http://host.docker.internal:<port>/`.
-The container and the server each need a setting for that: see [wayuse-builder](../wayuse-builder/README.md#a-server-on-the-host).
+The container and the server each need a setting for that: see [wayuse-build](../wayuse-build/README.md#a-server-on-the-host).
 
 The same from a program. It uses web standards alone, so it runs in Node.js and in a browser:
 

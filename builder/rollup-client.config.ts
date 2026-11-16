@@ -23,7 +23,7 @@ const rollupConfig: RollupOptions = {
             transforms: ["typescript"],
         }),
 
-        showFiles({deny: /\W(builder|server|test)\W/}),
+        showFiles({deny: /\W(build|server|test)\W/}),
     ],
 }
 

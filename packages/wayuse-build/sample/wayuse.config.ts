@@ -1,4 +1,4 @@
-import {defineConfig} from "wayuse-builder"
+import {defineConfig} from "wayuse-build"
 
 export default defineConfig({
     node: {

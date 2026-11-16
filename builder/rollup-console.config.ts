@@ -38,7 +38,7 @@ const rollupConfig: RollupOptions = {
         }),
 
         // The browser gets nothing of Node: only src/console/ and the client both sides share.
-        showFiles({deny: /^src\/(builder|server|client|jwt|test-utils)\/|\.test\./}),
+        showFiles({deny: /^src\/(build|server|client|jwt|test-utils)\/|\.test\./}),
     ],
 }
 

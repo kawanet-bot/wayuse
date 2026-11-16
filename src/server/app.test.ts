@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {resolveConfig} from "../builder/config.ts"
+import {resolveConfig} from "../build/config.ts"
 import {generateKeyPair, signJwt} from "../client/jwt-sign.ts"
 import {createApp} from "./app.ts"
 import {type AuthOptions, parsePublicKey} from "./jwt-verify.ts"
@@ -32,7 +32,7 @@ describe(TITLE, () => {
         assert.equal(await res.text(), "")
     })
 
-    it("returns the resolved configuration as the builder wrote it", async () => {
+    it("returns the resolved configuration as wayuse-build wrote it", async () => {
         const {res} = await run("/wayuse/config", bearer)
         assert.equal(res.status, 200)
         assert.deepEqual(await res.json(), config)

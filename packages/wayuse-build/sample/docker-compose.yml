@@ -1,8 +1,4 @@
-# Once, make the keys. Docker Compose reads .env, and only the public key below reaches the container.
-#   npx wayuse jwt keygen > .env
-#
-# Then build the image and start the container.
-#   make -C ../builder/pack && npx wayuse-build --server-tarball ../builder/pack/server.tgz && docker compose up --build -d
+# To start with this file, see https://github.com/kawanet/wayuse/tree/main/packages/wayuse-build#readme
 
 name: wayuse-sample
 

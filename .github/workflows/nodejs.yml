@@ -29,7 +29,6 @@ jobs:
           path: |
             README.md
             builder/pack/
-            sample/
           if-no-files-found: error
           retention-days: 1
 

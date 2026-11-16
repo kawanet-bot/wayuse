@@ -2,7 +2,7 @@
 
 import {readFileSync} from "node:fs"
 import type {WayuseClient} from "wayuse-client"
-import {resolveConfig} from "../builder/config.ts"
+import {resolveConfig} from "../build/config.ts"
 import {generateKeyPair, signJwt} from "../client/jwt-sign.ts"
 import {createApp} from "../server/app.ts"
 import type {Exec} from "../server/exec.ts"

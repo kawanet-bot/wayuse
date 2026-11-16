@@ -4,13 +4,13 @@ import type {RollupOptions} from "rollup"
 import {showFiles} from "./show-files.ts"
 
 const rollupConfig: RollupOptions = {
-    input: "../src/builder/builder.ts",
+    input: "../src/build/build.ts",
 
     // Bare specifiers stay external; only relative paths are bundled.
     external: [/^[^.\/]/],
 
     output: {
-        file: "../packages/wayuse-builder/dist/wayuse-builder.js",
+        file: "../packages/wayuse-build/dist/wayuse-build.js",
         format: "esm",
     },
 

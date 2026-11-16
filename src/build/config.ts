@@ -1,12 +1,12 @@
-import type * as declared from "wayuse-builder"
-import type {WayuseBuilder} from "wayuse-builder"
+import type * as declared from "wayuse-build"
+import type {WayuseBuild} from "wayuse-build"
 import type {WayuseClient} from "wayuse-client"
 import {VERSION} from "./version.ts"
 
-type Input = WayuseBuilder.Config
+type Input = WayuseBuild.Config
 type Resolved = WayuseClient.Config
 
-// The Node.js that runs this builder: the one the image's owner already develops and tests with.
+// The Node.js that runs wayuse-build: the one the image's owner already develops and tests with.
 const DEFAULT_NODE_VERSION = process.versions.node
 
 const CHANNELS = ["stable", "beta", "unstable"] as const
@@ -120,7 +120,7 @@ export const resolveConfig = (input: Input): Resolved => {
     })
 
     return {
-        builder: {version: VERSION},
+        wayuse: {build: {version: VERSION}},
         // The default is checked like a given value: a nightly build of Node.js has no release to download.
         node: {version: stringOf(node.version ?? DEFAULT_NODE_VERSION, "config.node.version", NODE_VERSION, "")},
         apps: installed,

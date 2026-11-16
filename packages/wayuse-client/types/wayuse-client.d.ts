@@ -6,8 +6,8 @@ export declare namespace WayuseClient {
 
     /** What the image was defined to hold, with every default filled in. Baked in as /etc/wayuse/wayuse.json. */
     interface Config {
-        /** The wayuse-builder that filled in the defaults. */
-        builder: {version: string}
+        /** The wayuse-build that filled in the defaults. */
+        wayuse: {build: {version: string}}
         node: {version: string}
         /** The installed applications. A key is present only for an installed one. */
         apps: {chrome?: ChromeConfig, redir?: RedirConfig}

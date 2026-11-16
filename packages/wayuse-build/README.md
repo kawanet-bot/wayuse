@@ -1,6 +1,6 @@
-# wayuse-builder
+# wayuse-build
 
-[![npm version](https://img.shields.io/npm/v/wayuse-builder)](https://www.npmjs.com/package/wayuse-builder)
+[![npm version](https://img.shields.io/npm/v/wayuse-build)](https://www.npmjs.com/package/wayuse-build)
 
 Build the wayuse Docker image.
 
@@ -9,7 +9,7 @@ Build the wayuse Docker image.
 `wayuse.config.ts` defines what the image holds:
 
 ```ts
-import {defineConfig} from "wayuse-builder"
+import {defineConfig} from "wayuse-build"
 
 export default defineConfig({
     node: {
@@ -39,6 +39,18 @@ npx wayuse-build
 docker build -t my-wayuse .wayuse
 docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
+
+The package ships that `wayuse.config.ts` in [sample/](sample/), with a [docker-compose.yml](sample/docker-compose.yml) that runs its image.
+Copy them, make the keys once, and start the container:
+
+```sh
+cp node_modules/wayuse-build/sample/* .
+npx wayuse jwt keygen > .env
+npx wayuse-build && docker compose up --build -d
+```
+
+Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
+The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `.wayuse` beside its file.
 
 ## CONFIGURATION
 
@@ -126,14 +138,7 @@ Connect by an IP address or `localhost`. Chrome refuses a request whose `Host` h
 A development server on the host, such as `wrangler dev`, is opened in the container as `http://host.docker.internal:<port>/`.
 On Linux a container does not reach the host's `127.0.0.1`, so two things are needed.
 
-1. Give the container the host's name, with `docker run --add-host host.docker.internal:host-gateway`, or in a `docker-compose.yml`:
-
-   ```yaml
-   services:
-     wayuse:
-       extra_hosts:
-         - "host.docker.internal:host-gateway"
-   ```
+1. Give the container the host's name, with `docker run --add-host host.docker.internal:host-gateway`. The sample's `docker-compose.yml` does it with `extra_hosts`.
 
 2. Make the server listen on more than `127.0.0.1`, which is where `wrangler dev`, like most development servers, listens by default:
 
