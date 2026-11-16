@@ -23,8 +23,8 @@ const rollupConfig: RollupOptions = {
 
         // Neither is part of this package. wayuse-build puts them into the image, and the pages load them from there.
         paths: {
-            "@novnc/novnc": "../../vendor/novnc.js",
-            "html-ele": "../../vendor/html-ele.mjs",
+            "@novnc/novnc": "../vendor/novnc.js",
+            "html-ele": "../vendor/html-ele.mjs",
         },
     },
 

@@ -31,15 +31,15 @@ describe(TITLE, () => {
         assert.equal(res.headers.get("location"), "console/")
     })
 
-    it("serves under /vendor/ what the image has in its vendor directory", async () => {
-        const res = await get("/vendor/novnc.js")
+    it("serves under /console/vendor/ what the image has in its vendor directory", async () => {
+        const res = await get("/console/vendor/novnc.js")
         assert.equal(res.status, 200)
         assert.match(res.headers.get("content-type") ?? "", /^text\/javascript/)
         assert.equal(await res.text(), "export default class RFB {}\n")
     })
 
     it("serves nothing else of a package, and nothing above a directory it serves", async () => {
-        for (const path of ["/vendor/../package.json", "/console/../package.json", "/console/%2e%2e/package.json", "/console/js/../../package.json", "/vendor/%2e%2e/wayuse-server.js", "/wayuse-server.js"]) {
+        for (const path of ["/console/vendor/../package.json", "/console/../package.json", "/console/%2e%2e/package.json", "/console/js/../../package.json", "/console/vendor/%2e%2e/wayuse-server.js", "/wayuse-server.js"]) {
             assert.equal((await get(path)).status, 401, path)
         }
         assert.equal((await get("/console/nosuch.html", {authorization: `Bearer ${server.jwt}`})).status, 404)

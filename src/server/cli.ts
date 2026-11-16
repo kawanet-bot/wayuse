@@ -17,7 +17,7 @@ const USAGE = `
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: ${DEFAULT_PORT})
   -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)
-  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)
+  --vendor <dir>       what is served under /console/vendor/ (default: /opt/wayuse/vendor)
   -v, --version        print this package's version
   -h, --help           print this usage
 Environment:

@@ -108,8 +108,8 @@ The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
 A link of the form `/console/#!?jwt=<JWT>` signs in with the token in it. A browser sends what follows the `#` to no server.
 The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
 
-The vnc page loads [noVNC](https://github.com/novnc/noVNC) from `/vendor/novnc.js`. It is not in this package: wayuse-build puts it into the image.
-The monitor and the API form load [html-ele](https://github.com/kawanet/html-ele) from `/vendor/html-ele.mjs`, which wayuse-build puts there as well.
+The vnc page loads [noVNC](https://github.com/novnc/noVNC) from `/console/vendor/novnc.js`. It is not in this package: wayuse-build puts it into the image.
+The monitor and the API form load [html-ele](https://github.com/kawanet/html-ele) from `/console/vendor/html-ele.mjs`, which wayuse-build puts there as well.
 
 ## VNC
 
@@ -129,7 +129,7 @@ This package is under the MIT license, but for what it carries of others:
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: 9580)
   -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)
-  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)
+  --vendor <dir>       what is served under /console/vendor/ (default: /opt/wayuse/vendor)
   -v, --version        print this package's version
   -h, --help           print this usage
 ```

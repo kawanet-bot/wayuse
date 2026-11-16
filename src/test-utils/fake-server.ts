@@ -45,7 +45,7 @@ export interface FakeServerOptions {
     vncPort?: (n: number) => number
     /** The tickets a test shares with the relay it stands up beside. */
     tickets?: VncTickets
-    /** A directory to serve under /vendor/. */
+    /** A directory to serve under /console/vendor/. */
     vendorDir?: string
 }
 

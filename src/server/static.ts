@@ -21,7 +21,7 @@ export const createStaticApp = (vendorDir: string): Hono => {
     app.use("/console/*", serveStatic({root: `${root}htdocs`}))
 
     // What wayuse-build puts into the image from other packages for the pages: noVNC and html-ele. Outside an image there is none.
-    if (existsSync(vendorDir)) app.use("/vendor/*", serveStatic({root: vendorDir, rewriteRequestPath: path => path.replace(/^\/vendor/, "")}))
+    if (existsSync(vendorDir)) app.use("/console/vendor/*", serveStatic({root: vendorDir, rewriteRequestPath: path => path.replace(/^\/console\/vendor/, "")}))
 
     return app
 }

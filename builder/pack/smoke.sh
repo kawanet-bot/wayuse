@@ -28,7 +28,7 @@ check() {
 check /ok 200
 check /console/ 200
 check /console/js/monitor.js 200
-check /vendor/novnc.js 200
-check /vendor/html-ele.mjs 200
+check /console/vendor/novnc.js 200
+check /console/vendor/html-ele.mjs 200
 check /wayuse/config 401
 check /app/chrome/tab/ 401
