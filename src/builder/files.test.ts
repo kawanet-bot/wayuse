@@ -40,6 +40,20 @@ describe(TITLE, () => {
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "^0.0.0"})
     })
 
+    // A missing backslash, or one after the last package, makes a Dockerfile that does not build.
+    it("continues the line after every package but the last", () => {
+        const dockerfile = generatedFilesOf(resolveConfig({packages: ["fonts-noto-cjk", "fonts-noto-core"]}))["Dockerfile"]!
+        assert.match(dockerfile, /--no-install-recommends \\\n {8}fonts-noto-cjk \\\n {8}fonts-noto-core\n\n/)
+    })
+
+    it("installs redir and keeps it running, with a line for each port in a file of their own", () => {
+        const files = generatedFilesOf(resolveConfig({apps: {redir: {ports: {9223: "127.0.0.1:9222", 18081: "host.docker.internal:18081"}}}}))
+        const dockerfile = files["Dockerfile"]!
+        assert.match(dockerfile, /\n {8}redir\n/)
+        assert.match(dockerfile, /"\/opt\/wayuse\/bin\/redir-start\.sh","\/opt\/wayuse\/bin\/server-start\.sh"\]\n$/)
+        assert.equal(files["rootfs/etc/wayuse/redir.conf"], "9223 127.0.0.1:9222\n18081 host.docker.internal:18081\n")
+    })
+
     it("installs what the server needs for Chrome beside the server", () => {
         const files = generatedFilesOf(config, {serverTarball: "server.tgz"})
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "file:wayuse-server.tgz", "html-slim": "^0.5.0"})

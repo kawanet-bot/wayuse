@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import {describe, it} from "node:test"
 import {runCLI} from "../client/cli.ts"
 import {createFakeServer} from "../test-utils/fake-server.ts"
-import {type Values, ENDPOINTS, cliOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
+import {type Values, CLICKABLE, ENDPOINTS, cliOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
 
 const TITLE = "console/api-endpoints.test.ts"
 
@@ -45,6 +45,22 @@ describe(TITLE, () => {
         assert.equal(new Set(ENDPOINTS.map(keyOf)).size, ENDPOINTS.length)
         for (const endpoint of ENDPOINTS) {
             for (const field of fieldsOf(endpoint)) assert.ok(field in VALUES, `${keyOf(endpoint)}: ${field}`)
+        }
+    })
+
+    // Only the paths tie a capture to its click, so a renamed endpoint would leave a click on the picture doing nothing.
+    it("sends a click on each clickable capture to an endpoint that takes it", () => {
+        for (const [path, {field, click}] of Object.entries(CLICKABLE)) {
+            const capture = ENDPOINTS.find(endpoint => endpoint.path === path)
+            assert.equal(capture?.method, "GET", path)
+            assert.equal(capture?.shows, "image", path)
+            assert.ok(fieldsOf(capture!).includes(field), path)
+
+            const target = ENDPOINTS.find(endpoint => keyOf(endpoint) === click)
+            assert.ok(target, click)
+            assert.ok(fieldsOf(target).includes(field), click)
+            assert.ok(fieldsOf(target).includes("x"), click)
+            assert.ok(fieldsOf(target).includes("y"), click)
         }
     })
 

@@ -16,10 +16,16 @@ const NODE_VERSION = /^\d+\.\d+\.\d+$/
 const TIMEZONE = /^[A-Za-z0-9_+-]+(\/[A-Za-z0-9_+-]+)*$/
 const APT_PACKAGE = /^[a-z0-9][a-z0-9+.-]+$/
 const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
+// A host name or an address, then the port there.
+const REDIR_TARGET = /^[A-Za-z0-9.-]+:\d+$/
 
 // sway refuses nothing here, so the bounds are those of the screens the server resizes to.
 const SCREEN_MIN = 1
 const SCREEN_MAX = 2560
+
+// The container's user cannot listen on a port below 1024.
+const PORT_MIN = 1024
+const PORT_MAX = 65535
 
 export class ConfigError extends Error {
 }
@@ -71,14 +77,38 @@ const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {
     return {channel: channel as typeof CHANNELS[number], env}
 }
 
+const redirOf = (value: unknown): WayuseClient.RedirConfig => {
+    const redir = recordOf(value, "config.apps.redir", ["ports"])
+
+    const ports: Record<number, string> = {}
+    for (const [port, target] of Object.entries(recordOf(redir.ports, "config.apps.redir.ports", Object.keys(redir.ports ?? {})))) {
+        if (!/^\d+$/.test(port) || +port < PORT_MIN || +port > PORT_MAX) {
+            throw new ConfigError(`config.apps.redir.ports takes a port from ${PORT_MIN} to ${PORT_MAX}: ${JSON.stringify(port)}`)
+        }
+        if (typeof target !== "string" || !REDIR_TARGET.test(target)) {
+            throw new ConfigError(`config.apps.redir.ports.${port} is not valid: ${JSON.stringify(target)}`)
+        }
+        ports[+port] = target
+    }
+
+    // With no port there is no redir to keep running, and the start script would end at once.
+    if (!Object.keys(ports).length) throw new ConfigError("config.apps.redir.ports is required")
+
+    return {ports}
+}
+
 /**
  * Fills in every default and refuses what the generated files could not carry.
  */
 export const resolveConfig = (input: Input): Resolved => {
     const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages"])
     const node = recordOf(config.node, "config.node", ["version"])
-    const apps = recordOf(config.apps, "config.apps", ["chrome"])
+    const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])
+
+    const installed: Resolved["apps"] = {}
+    if (apps.chrome !== undefined) installed.chrome = chromeOf(apps.chrome)
+    if (apps.redir !== undefined) installed.redir = redirOf(apps.redir)
 
     const packages = config.packages ?? []
     if (!Array.isArray(packages)) throw new ConfigError("config.packages must be an array")
@@ -88,7 +118,7 @@ export const resolveConfig = (input: Input): Resolved => {
         builder: {version: VERSION},
         // The default is checked like a given value: a nightly build of Node.js has no release to download.
         node: {version: stringOf(node.version ?? DEFAULT_NODE_VERSION, "config.node.version", NODE_VERSION, "")},
-        apps: apps.chrome === undefined ? {} : {chrome: chromeOf(apps.chrome)},
+        apps: installed,
         timezone: stringOf(config.timezone, "config.timezone", TIMEZONE, "Etc/UTC"),
         screen: {
             width: sizeOf(screen.width, "config.screen.width", 1280),

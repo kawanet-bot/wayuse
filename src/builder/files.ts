@@ -24,8 +24,10 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
     }
 
-    const {chrome} = config.apps
+    const {chrome, redir} = config.apps
     if (chrome) files["rootfs/etc/wayuse/chrome.env"] = shellEnvOf(chrome.env)
+    // One line per redir, for the start script to read: the port to listen on, then where it forwards to.
+    if (redir) files["rootfs/etc/wayuse/redir.conf"] = Object.entries(redir.ports).map(([port, target]) => `${port} ${target}\n`).join("")
 
     return files
 }
