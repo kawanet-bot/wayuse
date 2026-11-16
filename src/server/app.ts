@@ -1,6 +1,7 @@
 import {Hono} from "hono"
 import type {ContentfulStatusCode} from "hono/utils/http-status"
 import type {WayuseClient} from "wayuse-client"
+import {createAppsApp} from "./apps/apps-api.ts"
 import {createClipboardApp} from "./clipboard/clipboard-api.ts"
 import type {ServerDeps} from "./deps.ts"
 import {type Exec, exec as realExec} from "./exec.ts"
@@ -66,15 +67,7 @@ export const createApp = async ({config, stderr, auth, runtimeDir, exec = realEx
     app.route("/", createWayuseApp(deps))
     app.route("/", createSlotApp(deps))
     app.route("/", createClipboardApp(deps))
-
-    // Decided when the image is built: one that was not installed is not started either, and trying it would only time out.
-    // Imported only then, so an image without an application loads neither its code nor what that depends on.
-    if (config.apps.chrome) app.route("/", (await import("./chrome/chrome-api.ts")).createChromeApp(deps))
-
-    // Said in words, so a caller does not take it for a path that was misspelled.
-    app.all("/app/:name/*", c => {
-        throw new HttpError(404, `Application not installed: ${c.req.param("name")}`)
-    })
+    app.route("/", await createAppsApp(deps))
 
     app.notFound(c => c.json({error: {message: "Not Found"}}, 404))
 

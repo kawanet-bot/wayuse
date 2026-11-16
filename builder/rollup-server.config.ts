@@ -18,7 +18,8 @@ const rollupConfig: RollupOptions = {
     },
 
     plugins: [
-        json(),
+        // The key tables are read whole, and named exports would write every key of them twice.
+        json({namedExports: false}),
 
         sucrase({
             disableESTransforms: true,
