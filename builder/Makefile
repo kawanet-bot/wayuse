@@ -23,6 +23,12 @@ SERVER_CONFIG := ./rollup-server.config.ts
 CLIENT_CONFIG := ./rollup-client.config.ts
 CONSOLE_CONFIG := ./rollup-console.config.ts
 
+# A bundle past its cap has taken in a module that was meant to stay external. Each cap leaves room to grow by half.
+BUILDER_MAX_BYTES := 30000
+SERVER_MAX_BYTES := 300000
+CLIENT_MAX_BYTES := 30000
+CONSOLE_MAX_BYTES := 60000
+
 ALL := $(BUILDER_DST) $(SERVER_DST) $(CLIENT_DST) $(CONSOLE_DST)
 
 # The build and the tests run .ts as it is, which takes Node's own type stripping: 22.18 and up.
@@ -45,6 +51,7 @@ $(BUILDER_DST): $(BUILDER_CONFIG) $(BUILDER_SRC) $(ROLLUP_SRC) ../packages/wayus
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
+	@test "$$(wc -c < $@)" -le $(BUILDER_MAX_BYTES) || { echo "ERROR: $@ exceeds $(BUILDER_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 # Node strips no types under node_modules, so the image runs this file and never the sources.
@@ -55,6 +62,7 @@ $(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../pac
 	@# What only Chrome needs must stay in Chrome's own file, or an image without Chrome would load it at start.
 	@! grep -q "html-slim" $@ $(dir $@)server/server.js || { echo "ERROR: the server loads html-slim at start" >&2; exit 1; }
 	@ls -l $@ $(dir $@)server
+	@test "$$(cat $@ $(dir $@)server/*.js | wc -c)" -le $(SERVER_MAX_BYTES) || { echo "ERROR: $@ and $(dir $@)server exceed $(SERVER_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 # src/jwt/ is bundled here and into the server, and src/api/ here and, later, into the console.
@@ -62,13 +70,17 @@ $(CLIENT_DST): $(CLIENT_CONFIG) $(CLIENT_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../pac
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
+	@test "$$(wc -c < $@)" -le $(CLIENT_MAX_BYTES) || { echo "ERROR: $@ exceeds $(CLIENT_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 # The scripts of the console's pages, for the browser. One file stands for all of them: rollup writes them together.
 $(CONSOLE_DST): $(CONSOLE_CONFIG) $(CONSOLE_SRC) $(SHARED_SRC) $(ROLLUP_SRC)
+	@# A file an earlier build left there would be counted below, and packed, with the rest.
+	@/bin/rm -fr $(dir $@)
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $(dir $@)
+	@test "$$(cat $(dir $@)*.js | wc -c)" -le $(CONSOLE_MAX_BYTES) || { echo "ERROR: $(dir $@) exceeds $(CONSOLE_MAX_BYTES) byte cap" >&2; exit 1; }
 	@echo ""
 
 ####
