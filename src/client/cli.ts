@@ -6,47 +6,47 @@ import {type CLIIO, UsageError} from "./cli-io.ts"
 import {runJwt} from "./cli-jwt.ts"
 import {VERSION} from "./version.ts"
 
-const USAGE = [
-    "Usage: wayuse <command> [options]",
-    "  auth me                         print the claims of WAYUSE_JWT, as the server reads them",
-    "  config                          print the configuration the image was built from",
-    "  slot list                       print every screen",
-    "  slot show [--slot <slot>]       print one screen",
-    "  slot capture [--slot <slot>] [-o <file>]",
-    "                                  write a PNG of one screen (default: to the standard output)",
-    "  slot clear [--slot <slot>]      close every window on one screen",
-    "  slot click <x> <y> [--slot <slot>] [--button <button>]",
-    "                                  click a pixel of the screen's capture, whatever is there",
-    "  slot key <keys> [--slot <slot>] send keys to the screen: \"ctrl+l .. ctrl+v .. Return\"",
-    "  slot vnc [--slot <slot>]        issue a one-time ticket, and print the WebSocket URL a VNC client connects to",
-    "  clipboard get                   print the text on the clipboard",
-    "  clipboard set <text>            put the text on the clipboard",
-    "  status                          print the load and the memory of the host",
-    "  chrome list                     print every tab of Chrome",
-    "  chrome open <url> [--slot <slot>] [--size <width>x<height>] [--context temporary] [--add]",
-    "                                  open the URL in a new window that replaces what is on the slot,",
-    "                                  or with --add in one more window over it",
-    "  chrome show [--tab <id>]        print one tab",
-    "  chrome close [--tab <id>]       close one tab",
-    "  chrome capture [--tab <id>] [-o <file>]",
-    "                                  write a JPEG of what one tab shows",
-    "  chrome html [--tab <id>] [-o <file>]",
-    "                                  write the tab's DOM as lightened HTML",
-    "  chrome click <x> <y> [--tab <id>] [--button <button>]",
-    "                                  click a pixel of the tab's capture",
-    "  chrome eval <expression> [--tab <id>]",
-    "                                  evaluate JavaScript in the tab's page, and print the result",
-    "  jwt keygen                      print a new key pair, as lines for an .env file",
-    "  jwt public-key                  print the public key of WAYUSE_JWT_PRIVATE_KEY",
-    "  jwt sign --sub <subject> [--claim <name>[=<value>]]...",
-    "                                  print a JWT signed with WAYUSE_JWT_PRIVATE_KEY, for WAYUSE_JWT_AUDIENCE",
-    "  -v, --version                   print this package's version",
-    "  -h, --help                      print this usage",
-    "--slot is the first screen when left out. --tab may be left out while Chrome has one tab.",
-    "Environment:",
-    `  WAYUSE_URL                      where the server is reached (default: ${DEFAULT_URL})`,
-    "  WAYUSE_JWT                      the token sent with each request",
-].map(line => `${line}\n`).join("")
+const USAGE = `
+Usage: wayuse <command> [options]
+  auth me                         print the claims of WAYUSE_JWT, as the server reads them
+  config                          print the configuration the image was built from
+  slot list                       print every screen
+  slot show [--slot <slot>]       print one screen
+  slot capture [--slot <slot>] [-o <file>]
+                                  write a PNG of one screen (default: to the standard output)
+  slot clear [--slot <slot>]      close every window on one screen
+  slot click <x> <y> [--slot <slot>] [--button <button>]
+                                  click a pixel of the screen's capture, whatever is there
+  slot key <keys> [--slot <slot>] send keys to the screen: "ctrl+l .. ctrl+v .. Return"
+  slot vnc [--slot <slot>]        issue a one-time ticket, and print the WebSocket URL a VNC client connects to
+  clipboard get                   print the text on the clipboard
+  clipboard set <text>            put the text on the clipboard
+  status                          print the load and the memory of the host
+  chrome list                     print every tab of Chrome
+  chrome open <url> [--slot <slot>] [--size <width>x<height>] [--context temporary] [--add]
+                                  open the URL in a new window that replaces what is on the slot,
+                                  or with --add in one more window over it
+  chrome show [--tab <id>]        print one tab
+  chrome close [--tab <id>]       close one tab
+  chrome capture [--tab <id>] [-o <file>]
+                                  write a JPEG of what one tab shows
+  chrome html [--tab <id>] [-o <file>]
+                                  write the tab's DOM as lightened HTML
+  chrome click <x> <y> [--tab <id>] [--button <button>]
+                                  click a pixel of the tab's capture
+  chrome eval <expression> [--tab <id>]
+                                  evaluate JavaScript in the tab's page, and print the result
+  jwt keygen                      print a new key pair, as lines for an .env file
+  jwt public-key                  print the public key of WAYUSE_JWT_PRIVATE_KEY
+  jwt sign --sub <subject> [--claim <name>[=<value>]]...
+                                  print a JWT signed with WAYUSE_JWT_PRIVATE_KEY, for WAYUSE_JWT_AUDIENCE
+  -v, --version                   print this package's version
+  -h, --help                      print this usage
+--slot is the first screen when left out. --tab may be left out while Chrome has one tab.
+Environment:
+  WAYUSE_URL                      where the server is reached (default: ${DEFAULT_URL})
+  WAYUSE_JWT                      the token sent with each request
+`.trimStart()
 
 const EXIT_FAILURE = 1
 const EXIT_USAGE = 2

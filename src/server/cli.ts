@@ -13,17 +13,17 @@ import {createWayvncProxy} from "./wayvnc/wayvnc-proxy.ts"
 // Assigned to nothing at IANA and no development server's own, so it seldom meets another server on a host.
 export const DEFAULT_PORT = 9580
 
-const USAGE = [
-    "Usage: wayuse-server [options]",
-    `  -p, --port <port>    the port to listen on (default: ${DEFAULT_PORT})`,
-    "  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)",
-    "  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)",
-    "  -v, --version        print this package's version",
-    "  -h, --help           print this usage",
-    "Environment:",
-    "  WAYUSE_JWT_PUBLIC_KEY  the key tokens are verified with: without it, every API that needs a token is refused",
-    "  WAYUSE_JWT_AUDIENCE    the aud a token must carry (default: wayuse)",
-].map(line => `${line}\n`).join("")
+const USAGE = `
+Usage: wayuse-server [options]
+  -p, --port <port>    the port to listen on (default: ${DEFAULT_PORT})
+  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)
+  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)
+  -v, --version        print this package's version
+  -h, --help           print this usage
+Environment:
+  WAYUSE_JWT_PUBLIC_KEY  the key tokens are verified with: without it, every API that needs a token is refused
+  WAYUSE_JWT_AUDIENCE    the aud a token must carry (default: wayuse)
+`.trimStart()
 
 const EXIT_USAGE = 2
 
