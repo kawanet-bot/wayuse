@@ -36,8 +36,8 @@ export declare namespace WayuseBuilder {
     }
 
     interface RedirConfig {
-        /** The arguments of redir. ":9223 127.0.0.1:9222" forwards port 9223 to Chrome DevTools Protocol. */
-        args: string
+        /** The ports to listen on, each with where it forwards to. {9223: "127.0.0.1:9222"} forwards port 9223 to Chrome DevTools Protocol. */
+        ports: Record<number, string>
     }
 
     interface ScreenConfig {

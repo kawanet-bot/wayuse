@@ -16,12 +16,16 @@ const NODE_VERSION = /^\d+\.\d+\.\d+$/
 const TIMEZONE = /^[A-Za-z0-9_+-]+(\/[A-Za-z0-9_+-]+)*$/
 const APT_PACKAGE = /^[a-z0-9][a-z0-9+.-]+$/
 const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
-// Addresses, ports and redir's own options, as words a shell splits and never expands.
-const REDIR_ARGS = /^[A-Za-z0-9:.=_-]+( [A-Za-z0-9:.=_-]+)*$/
+// A host name or an address, then the port there.
+const REDIR_TARGET = /^[A-Za-z0-9.-]+:\d+$/
 
 // sway refuses nothing here, so the bounds are those of the screens the server resizes to.
 const SCREEN_MIN = 1
 const SCREEN_MAX = 2560
+
+// The container's user cannot listen on a port below 1024.
+const PORT_MIN = 1024
+const PORT_MAX = 65535
 
 export class ConfigError extends Error {
 }
@@ -74,13 +78,23 @@ const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {
 }
 
 const redirOf = (value: unknown): WayuseClient.RedirConfig => {
-    const redir = recordOf(value, "config.apps.redir", ["args"])
+    const redir = recordOf(value, "config.apps.redir", ["ports"])
 
-    // redir has nothing to forward without them, so no default stands in.
-    const args = stringOf(redir.args, "config.apps.redir.args", REDIR_ARGS, "")
-    if (!args) throw new ConfigError("config.apps.redir.args is required")
+    const ports: Record<number, string> = {}
+    for (const [port, target] of Object.entries(recordOf(redir.ports, "config.apps.redir.ports", Object.keys(redir.ports ?? {})))) {
+        if (!/^\d+$/.test(port) || +port < PORT_MIN || +port > PORT_MAX) {
+            throw new ConfigError(`config.apps.redir.ports takes a port from ${PORT_MIN} to ${PORT_MAX}: ${JSON.stringify(port)}`)
+        }
+        if (typeof target !== "string" || !REDIR_TARGET.test(target)) {
+            throw new ConfigError(`config.apps.redir.ports.${port} is not valid: ${JSON.stringify(target)}`)
+        }
+        ports[+port] = target
+    }
 
-    return {args}
+    // With no port there is no redir to keep running, and the start script would end at once.
+    if (!Object.keys(ports).length) throw new ConfigError("config.apps.redir.ports is required")
+
+    return {ports}
 }
 
 /**

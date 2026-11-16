@@ -50,8 +50,8 @@ Every item may be left out.
 | `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
 | `apps.chrome.env` | `{}` | Environment variables for the Chrome process alone. `LANGUAGE` sets Chrome's language. No secrets: they are baked into the image. |
-| `apps.redir` | not installed | Installs [redir](https://github.com/troglobit/redir) and keeps it running. It forwards a TCP port inside the container. |
-| `apps.redir.args` | required | The arguments of `redir`. `":9223 127.0.0.1:9222"` forwards port 9223 to Chrome DevTools Protocol. |
+| `apps.redir` | not installed | Installs [redir](https://github.com/troglobit/redir) and keeps it running. It forwards TCP ports inside the container. |
+| `apps.redir.ports` | required | The ports to listen on, from 1024 up, each with where it forwards to. `{9223: "127.0.0.1:9222"}` forwards port 9223 to Chrome DevTools Protocol. |
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |
 | `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
 | `packages` | `[]` | Additional apt packages, fonts among them. |
@@ -103,11 +103,12 @@ Chrome listens on 127.0.0.1 inside the container, so `-p 9222:9222` alone reache
 export default defineConfig({
     apps: {
         chrome: {},
-        redir: {args: ":9223 127.0.0.1:9222"},
+        redir: {ports: {9223: "127.0.0.1:9222"}},
     },
 })
 ```
 
+redir listens on every address of the container, one redir for each port.
 Publish that port to the host's `127.0.0.1` only. The host may give it any number, 9222 included:
 
 ```sh
@@ -151,6 +152,14 @@ npx wayuse slot capture -o screen.png
 | `0.0.0.0` | Reached. The network the host is on reaches it too. |
 | the address of Docker's bridge, which `ip -4 addr show docker0` tells, such as `172.17.0.1` | Reached, and by the containers alone. |
 | `127.0.0.1` | Not reached: Chrome shows that the connection was refused. |
+
+`apps.redir` gives the page the same server as `http://127.0.0.1:8787/`, where a page is in a secure context:
+
+```ts
+redir: {ports: {8787: "host.docker.internal:8787"}},
+```
+
+redir looks the name up when it starts. Without `--add-host`, it ends at once and the supervisor keeps starting it again, every redir with it.
 
 `docker run --network host` is another way: the container then shares the host's network, `127.0.0.1` included.
 Its own ports are then the host's as well: 3000, on every address of the host, and 9222 and 5900 + n.

@@ -21,8 +21,9 @@ describe(TITLE, () => {
         assert.deepEqual(resolveConfig({apps: {}}).apps, {})
     })
 
-    it("installs redir only when its key is present, with the arguments as given", () => {
-        assert.deepEqual(resolveConfig({apps: {redir: {args: ":9223 127.0.0.1:9222"}}}).apps, {redir: {args: ":9223 127.0.0.1:9222"}})
+    it("installs redir only when its key is present, with the ports as given", () => {
+        const ports = {9223: "127.0.0.1:9222", 18081: "host.docker.internal:18081"}
+        assert.deepEqual(resolveConfig({apps: {redir: {ports}}}).apps, {redir: {ports}})
     })
 
     it("keeps what is given", () => {
@@ -49,9 +50,14 @@ describe(TITLE, () => {
         ["an unknown channel", {apps: {chrome: {channel: "canary"}}}],
         ["an environment name with a space", {apps: {chrome: {env: {"A B": "1"}}}}],
         ["an environment value that is not a string", {apps: {chrome: {env: {A: 1}}}}],
-        ["redir without arguments", {apps: {redir: {}}}],
-        ["redir arguments with shell syntax", {apps: {redir: {args: ":9223 127.0.0.1:9222; id"}}}],
-        ["redir arguments that are not a string", {apps: {redir: {args: [":9223", "127.0.0.1:9222"]}}}],
+        ["redir without ports", {apps: {redir: {}}}],
+        ["redir with no port", {apps: {redir: {ports: {}}}}],
+        ["a redir port that is not a number", {apps: {redir: {ports: {cdp: "127.0.0.1:9222"}}}}],
+        ["a redir port below 1024", {apps: {redir: {ports: {80: "127.0.0.1:8080"}}}}],
+        ["a redir target with shell syntax", {apps: {redir: {ports: {9223: "127.0.0.1:9222; id"}}}}],
+        ["a redir target with an option after it", {apps: {redir: {ports: {9223: "127.0.0.1:9222 -t 3"}}}}],
+        ["a redir target without a port", {apps: {redir: {ports: {9223: "127.0.0.1"}}}}],
+        ["a redir target that is not a string", {apps: {redir: {ports: {9223: 9222}}}}],
         ["a time zone with shell syntax", {timezone: "Asia/Tokyo; rm -rf /"}],
         ["a time zone that climbs out of zoneinfo", {timezone: "../../etc/passwd"}],
         ["a package with shell syntax", {packages: ["curl && true"]}],

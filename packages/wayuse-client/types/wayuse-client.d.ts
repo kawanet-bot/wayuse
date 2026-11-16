@@ -23,7 +23,7 @@ export declare namespace WayuseClient {
     }
 
     interface RedirConfig {
-        args: string
+        ports: Record<number, string>
     }
 
     /** A screen: one sway output, HEADLESS-1 and up. */
