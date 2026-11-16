@@ -20,6 +20,7 @@ describe(TITLE, () => {
         timezone: "Asia/Tokyo",
         screen: {width: 1920, height: 1080},
         packages: ["fonts-noto-cjk"],
+        console: {signIn: "/front/screen-sign-in/?next="},
     })
 
     it("puts each setting where it takes effect", () => {
@@ -34,6 +35,7 @@ describe(TITLE, () => {
         assert.equal(files["rootfs/etc/wayuse/chrome.env"], "LANGUAGE='ja'\n")
         assert.deepEqual(JSON.parse(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"]!), {AutoplayAllowlist: ["https://www.youtube.com"]})
         assert.deepEqual(JSON.parse(files["rootfs/etc/wayuse/wayuse.json"]!), config)
+        assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/htdocs/console/config.json"]!), {signIn: "/front/screen-sign-in/?next="})
     })
 
     it("leaves Chrome out of an image without it, and what only Chrome needs", () => {
@@ -41,6 +43,7 @@ describe(TITLE, () => {
         assert.doesNotMatch(files["Dockerfile"]!, /chrome/)
         assert.equal(files["rootfs/etc/wayuse/chrome.env"], undefined)
         assert.equal(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"], undefined)
+        assert.equal(files["rootfs/opt/wayuse/htdocs/console/config.json"], "{}\n")
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "^0.0.0"})
     })
 

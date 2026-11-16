@@ -16,6 +16,8 @@ export declare namespace WayuseBuild {
         screen?: ScreenConfig
         /** Additional apt packages, fonts among them. */
         packages?: string[]
+        /** The console's pages. */
+        console?: ConsoleConfig
     }
 
     interface NodeConfig {
@@ -47,6 +49,11 @@ export declare namespace WayuseBuild {
         width?: number
         /** Default: 960. */
         height?: number
+    }
+
+    interface ConsoleConfig {
+        /** Where the entry sends a visitor without a token, on the console's own origin. The path to come back to is added at its end. Default: the entry asks for a token. */
+        signIn?: string
     }
 
     interface CLIOptions {

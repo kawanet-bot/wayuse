@@ -11,6 +11,9 @@ export const hashParams = (hash: string): URLSearchParams => new URLSearchParams
 /** The token of a login link, "#!?jwt=...". A browser sends what follows the "#" to no server. */
 export const tokenOfHash = (hash: string): string | undefined => hashParams(hash).get("jwt") || undefined
 
+/** Where a visitor goes for a token: the sign-in address, with the entry's own path and "#!?jwt=" at its end for the token to be added to. */
+export const signInUrlOf = (signIn: string, pathname: string): string => signIn + encodeURIComponent(`${pathname}#!?jwt=`)
+
 /** Whether the server itself refused the token. A server that is down, or a proxy's own error, says nothing of the token. */
 export const isRefusal = (error: unknown): boolean => (error as {status?: unknown} | null)?.status === 401
 

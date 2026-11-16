@@ -28,6 +28,8 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
         "rootfs/etc/wayuse/wayuse.json": JSON.stringify(config, null, 2) + "\n",
         "rootfs/etc/wayuse/sway/config": swayConfigOf(config),
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
+        // The entry reads it before it has a token, which the API would ask for.
+        [`${CONSOLE}/config.json`]: JSON.stringify(config.console, null, 2) + "\n",
     }
 
     const {chrome, redir} = config.apps

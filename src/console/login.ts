@@ -1,8 +1,18 @@
 // The entry of the console: goes on to the monitor with a token the server accepts, and asks for one otherwise.
 
+import type {WayuseClient} from "wayuse-client"
 import {createClient} from "../api/api-client.ts"
 import {$, BASE, getToken, setToken} from "./console-client.ts"
-import {failureOf, isRefusal, tokenOfHash} from "./console-util.ts"
+import {failureOf, isRefusal, signInUrlOf, tokenOfHash} from "./console-util.ts"
+
+type ConsoleConfig = WayuseClient.Config["console"]
+
+// What wayuse-build wrote beside this page. A console served without the file has no sign-in address.
+const signInOf = async (): Promise<string | undefined> => {
+    const res = await fetch("config.json").catch(() => undefined)
+    const config: ConsoleConfig | undefined = res?.ok ? await res.json().catch(() => undefined) : undefined
+    return config?.signIn || undefined
+}
 
 // Not the console's client: here a refused token is an answer to show, not a reason to come back to this page.
 // Only the server's own 401 is a refusal. Anything else is thrown, and leaves the token as it is.
@@ -33,6 +43,11 @@ const start = async (): Promise<void> => {
 
     // Every server under this origin shares the saved token, so only a refusal takes it away.
     setToken(undefined)
+
+    // A token the link brought and the server refused would come back the same, so the visitor is not sent again.
+    const signIn = linked ? undefined : await signInOf()
+    if (signIn) return location.replace(signInUrlOf(signIn, location.pathname))
+
     show(saved ? "The server refused the token." : "Paste a token to sign in.", !!saved)
 }
 

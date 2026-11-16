@@ -22,6 +22,9 @@ const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
 // A host name or an address, then the port there. One that starts with a hyphen would be read as an option of redir.
 const REDIR_TARGET = /^[A-Za-z0-9][A-Za-z0-9.-]*:\d+$/
 
+// The entry comes back from there by a path alone, so the address has no scheme and no host of its own.
+const SIGN_IN = /^(?![A-Za-z][A-Za-z0-9+.-]*:|[\/\\]{2})\S+$/
+
 // sway refuses nothing here, so the bounds are those of the screens the server resizes to.
 const SCREEN_MIN = 1
 const SCREEN_MAX = 2560
@@ -108,10 +111,11 @@ const redirOf = (value: unknown): WayuseClient.RedirConfig => {
  * Fills in every default and refuses what the generated files could not carry.
  */
 export const resolveConfig = (input: Input): Resolved => {
-    const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages"])
+    const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages", "console"])
     const node = recordOf(config.node, "config.node", ["version"])
     const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])
+    const signIn = stringOf(recordOf(config.console, "config.console", ["signIn"]).signIn, "config.console.signIn", SIGN_IN, "")
 
     const installed: Resolved["apps"] = {}
     if (apps.chrome != null) installed.chrome = chromeOf(apps.chrome)
@@ -137,5 +141,6 @@ export const resolveConfig = (input: Input): Resolved => {
             height: sizeOf(screen.height, "config.screen.height", 960),
         },
         packages,
+        console: signIn ? {signIn} : {},
     }
 }
