@@ -50,6 +50,8 @@ Every item may be left out.
 | `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
 | `apps.chrome.env` | `{}` | Environment variables for the Chrome process alone. `LANGUAGE` sets Chrome's language. No secrets: they are baked into the image. |
+| `apps.redir` | not installed | Installs [redir](https://github.com/troglobit/redir) and keeps it running. It forwards a TCP port inside the container. |
+| `apps.redir.args` | required | The arguments of `redir`. `":9223 127.0.0.1:9222"` forwards port 9223 to Chrome DevTools Protocol. |
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |
 | `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
 | `packages` | `[]` | Additional apt packages, fonts among them. |
@@ -91,6 +93,31 @@ tini is PID 1 in the image, so `--init` is not needed.
 | 3000 | wayuse-server. Publish it with `-p` to reach the container from outside |
 | 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
 | 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
+
+### Chrome DevTools Protocol from the host
+
+Chrome listens on 127.0.0.1 inside the container, so `-p 9222:9222` alone reaches nothing.
+`apps.redir` forwards another port to it:
+
+```ts
+export default defineConfig({
+    apps: {
+        chrome: {},
+        redir: {args: ":9223 127.0.0.1:9222"},
+    },
+})
+```
+
+Publish that port to the host's `127.0.0.1` only. The host may give it any number, 9222 included:
+
+```sh
+docker run --rm --shm-size 256m -p 127.0.0.1:3000:3000 -p 127.0.0.1:9222:9223 my-wayuse
+curl http://127.0.0.1:9222/json/version
+```
+
+Chrome DevTools Protocol has no authentication, and it passes by the token of wayuse-server.
+Whoever reaches the port drives Chrome, reads its cookies and opens `file://` in the container.
+Connect by an IP address or `localhost`. Chrome refuses a request whose `Host` header is another name.
 
 ### A server on the host
 

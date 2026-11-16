@@ -40,6 +40,14 @@ describe(TITLE, () => {
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "^0.0.0"})
     })
 
+    it("installs redir and keeps it running, its arguments in a file of their own", () => {
+        const files = generatedFilesOf(resolveConfig({apps: {redir: {args: ":9223 127.0.0.1:9222"}}}))
+        const dockerfile = files["Dockerfile"]!
+        assert.match(dockerfile, /\n {8}redir\n/)
+        assert.match(dockerfile, /"\/opt\/wayuse\/bin\/redir-start\.sh","\/opt\/wayuse\/bin\/server-start\.sh"\]\n$/)
+        assert.equal(files["rootfs/etc/wayuse/redir.env"], "REDIR_ARGS=':9223 127.0.0.1:9222'\n")
+    })
+
     it("installs what the server needs for Chrome beside the server", () => {
         const files = generatedFilesOf(config, {serverTarball: "server.tgz"})
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "file:wayuse-server.tgz", "html-slim": "^0.5.0"})

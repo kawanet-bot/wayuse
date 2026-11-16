@@ -21,6 +21,10 @@ describe(TITLE, () => {
         assert.deepEqual(resolveConfig({apps: {}}).apps, {})
     })
 
+    it("installs redir only when its key is present, with the arguments as given", () => {
+        assert.deepEqual(resolveConfig({apps: {redir: {args: ":9223 127.0.0.1:9222"}}}).apps, {redir: {args: ":9223 127.0.0.1:9222"}})
+    })
+
     it("keeps what is given", () => {
         const config = resolveConfig({
             node: {version: "24.11.1"},
@@ -45,6 +49,9 @@ describe(TITLE, () => {
         ["an unknown channel", {apps: {chrome: {channel: "canary"}}}],
         ["an environment name with a space", {apps: {chrome: {env: {"A B": "1"}}}}],
         ["an environment value that is not a string", {apps: {chrome: {env: {A: 1}}}}],
+        ["redir without arguments", {apps: {redir: {}}}],
+        ["redir arguments with shell syntax", {apps: {redir: {args: ":9223 127.0.0.1:9222; id"}}}],
+        ["redir arguments that are not a string", {apps: {redir: {args: [":9223", "127.0.0.1:9222"]}}}],
         ["a time zone with shell syntax", {timezone: "Asia/Tokyo; rm -rf /"}],
         ["a time zone that climbs out of zoneinfo", {timezone: "../../etc/passwd"}],
         ["a package with shell syntax", {packages: ["curl && true"]}],

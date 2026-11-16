@@ -16,6 +16,8 @@ const NODE_VERSION = /^\d+\.\d+\.\d+$/
 const TIMEZONE = /^[A-Za-z0-9_+-]+(\/[A-Za-z0-9_+-]+)*$/
 const APT_PACKAGE = /^[a-z0-9][a-z0-9+.-]+$/
 const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
+// Addresses, ports and redir's own options, as words a shell splits and never expands.
+const REDIR_ARGS = /^[A-Za-z0-9:.=_-]+( [A-Za-z0-9:.=_-]+)*$/
 
 // sway refuses nothing here, so the bounds are those of the screens the server resizes to.
 const SCREEN_MIN = 1
@@ -71,14 +73,28 @@ const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {
     return {channel: channel as typeof CHANNELS[number], env}
 }
 
+const redirOf = (value: unknown): WayuseClient.RedirConfig => {
+    const redir = recordOf(value, "config.apps.redir", ["args"])
+
+    // redir has nothing to forward without them, so no default stands in.
+    const args = stringOf(redir.args, "config.apps.redir.args", REDIR_ARGS, "")
+    if (!args) throw new ConfigError("config.apps.redir.args is required")
+
+    return {args}
+}
+
 /**
  * Fills in every default and refuses what the generated files could not carry.
  */
 export const resolveConfig = (input: Input): Resolved => {
     const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages"])
     const node = recordOf(config.node, "config.node", ["version"])
-    const apps = recordOf(config.apps, "config.apps", ["chrome"])
+    const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])
+
+    const installed: Resolved["apps"] = {}
+    if (apps.chrome !== undefined) installed.chrome = chromeOf(apps.chrome)
+    if (apps.redir !== undefined) installed.redir = redirOf(apps.redir)
 
     const packages = config.packages ?? []
     if (!Array.isArray(packages)) throw new ConfigError("config.packages must be an array")
@@ -88,7 +104,7 @@ export const resolveConfig = (input: Input): Resolved => {
         builder: {version: VERSION},
         // The default is checked like a given value: a nightly build of Node.js has no release to download.
         node: {version: stringOf(node.version ?? DEFAULT_NODE_VERSION, "config.node.version", NODE_VERSION, "")},
-        apps: apps.chrome === undefined ? {} : {chrome: chromeOf(apps.chrome)},
+        apps: installed,
         timezone: stringOf(config.timezone, "config.timezone", TIMEZONE, "Etc/UTC"),
         screen: {
             width: sizeOf(screen.width, "config.screen.width", 1280),

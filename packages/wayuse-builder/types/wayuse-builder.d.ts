@@ -25,6 +25,7 @@ export declare namespace WayuseBuilder {
 
     interface AppsConfig {
         chrome?: ChromeConfig
+        redir?: RedirConfig
     }
 
     interface ChromeConfig {
@@ -32,6 +33,11 @@ export declare namespace WayuseBuilder {
         channel?: "stable" | "beta" | "unstable"
         /** Environment variables for the Chrome process alone. They are baked into the image, so no secrets. */
         env?: Record<string, string>
+    }
+
+    interface RedirConfig {
+        /** The arguments of redir. ":9223 127.0.0.1:9222" forwards port 9223 to Chrome DevTools Protocol. */
+        args: string
     }
 
     interface ScreenConfig {

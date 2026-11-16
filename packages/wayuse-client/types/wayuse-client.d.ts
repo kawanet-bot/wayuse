@@ -10,7 +10,7 @@ export declare namespace WayuseClient {
         builder: {version: string}
         node: {version: string}
         /** The installed applications. A key is present only for an installed one. */
-        apps: {chrome?: ChromeConfig}
+        apps: {chrome?: ChromeConfig, redir?: RedirConfig}
         timezone: string
         /** The size a screen has until a client resizes it. */
         screen: {width: number, height: number}
@@ -20,6 +20,10 @@ export declare namespace WayuseClient {
     interface ChromeConfig {
         channel: "stable" | "beta" | "unstable"
         env: Record<string, string>
+    }
+
+    interface RedirConfig {
+        args: string
     }
 
     /** A screen: one sway output, HEADLESS-1 and up. */

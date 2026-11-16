@@ -9,6 +9,7 @@ export const SERVER_TARBALL = "wayuse-server.tgz"
 /** What wayuse-server needs for an application and leaves out of its own dependencies, as an optional peer. */
 export const APP_PACKAGES: Record<keyof WayuseClient.Config["apps"], Record<string, string>> = {
     chrome: {"html-slim": "^0.5.0"},
+    redir: {},
 }
 
 /**

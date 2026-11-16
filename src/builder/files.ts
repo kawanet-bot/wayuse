@@ -24,8 +24,9 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
     }
 
-    const {chrome} = config.apps
+    const {chrome, redir} = config.apps
     if (chrome) files["rootfs/etc/wayuse/chrome.env"] = shellEnvOf(chrome.env)
+    if (redir) files["rootfs/etc/wayuse/redir.env"] = shellEnvOf({REDIR_ARGS: redir.args})
 
     return files
 }
