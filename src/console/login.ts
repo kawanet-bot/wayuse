@@ -2,11 +2,15 @@
 
 import {createClient} from "../api/api-client.ts"
 import {$, BASE, getToken, setToken} from "./console-client.ts"
-import {tokenOfHash} from "./console-util.ts"
+import {failureOf, isRefusal, tokenOfHash} from "./console-util.ts"
 
 // Not the console's client: here a refused token is an answer to show, not a reason to come back to this page.
+// Only the server's own 401 is a refusal. Anything else is thrown, and leaves the token as it is.
 const accepts = async (jwt: string): Promise<boolean> =>
-    createClient({url: location.origin + BASE, token: jwt}).getMe().then(() => true, () => false)
+    createClient({url: location.origin + BASE, token: jwt}).getMe().then(() => true, error => {
+        if (isRefusal(error)) return false
+        throw new Error(`The server gave no answer on the token: ${failureOf(error)}`)
+    })
 
 const show = (message: string, error = false): void => {
     $("message").textContent = message
@@ -26,6 +30,8 @@ const start = async (): Promise<void> => {
 
     const saved = getToken()
     if (saved && await accepts(saved)) return enter()
+
+    // Every server under this origin shares the saved token, so only a refusal takes it away.
     setToken(undefined)
     show(saved ? "The server refused the token." : "Paste a token to sign in.", !!saved)
 }
@@ -38,7 +44,7 @@ $("form").addEventListener("submit", event => {
         if (!ok) return show("The server refused the token.", true)
         setToken(jwt)
         enter()
-    })
+    }, error => show((error as Error).message, true))
 })
 
-start().catch(error => show(String(error), true))
+start().catch(error => show((error as Error).message, true))
