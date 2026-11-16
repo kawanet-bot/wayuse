@@ -1,14 +1,7 @@
-// What the vnc page uses of noVNC, which comes with no types of its own.
+// noVNC comes with no types. Those of @types/novnc__novnc name an entry that noVNC had before, so they are passed on to the one it has now.
 
 declare module "@novnc/novnc" {
-    /** A VNC connection drawn into an element. It reports "connect" and "disconnect" as events. */
-    export default class RFB extends EventTarget {
-        constructor(target: HTMLElement, url: string)
+    import RFB from "@novnc/novnc/lib/rfb"
 
-        scaleViewport: boolean
-        resizeSession: boolean
-        background: string
-
-        focus(): void
-    }
+    export default RFB
 }
