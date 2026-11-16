@@ -16,12 +16,12 @@ const rollupConfig: RollupOptions = {
     external: [/^[^.\/]/],
 
     output: {
-        dir: "../packages/wayuse-server/dist/console",
+        dir: "../packages/wayuse-build/dist/console",
         format: "esm",
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
 
-        // Neither is part of this package. wayuse-build puts them into the image, and the pages load them from there.
+        // Neither is bundled here. wayuse-build puts them beside these scripts when it writes the build directory.
         paths: {
             "@novnc/novnc": "../vendor/novnc.js",
             "html-ele": "../vendor/html-ele.mjs",

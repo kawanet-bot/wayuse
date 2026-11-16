@@ -1,4 +1,4 @@
-import {copyFile, cp, mkdir, rm, writeFile} from "node:fs/promises"
+import {copyFile, cp, mkdir, readdir, rm, writeFile} from "node:fs/promises"
 import {dirname, join} from "node:path"
 import {fileURLToPath} from "node:url"
 import type {WayuseClient} from "wayuse-client"
@@ -12,6 +12,12 @@ type Resolved = WayuseClient.Config
 
 // Resolved by name, so the sources under test and the built copy find the same assets.
 const assetsRoot = (): string => fileURLToPath(new URL("../assets/", import.meta.resolve("wayuse-build")))
+
+// The console's scripts are built from src/console/, beside this package's own file.
+const consoleScripts = (): string => fileURLToPath(new URL("./console/", import.meta.resolve("wayuse-build")))
+
+// Where the image has the console, laid out as its URLs are.
+const CONSOLE = "rootfs/opt/wayuse/htdocs/console"
 
 /**
  * The generated files by their path in the build directory. rootfs/ mirrors the image's file system.
@@ -49,13 +55,21 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
 
     const paths = Object.keys(files)
 
+    // The pages are already there, written by hand in assets/. Their scripts join them.
+    await mkdir(join(outdir, CONSOLE, "js"), {recursive: true})
+    for (const name of (await readdir(consoleScripts())).sort()) {
+        const script = `${CONSOLE}/js/${name}`
+        await copyFile(join(consoleScripts(), name), join(outdir, script))
+        paths.push(script)
+    }
+
     // Made here and never shipped in a wayuse package: noVNC comes from its own, under its own license.
-    const novnc = "rootfs/opt/wayuse/vendor/novnc.js"
+    const novnc = `${CONSOLE}/vendor/novnc.js`
     await bundleNovnc(join(outdir, novnc))
     paths.push(novnc)
 
     // One file as npm installed it, which the console's pages import to build their elements.
-    const htmlEle = "rootfs/opt/wayuse/vendor/html-ele.mjs"
+    const htmlEle = `${CONSOLE}/vendor/html-ele.mjs`
     await copyFile(fileURLToPath(import.meta.resolve("html-ele")), join(outdir, htmlEle))
     paths.push(htmlEle)
 

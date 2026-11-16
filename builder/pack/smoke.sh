@@ -8,7 +8,7 @@ port=$2
 base=http://127.0.0.1:$port
 
 node "$rootfs/opt/wayuse/node_modules/wayuse-server/bin/wayuse-server.js" \
-    --port "$port" --config "$rootfs/etc/wayuse/wayuse.json" --vendor "$rootfs/opt/wayuse/vendor" &
+    --port "$port" --config "$rootfs/etc/wayuse/wayuse.json" --htdocs "$rootfs/opt/wayuse/htdocs" &
 trap 'kill $!' EXIT
 
 # The server answers within a second, and a port that never opens fails the first check below.

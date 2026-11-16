@@ -28,6 +28,7 @@
   "files": [
     "assets/",
     "bin/wayuse-build.js",
+    "dist/console/",
     "dist/wayuse-build.js",
     "LICENSE",
     "README.md",
