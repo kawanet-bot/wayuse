@@ -56,6 +56,7 @@ describe(TITLE, () => {
         ["a redir port below 1024", {apps: {redir: {ports: {80: "127.0.0.1:8080"}}}}],
         ["a redir target with shell syntax", {apps: {redir: {ports: {9223: "127.0.0.1:9222; id"}}}}],
         ["a redir target with an option after it", {apps: {redir: {ports: {9223: "127.0.0.1:9222 -t 3"}}}}],
+        ["a redir target that starts with a hyphen", {apps: {redir: {ports: {9223: "-t:3"}}}}],
         ["a redir target without a port", {apps: {redir: {ports: {9223: "127.0.0.1"}}}}],
         ["a redir target that is not a string", {apps: {redir: {ports: {9223: 9222}}}}],
         ["a time zone with shell syntax", {timezone: "Asia/Tokyo; rm -rf /"}],

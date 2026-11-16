@@ -16,8 +16,8 @@ const NODE_VERSION = /^\d+\.\d+\.\d+$/
 const TIMEZONE = /^[A-Za-z0-9_+-]+(\/[A-Za-z0-9_+-]+)*$/
 const APT_PACKAGE = /^[a-z0-9][a-z0-9+.-]+$/
 const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
-// A host name or an address, then the port there.
-const REDIR_TARGET = /^[A-Za-z0-9.-]+:\d+$/
+// A host name or an address, then the port there. One that starts with a hyphen would be read as an option of redir.
+const REDIR_TARGET = /^[A-Za-z0-9][A-Za-z0-9.-]*:\d+$/
 
 // sway refuses nothing here, so the bounds are those of the screens the server resizes to.
 const SCREEN_MIN = 1
