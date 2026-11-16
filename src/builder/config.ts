@@ -1,5 +1,5 @@
-import type * as declared from "wayuse-builder"
-import type {WayuseBuilder} from "wayuse-builder"
+import type * as declared from "wayuse-build"
+import type {WayuseBuilder} from "wayuse-build"
 import type {WayuseClient} from "wayuse-client"
 import {VERSION} from "./version.ts"
 

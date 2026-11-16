@@ -1,5 +1,5 @@
 {
-  "name": "wayuse-builder",
+  "name": "wayuse-build",
   "description": "Build the wayuse Docker image.",
   "version": "0.0.0",
   "author": "Kawanet",
@@ -20,22 +20,22 @@
   },
   "exports": {
     ".": {
-      "types": "./types/wayuse-builder.d.ts",
-      "module-sync": "./dist/wayuse-builder.js",
-      "import": "./dist/wayuse-builder.js"
+      "types": "./types/wayuse-build.d.ts",
+      "module-sync": "./dist/wayuse-build.js",
+      "import": "./dist/wayuse-build.js"
     }
   },
   "files": [
     "assets/",
     "bin/wayuse-build.js",
-    "dist/wayuse-builder.js",
+    "dist/wayuse-build.js",
     "LICENSE",
     "README.md",
     "sample/docker-compose.yml",
     "sample/wayuse.config.ts",
     "types/*.d.ts"
   ],
-  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-builder#readme",
+  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-build#readme",
   "keywords": [
     "docker",
     "wayland",
@@ -45,8 +45,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/wayuse.git",
-    "directory": "packages/wayuse-builder"
+    "directory": "packages/wayuse-build"
   },
   "type": "module",
-  "types": "./types/wayuse-builder.d.ts"
+  "types": "./types/wayuse-build.d.ts"
 }

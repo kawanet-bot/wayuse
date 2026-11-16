@@ -13,7 +13,7 @@ CONSOLE_SRC := $(shell find ../src/console -name '*.ts' -not -name '*.test.ts')
 TYPES := $(wildcard ../packages/*/types/*.d.ts)
 ROLLUP_SRC := $(wildcard ./*.ts)
 
-BUILDER_DST := ../packages/wayuse-builder/dist/wayuse-builder.js
+BUILDER_DST := ../packages/wayuse-build/dist/wayuse-build.js
 SERVER_DST := ../packages/wayuse-server/dist/wayuse-server.js
 CLIENT_DST := ../packages/wayuse-client/dist/wayuse-client.js
 CONSOLE_DST := ../packages/wayuse-server/dist/console/login.js
@@ -48,7 +48,7 @@ is-not-buildable:
 	@ [ "$(BUILDABLE)" != "YES" ] || [ ! -f ../node_modules/.bin/rollup ]
 
 # The package name resolves to this file, for bin/wayuse-build.js and for a wayuse.config.ts alike.
-$(BUILDER_DST): $(BUILDER_CONFIG) $(BUILDER_SRC) $(ROLLUP_SRC) ../packages/wayuse-builder/package.json
+$(BUILDER_DST): $(BUILDER_CONFIG) $(BUILDER_SRC) $(ROLLUP_SRC) ../packages/wayuse-build/package.json
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@

@@ -1,4 +1,4 @@
-// Entry point of the wayuse-builder package. Built to dist/wayuse-builder.js.
+// Entry point of the wayuse-build package. Built to dist/wayuse-build.js.
 
 export {CLI} from "./cli.ts"
 export {defineConfig} from "./config.ts"

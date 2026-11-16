@@ -1,7 +1,7 @@
 import {resolve} from "node:path"
 import {pathToFileURL} from "node:url"
 import {parseArgs} from "node:util"
-import type * as declared from "wayuse-builder"
+import type * as declared from "wayuse-build"
 import {ConfigError, resolveConfig} from "./config.ts"
 import {writeBuildDir} from "./files.ts"
 import {VERSION} from "./version.ts"
@@ -51,7 +51,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     }
 
     if (options.version) {
-        process.stdout.write(`wayuse-builder ${VERSION}\n`)
+        process.stdout.write(`wayuse-build ${VERSION}\n`)
         return 0
     }
 

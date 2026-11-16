@@ -18,8 +18,8 @@ all: pack
 # The three tarballs under fixed names, so a command and an image name them without their versions.
 pack: clean
 	$(MAKE) -C .. all
-	cd ../.. && npm pack -w packages/wayuse-builder -w packages/wayuse-server -w packages/wayuse-client --pack-destination builder/pack
-	mv wayuse-builder-*.tgz builder.tgz
+	cd ../.. && npm pack -w packages/wayuse-build -w packages/wayuse-server -w packages/wayuse-client --pack-destination builder/pack
+	mv wayuse-build-*.tgz builder.tgz
 	mv wayuse-server-*.tgz server.tgz
 	mv wayuse-client-*.tgz client.tgz
 
@@ -39,7 +39,7 @@ test-bin:
 # Each executable starts and names its own package, and the keys come out without a server.
 test-cli:
 	cd ../.. && ./$(PKG_ROOT)/wayuse-client/bin/wayuse.js -v | grep "^wayuse-client " > /dev/null
-	cd ../.. && ./$(PKG_ROOT)/wayuse-builder/bin/wayuse-build.js -v | grep "^wayuse-builder " > /dev/null
+	cd ../.. && ./$(PKG_ROOT)/wayuse-build/bin/wayuse-build.js -v | grep "^wayuse-build " > /dev/null
 	cd ../.. && ./$(PKG_ROOT)/wayuse-server/bin/wayuse-server.js -v | grep "^wayuse-server " > /dev/null
 	cd ../.. && [ "$$(./$(PKG_ROOT)/wayuse-client/bin/wayuse.js jwt keygen | grep -c '^WAYUSE_JWT_')" = 2 ]
 
@@ -47,8 +47,8 @@ test-cli:
 test-build:
 	/bin/rm -fr tmp
 	mkdir -p tmp
-	cp ../../$(PKG_ROOT)/wayuse-builder/sample/* tmp/
-	cd tmp && ../../../$(PKG_ROOT)/wayuse-builder/bin/wayuse-build.js --server-tarball ../server.tgz > /dev/null
+	cp ../../$(PKG_ROOT)/wayuse-build/sample/* tmp/
+	cd tmp && ../../../$(PKG_ROOT)/wayuse-build/bin/wayuse-build.js --server-tarball ../server.tgz > /dev/null
 	[ -s tmp/.wayuse/Dockerfile ]
 	[ -x tmp/.wayuse/rootfs/opt/wayuse/bin/supervise.sh ]
 	grep -q "Licensed under MPL 2.0" tmp/.wayuse/rootfs/opt/wayuse/vendor/novnc.js

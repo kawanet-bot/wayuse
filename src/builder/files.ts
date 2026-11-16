@@ -11,7 +11,7 @@ import {swayConfigOf} from "./sway-config.ts"
 type Resolved = WayuseClient.Config
 
 // Resolved by name, so the sources under test and the built copy find the same assets.
-const assetsRoot = (): string => fileURLToPath(new URL("../assets/", import.meta.resolve("wayuse-builder")))
+const assetsRoot = (): string => fileURLToPath(new URL("../assets/", import.meta.resolve("wayuse-build")))
 
 /**
  * The generated files by their path in the build directory. rootfs/ mirrors the image's file system.

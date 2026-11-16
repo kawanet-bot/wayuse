@@ -1,6 +1,6 @@
-# wayuse-builder
+# wayuse-build
 
-[![npm version](https://img.shields.io/npm/v/wayuse-builder)](https://www.npmjs.com/package/wayuse-builder)
+[![npm version](https://img.shields.io/npm/v/wayuse-build)](https://www.npmjs.com/package/wayuse-build)
 
 Build the wayuse Docker image.
 
@@ -9,7 +9,7 @@ Build the wayuse Docker image.
 `wayuse.config.ts` defines what the image holds:
 
 ```ts
-import {defineConfig} from "wayuse-builder"
+import {defineConfig} from "wayuse-build"
 
 export default defineConfig({
     node: {
@@ -44,7 +44,7 @@ The package ships that `wayuse.config.ts` in [sample/](sample/), with a [docker-
 Copy them, make the keys once, and start the container:
 
 ```sh
-cp node_modules/wayuse-builder/sample/* .
+cp node_modules/wayuse-build/sample/* .
 npx wayuse jwt keygen > .env
 npx wayuse-build && docker compose up --build -d
 ```

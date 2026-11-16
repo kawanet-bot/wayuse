@@ -4,7 +4,7 @@
 
 The HTTP server that runs inside the wayuse container.
 
-The image [wayuse-builder](../wayuse-builder/README.md) builds installs and starts it. It listens on port 9580 there.
+The image [wayuse-build](../wayuse-build/README.md) builds installs and starts it. It listens on port 9580 there.
 
 ## API
 
@@ -108,8 +108,8 @@ The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
 A link of the form `/console/#!?jwt=<JWT>` signs in with the token in it. A browser sends what follows the `#` to no server.
 The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
 
-The vnc page loads [noVNC](https://github.com/novnc/noVNC) from `/vendor/novnc.js`. It is not in this package: wayuse-builder puts it into the image.
-The monitor and the API form load [html-ele](https://github.com/kawanet/html-ele) from `/vendor/html-ele.mjs`, which wayuse-builder puts there as well.
+The vnc page loads [noVNC](https://github.com/novnc/noVNC) from `/vendor/novnc.js`. It is not in this package: wayuse-build puts it into the image.
+The monitor and the API form load [html-ele](https://github.com/kawanet/html-ele) from `/vendor/html-ele.mjs`, which wayuse-build puts there as well.
 
 ## VNC
 

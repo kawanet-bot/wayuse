@@ -10,7 +10,7 @@ const rollupConfig: RollupOptions = {
     external: [/^[^.\/]/],
 
     output: {
-        file: "../packages/wayuse-builder/dist/wayuse-builder.js",
+        file: "../packages/wayuse-build/dist/wayuse-build.js",
         format: "esm",
     },
 
