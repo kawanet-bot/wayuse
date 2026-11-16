@@ -110,9 +110,14 @@ export const resolveConfig = (input: Input): Resolved => {
     if (apps.chrome != null) installed.chrome = chromeOf(apps.chrome)
     if (apps.redir != null) installed.redir = redirOf(apps.redir)
 
-    const packages = config.packages ?? []
-    if (!Array.isArray(packages)) throw new ConfigError("config.packages must be an array")
-    packages.forEach((name, i) => stringOf(name, `config.packages[${i}]`, APT_PACKAGE, ""))
+    const given = config.packages ?? []
+    if (!Array.isArray(given)) throw new ConfigError("config.packages must be an array")
+
+    // An element without a value names no package. It is left out, where it would reach the Dockerfile as a word.
+    const packages: string[] = []
+    given.forEach((name, i) => {
+        if (name != null) packages.push(stringOf(name, `config.packages[${i}]`, APT_PACKAGE, ""))
+    })
 
     return {
         builder: {version: VERSION},
@@ -124,6 +129,6 @@ export const resolveConfig = (input: Input): Resolved => {
             width: sizeOf(screen.width, "config.screen.width", 1280),
             height: sizeOf(screen.height, "config.screen.height", 960),
         },
-        packages: packages as string[],
+        packages,
     }
 }
