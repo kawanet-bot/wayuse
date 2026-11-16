@@ -61,7 +61,7 @@ export const createApp = async ({config, stderr, auth, runtimeDir, exec = realEx
     app.route("/", createStaticApp(vendorDir))
 
     // Every route below needs a token, one that does not exist included.
-    app.use(jwtCheck(auth))
+    app.use(jwtCheck(auth, c => c.json({error: {message: "invalid token"}}, 401)))
 
     app.get("/auth/me", c => c.json({me: c.get("jwt")}))
 
