@@ -10,9 +10,12 @@ import {VERSION} from "./version.ts"
 import {createVncTickets} from "./wayvnc/vnc-ticket.ts"
 import {createWayvncProxy} from "./wayvnc/wayvnc-proxy.ts"
 
+// Assigned to nothing at IANA and no development server's own, so it seldom meets another server on a host.
+export const DEFAULT_PORT = 9580
+
 const USAGE = [
     "Usage: wayuse-server [options]",
-    "  -p, --port <port>    the port to listen on (default: 3000)",
+    `  -p, --port <port>    the port to listen on (default: ${DEFAULT_PORT})`,
     "  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)",
     "  --vendor <dir>       what is served under /vendor/ (default: /opt/wayuse/vendor)",
     "  -v, --version        print this package's version",
@@ -31,7 +34,7 @@ const readArgs = (args: string[]) => {
     const {values} = parseArgs({
         args,
         options: {
-            port: {type: "string", short: "p", default: "3000"},
+            port: {type: "string", short: "p", default: String(DEFAULT_PORT)},
             config: {type: "string", short: "c", default: "/etc/wayuse/wayuse.json"},
             vendor: {type: "string", default: "/opt/wayuse/vendor"},
             version: {type: "boolean", short: "v"},

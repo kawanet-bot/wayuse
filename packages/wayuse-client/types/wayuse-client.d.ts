@@ -191,7 +191,7 @@ export declare namespace WayuseClient {
     }
 
     interface ClientOptions {
-        /** Where the server is reached, a path ahead of its routes included: "http://127.0.0.1:3000/". */
+        /** Where the server is reached, a path ahead of its routes included: "http://127.0.0.1:9580/". */
         url: string
         /** The JWT, or a function that returns the one to send with each request. */
         token?: string | (() => string | undefined | Promise<string | undefined>)

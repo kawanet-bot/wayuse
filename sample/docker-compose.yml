@@ -14,8 +14,8 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway" # a server on this host is http://host.docker.internal:<port>/
     ports:
-      # Reached from this host alone, unless .env says otherwise: WAYUSE_PUBLISH=0.0.0.0:3000
-      - "${WAYUSE_PUBLISH:-127.0.0.1:3000}:3000"
+      # Reached from this host alone, unless .env says otherwise: WAYUSE_PUBLISH=0.0.0.0:9580
+      - "${WAYUSE_PUBLISH:-127.0.0.1:9580}:9580"
     environment:
       WAYUSE_OUTPUTS: "2"
       WAYUSE_JWT_PUBLIC_KEY: "${WAYUSE_JWT_PUBLIC_KEY:-}"

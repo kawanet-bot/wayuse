@@ -1,7 +1,7 @@
 import {parseArgs} from "node:util"
 import type * as declared from "wayuse-client"
 import {ApiError} from "../api/api-client.ts"
-import {runApi} from "./cli-api.ts"
+import {DEFAULT_URL, runApi} from "./cli-api.ts"
 import {type CLIIO, UsageError} from "./cli-io.ts"
 import {runJwt} from "./cli-jwt.ts"
 import {VERSION} from "./version.ts"
@@ -44,7 +44,7 @@ const USAGE = [
     "  -h, --help                      print this usage",
     "--slot is the first screen when left out. --tab may be left out while Chrome has one tab.",
     "Environment:",
-    "  WAYUSE_URL                      where the server is reached (default: http://127.0.0.1:3000/)",
+    `  WAYUSE_URL                      where the server is reached (default: ${DEFAULT_URL})`,
     "  WAYUSE_JWT                      the token sent with each request",
 ].map(line => `${line}\n`).join("")
 

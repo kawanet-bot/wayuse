@@ -4,6 +4,8 @@ import {mkdtemp, readFile, rm, stat, writeFile} from "node:fs/promises"
 import {tmpdir} from "node:os"
 import {join} from "node:path"
 import {describe, it} from "node:test"
+import {DEFAULT_URL} from "../client/cli-api.ts"
+import {DEFAULT_PORT} from "../server/cli.ts"
 import {resolveConfig} from "./config.ts"
 import {generatedFilesOf, writeBuildDir} from "./files.ts"
 import {APP_PACKAGES} from "./npm-package.ts"
@@ -65,6 +67,20 @@ describe(TITLE, () => {
         assert.deepEqual(Object.assign({}, ...Object.values(APP_PACKAGES)), server.peerDependencies)
         assert.deepEqual(Object.keys(server.peerDependenciesMeta), Object.keys(server.peerDependencies))
         for (const meta of Object.values(server.peerDependenciesMeta)) assert.deepEqual(meta, {optional: true})
+    })
+
+    // The three packages do not depend on one another, so nothing but this test holds their port together.
+    it("listens in the image on the port the server and the client take by default", () => {
+        const port = String(DEFAULT_PORT)
+        assert.equal(new URL(DEFAULT_URL).port, port)
+        assert.equal(generatedFilesOf(config)["Dockerfile"]!.match(/^EXPOSE (\d+)$/m)?.[1], port)
+
+        const start = readFileSync(new URL("../../packages/wayuse-builder/assets/rootfs/opt/wayuse/bin/server-start.sh", import.meta.url), "utf8")
+        assert.equal(start.match(/ --port=(\d+)$/m)?.[1], port)
+
+        // The sample publishes the port under its own number, which is where the client's default looks.
+        const sample = readFileSync(new URL("../../sample/docker-compose.yml", import.meta.url), "utf8")
+        assert.equal(sample.match(/^ +- "\$\{WAYUSE_PUBLISH:-127\.0\.0\.1:(\d+)\}:(\d+)"$/m)?.slice(1).join(), `${port},${port}`)
     })
 
     // A settings-only change must rebuild nothing above the COPY.

@@ -65,10 +65,10 @@ describe(TITLE, () => {
     it("reports a server it cannot reach in one line, with exit code 1", async () => {
         const out: string[] = []
         const fetch = async (): Promise<Response> => {
-            throw new TypeError("fetch failed", {cause: new Error("connect ECONNREFUSED 127.0.0.1:3000")})
+            throw new TypeError("fetch failed", {cause: new Error("connect ECONNREFUSED 127.0.0.1:9580")})
         }
         const code = await runCLI(["slot", "list"], {env: {}, stdout: {write: () => undefined}, stderr: {write: data => out.push(data)}, fetch})
-        assert.deepEqual({code, out}, {code: 1, out: ["connect ECONNREFUSED 127.0.0.1:3000\n"]})
+        assert.deepEqual({code, out}, {code: 1, out: ["connect ECONNREFUSED 127.0.0.1:9580\n"]})
     })
 
     it("ends wrong arguments in the reason, the usage and exit code 2", async () => {

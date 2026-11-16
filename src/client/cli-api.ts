@@ -17,7 +17,7 @@ export interface ApiValues {
 }
 
 // The port wayuse-server listens on, published on the same host: what the sample container gives.
-const DEFAULT_URL = "http://127.0.0.1:3000/"
+export const DEFAULT_URL = "http://127.0.0.1:9580/"
 
 const print = (io: CLIIO, value: unknown): void => {
     io.stdout.write(`${JSON.stringify(value, null, 2)}\n`)

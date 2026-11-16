@@ -85,7 +85,7 @@ export const commandsOf = (config: Resolved): string[] => [
 ]
 
 const runtimeOf = (config: Resolved): string => `
-EXPOSE 3000
+EXPOSE 9580
 USER wayuse
 WORKDIR /home/wayuse
 ENV ${RUNTIME_ENV.join(" ")}
