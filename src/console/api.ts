@@ -1,7 +1,7 @@
 // The form that tries each API: it shows the request, the wayuse command that does the same, and the response.
 
-import {CLICKABLE, INPUTS, SELECTS, clearImage, control, copy, fill, image, pretty, setStatus, showImage, values} from "./api-controls.ts"
-import {type Endpoint, type Field, ENDPOINTS, cliOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
+import {INPUTS, SELECTS, clearImage, control, copy, fill, image, pretty, setStatus, showImage, values} from "./api-controls.ts"
+import {type Endpoint, type Field, CLICKABLE, ENDPOINTS, cliOf, fieldsOf, keyOf, requestOf} from "./api-endpoints.ts"
 import {$, BASE, createConsoleClient} from "./console-client.ts"
 import {imagePixelOf} from "./console-util.ts"
 

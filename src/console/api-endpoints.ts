@@ -52,6 +52,12 @@ export const ENDPOINTS: Endpoint[] = [
 /** What tells one endpoint from another, for the form to remember the choice by. */
 export const keyOf = (endpoint: Endpoint): string => `${endpoint.method} ${endpoint.path}`
 
+/** The capture a click on the shown picture is sent to, by the path of the capture it came from. */
+export const CLICKABLE: Record<string, {field: "slot" | "id", click: string}> = {
+    "slot/:slot/capture.png": {field: "slot", click: "POST slot/:slot/click"},
+    "app/chrome/tab/:id/capture.jpg": {field: "id", click: "POST app/chrome/tab/:id/click"},
+}
+
 /** Every field the endpoint takes, in its path or in its body. */
 export const fieldsOf = (endpoint: Endpoint): Field[] => [...(endpoint.path.match(/:\w+/g) ?? []).map(name => name.slice(1) as Field), ...(endpoint.body ?? [])]
 

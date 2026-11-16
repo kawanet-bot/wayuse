@@ -1,16 +1,10 @@
 // The controls of the API form. They hold what is entered, and show the status, the response and the picture.
 
-import type {Field, Values} from "./api-endpoints.ts"
+import {type Field, type Values, CLICKABLE} from "./api-endpoints.ts"
 import {$} from "./console-client.ts"
 
 export const SELECTS: Field[] = ["slot", "id", "context"]
 export const INPUTS: Field[] = ["url", "width", "height", "x", "y", "button", "keys", "text", "expression"]
-
-// The capture a click on the shown picture is sent to, by the path of the capture it came from.
-export const CLICKABLE: Record<string, {field: "slot" | "id", click: string}> = {
-    "slot/:slot/capture.png": {field: "slot", click: "POST slot/:slot/click"},
-    "app/chrome/tab/:id/capture.jpg": {field: "id", click: "POST app/chrome/tab/:id/click"},
-}
 
 type Control = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 

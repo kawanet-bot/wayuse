@@ -40,6 +40,12 @@ describe(TITLE, () => {
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "^0.0.0"})
     })
 
+    // A missing backslash, or one after the last package, makes a Dockerfile that does not build.
+    it("continues the line after every package but the last", () => {
+        const dockerfile = generatedFilesOf(resolveConfig({packages: ["fonts-noto-cjk", "fonts-noto-core"]}))["Dockerfile"]!
+        assert.match(dockerfile, /--no-install-recommends \\\n {8}fonts-noto-cjk \\\n {8}fonts-noto-core\n\n/)
+    })
+
     it("installs redir and keeps it running, its arguments in a file of their own", () => {
         const files = generatedFilesOf(resolveConfig({apps: {redir: {args: ":9223 127.0.0.1:9222"}}}))
         const dockerfile = files["Dockerfile"]!
