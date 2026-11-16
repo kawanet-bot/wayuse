@@ -1,6 +1,6 @@
 import {createPrivateKey, createPublicKey, generateKeyPairSync, sign} from "node:crypto"
 import type * as declared from "wayuse-client"
-import {JWT_HEADER} from "../jwt/jwt-format.ts"
+import {JWT_HEADER} from "./jwt-format.ts"
 
 // Keys travel as one line of base64 over DER, the form an environment variable carries.
 const parsePrivateKey = (privateKey: string) => {

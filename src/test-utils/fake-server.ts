@@ -3,10 +3,10 @@
 import {readFileSync} from "node:fs"
 import type {WayuseClient} from "wayuse-client"
 import {resolveConfig} from "../build/config.ts"
-import {generateKeyPair, signJwt} from "../client/jwt-sign.ts"
+import {generateKeyPair, signJwt} from "../jwt/jwt-sign.ts"
+import {parsePublicKey} from "../jwt/jwt-verify.ts"
 import {createApp} from "../server/app.ts"
 import type {Exec} from "../server/exec.ts"
-import {parsePublicKey} from "../server/jwt-verify.ts"
 import type {VncTickets} from "../server/wayvnc/vnc-ticket.ts"
 
 const fixture = (name: string): Buffer => readFileSync(new URL(`./fixtures/${name}`, import.meta.url))

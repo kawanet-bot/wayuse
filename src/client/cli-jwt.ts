@@ -1,6 +1,6 @@
 import {DEFAULT_AUDIENCE} from "../jwt/jwt-format.ts"
+import {generateKeyPair, publicKeyOf, signJwt} from "../jwt/jwt-sign.ts"
 import {type Env, UsageError} from "./cli-io.ts"
-import {generateKeyPair, publicKeyOf, signJwt} from "./jwt-sign.ts"
 
 // The private key comes by the environment alone: an argument would show in `ps` and in the shell's history.
 const privateKeyOf = (env: Env): string => {

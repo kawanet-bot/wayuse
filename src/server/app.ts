@@ -1,12 +1,13 @@
 import {Hono} from "hono"
 import type {ContentfulStatusCode} from "hono/utils/http-status"
 import type {WayuseClient} from "wayuse-client"
+import {type AuthEnv, jwtCheck} from "../jwt/jwt-check-hono.ts"
+import type {AuthOptions} from "../jwt/jwt-verify.ts"
 import {createAppsApp} from "./apps/apps-api.ts"
 import {createClipboardApp} from "./clipboard/clipboard-api.ts"
 import type {ServerDeps} from "./deps.ts"
 import {type Exec, exec as realExec} from "./exec.ts"
 import {HttpError} from "./http-error.ts"
-import {type AuthEnv, type AuthOptions, jwtCheck} from "./jwt-verify.ts"
 import {type Writer, logger} from "./logger.ts"
 import {createSlotApp} from "./slot/slot-api.ts"
 import {createStaticApp} from "./static.ts"
@@ -60,7 +61,7 @@ export const createApp = async ({config, stderr, auth, runtimeDir, exec = realEx
     app.route("/", createStaticApp(vendorDir))
 
     // Every route below needs a token, one that does not exist included.
-    app.use(jwtCheck(auth))
+    app.use(jwtCheck(auth, c => c.json({error: {message: "invalid token"}}, 401)))
 
     app.get("/auth/me", c => c.json({me: c.get("jwt")}))
 
