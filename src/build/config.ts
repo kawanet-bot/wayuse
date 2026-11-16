@@ -11,6 +11,9 @@ const DEFAULT_NODE_VERSION = process.versions.node
 
 const CHANNELS = ["stable", "beta", "unstable"] as const
 
+// They keep Chrome to its one profile. Policies given in a configuration replace them.
+export const DEFAULT_POLICIES: Record<string, unknown> = {BrowserGuestModeEnabled: false, BrowserAddPersonEnabled: false}
+
 // Every value below ends up in a Dockerfile or a shell script, so each takes only what its syntax allows.
 const NODE_VERSION = /^\d+\.\d+\.\d+$/
 const TIMEZONE = /^[A-Za-z0-9_+-]+(\/[A-Za-z0-9_+-]+)*$/
@@ -60,7 +63,7 @@ const sizeOf = (value: unknown, path: string, fallback: number): number => {
 }
 
 const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {
-    const chrome = recordOf(value, "config.apps.chrome", ["channel", "env"])
+    const chrome = recordOf(value, "config.apps.chrome", ["channel", "env", "policies"])
 
     const channel = chrome.channel ?? "stable"
     if (!CHANNELS.includes(channel as typeof CHANNELS[number])) {
@@ -74,7 +77,11 @@ const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {
         env[name] = text
     }
 
-    return {channel: channel as typeof CHANNELS[number], env}
+    // Chrome's own names and values, written to its file as given. Only Chrome can tell a wrong one.
+    const policies = chrome.policies ?? DEFAULT_POLICIES
+    if (!isRecord(policies)) throw new ConfigError("config.apps.chrome.policies must be an object")
+
+    return {channel: channel as typeof CHANNELS[number], env, policies: {...policies}}
 }
 
 const redirOf = (value: unknown): WayuseClient.RedirConfig => {

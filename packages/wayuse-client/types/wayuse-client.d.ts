@@ -20,6 +20,8 @@ export declare namespace WayuseClient {
     interface ChromeConfig {
         channel: "stable" | "beta" | "unstable"
         env: Record<string, string>
+        /** Chrome's managed policies, as the image has them. */
+        policies: Record<string, unknown>
     }
 
     interface RedirConfig {

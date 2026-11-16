@@ -33,6 +33,8 @@ export declare namespace WayuseBuild {
         channel?: "stable" | "beta" | "unstable"
         /** Environment variables for the Chrome process alone. They are baked into the image, so no secrets. */
         env?: Record<string, string>
+        /** Chrome's managed policies, under Chrome's own names. Given, they replace the defaults, which keep Chrome to one profile. */
+        policies?: Record<string, unknown>
     }
 
     interface RedirConfig {

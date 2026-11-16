@@ -16,7 +16,7 @@ const TITLE = "build/files.test.ts"
 describe(TITLE, () => {
     const config = resolveConfig({
         node: {version: "24.11.1"},
-        apps: {chrome: {channel: "beta", env: {LANGUAGE: "ja"}}},
+        apps: {chrome: {channel: "beta", env: {LANGUAGE: "ja"}, policies: {AutoplayAllowlist: ["https://www.youtube.com"]}}},
         timezone: "Asia/Tokyo",
         screen: {width: 1920, height: 1080},
         packages: ["fonts-noto-cjk"],
@@ -32,6 +32,7 @@ describe(TITLE, () => {
         assert.match(dockerfile, /chrome-start\.sh","\/opt\/wayuse\/bin\/server-start\.sh"\]\n$/)
         assert.match(files["rootfs/etc/wayuse/sway/config"]!, /^output \* resolution 1920x1080$/m)
         assert.equal(files["rootfs/etc/wayuse/chrome.env"], "LANGUAGE='ja'\n")
+        assert.deepEqual(JSON.parse(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"]!), {AutoplayAllowlist: ["https://www.youtube.com"]})
         assert.deepEqual(JSON.parse(files["rootfs/etc/wayuse/wayuse.json"]!), config)
     })
 
@@ -39,6 +40,7 @@ describe(TITLE, () => {
         const files = generatedFilesOf(resolveConfig({}))
         assert.doesNotMatch(files["Dockerfile"]!, /chrome/)
         assert.equal(files["rootfs/etc/wayuse/chrome.env"], undefined)
+        assert.equal(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"], undefined)
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "^0.0.0"})
     })
 
