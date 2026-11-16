@@ -3,10 +3,10 @@ import {mkdtemp, readFile, rm} from "node:fs/promises"
 import {tmpdir} from "node:os"
 import {join} from "node:path"
 import {describe, it} from "node:test"
+import {publicKeyOf} from "../jwt/jwt-sign.ts"
 import {PNG_SIGNATURE, createFakeServer} from "../test-utils/fake-server.ts"
 import type {Env} from "./cli-io.ts"
 import {runCLI} from "./cli.ts"
-import {publicKeyOf} from "./jwt-sign.ts"
 
 const TITLE = "client/cli.test.ts"
 

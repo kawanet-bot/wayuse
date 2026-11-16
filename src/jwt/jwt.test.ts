@@ -1,8 +1,8 @@
 import assert from "node:assert/strict"
 import {generateKeyPairSync, sign} from "node:crypto"
 import {describe, it} from "node:test"
-import {generateKeyPair, publicKeyOf, signJwt} from "../client/jwt-sign.ts"
-import {parsePublicKey, verifyJwt} from "../server/jwt-verify.ts"
+import {generateKeyPair, publicKeyOf, signJwt} from "./jwt-sign.ts"
+import {parsePublicKey, verifyJwt} from "./jwt-verify.ts"
 
 const TITLE = "jwt/jwt.test.ts"
 

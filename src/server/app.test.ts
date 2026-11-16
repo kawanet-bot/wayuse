@@ -1,9 +1,9 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
 import {resolveConfig} from "../build/config.ts"
-import {generateKeyPair, signJwt} from "../client/jwt-sign.ts"
+import {generateKeyPair, signJwt} from "../jwt/jwt-sign.ts"
+import {type AuthOptions, parsePublicKey} from "../jwt/jwt-verify.ts"
 import {createApp} from "./app.ts"
-import {type AuthOptions, parsePublicKey} from "./jwt-verify.ts"
 
 const TITLE = "server/app.test.ts"
 
