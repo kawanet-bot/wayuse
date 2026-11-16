@@ -19,14 +19,14 @@ all: pack
 pack: clean
 	$(MAKE) -C .. all
 	cd ../.. && npm pack -w packages/wayuse-build -w packages/wayuse-server -w packages/wayuse-client --pack-destination builder/pack
-	mv wayuse-build-*.tgz builder.tgz
+	mv wayuse-build-*.tgz build.tgz
 	mv wayuse-server-*.tgz server.tgz
 	mv wayuse-client-*.tgz client.tgz
 
 # The lane has no manifest, so builder/pack/package.json stands in. A checkout keeps its own.
 unpack:
 	[ -e ../../package.json ] || cp package.json ../../
-	cd ../.. && npm install ./builder/pack/builder.tgz ./builder/pack/server.tgz ./builder/pack/client.tgz --no-audit --no-fund --no-save --engine-strict
+	cd ../.. && npm install ./builder/pack/build.tgz ./builder/pack/server.tgz ./builder/pack/client.tgz --no-audit --no-fund --no-save --engine-strict
 
 test: test-bin test-cli test-build test-server
 
@@ -43,7 +43,7 @@ test-cli:
 	cd ../.. && ./$(PKG_ROOT)/wayuse-server/bin/wayuse-server.js -v | grep "^wayuse-server " > /dev/null
 	cd ../.. && [ "$$(./$(PKG_ROOT)/wayuse-client/bin/wayuse.js jwt keygen | grep -c '^WAYUSE_JWT_')" = 2 ]
 
-# The sample's build directory as a user makes it, noVNC bundled from the builder's own dependency.
+# The sample's build directory as a user makes it, noVNC bundled from the dependency of wayuse-build.
 test-build:
 	/bin/rm -fr tmp
 	mkdir -p tmp

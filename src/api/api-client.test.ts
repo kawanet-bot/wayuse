@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {resolveConfig} from "../builder/config.ts"
+import {resolveConfig} from "../build/config.ts"
 import {PNG_SIGNATURE, createFakeServer, fakeExec} from "../test-utils/fake-server.ts"
 import {ApiError, createClient} from "./api-client.ts"
 

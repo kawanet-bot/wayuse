@@ -11,7 +11,7 @@ import {generatedFilesOf, writeBuildDir} from "./files.ts"
 import {APP_PACKAGES} from "./npm-package.ts"
 import {shellEnvOf} from "./shell-env.ts"
 
-const TITLE = "builder/files.test.ts"
+const TITLE = "build/files.test.ts"
 
 describe(TITLE, () => {
     const config = resolveConfig({
@@ -61,7 +61,7 @@ describe(TITLE, () => {
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"wayuse-server": "file:wayuse-server.tgz", "html-slim": "^0.5.0"})
     })
 
-    // The builder does not depend on the server, so nothing but this test holds the two lists together.
+    // wayuse-build does not depend on the server, so nothing but this test holds the two lists together.
     it("names for the applications exactly the server's optional peers, at the same ranges", () => {
         const server = JSON.parse(readFileSync(new URL("../../packages/wayuse-server/package.json", import.meta.url), "utf8"))
         assert.deepEqual(Object.assign({}, ...Object.values(APP_PACKAGES)), server.peerDependencies)

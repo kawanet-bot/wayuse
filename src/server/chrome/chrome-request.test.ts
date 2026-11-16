@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {resolveConfig} from "../../builder/config.ts"
+import {resolveConfig} from "../../build/config.ts"
 import {HttpError} from "../http-error.ts"
 import {checkTabId, resolveClickRequest, resolveOpenRequest} from "./chrome-request.ts"
 

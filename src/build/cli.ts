@@ -56,7 +56,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     }
 
     try {
-        const config = resolveConfig(await loadConfig(options.config) as declared.WayuseBuilder.Config)
+        const config = resolveConfig(await loadConfig(options.config) as declared.WayuseBuild.Config)
         const files = await writeBuildDir(config, options.outdir, {serverTarball: options["server-tarball"]})
         for (const file of files) process.stdout.write(`${options.outdir}/${file}\n`)
         return 0

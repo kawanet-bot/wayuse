@@ -1,9 +1,9 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import type {WayuseBuilder} from "wayuse-build"
+import type {WayuseBuild} from "wayuse-build"
 import {ConfigError, resolveConfig} from "./config.ts"
 
-const TITLE = "builder/config.test.ts"
+const TITLE = "build/config.test.ts"
 
 describe(TITLE, () => {
     it("fills in every default", () => {
@@ -74,7 +74,7 @@ describe(TITLE, () => {
 
     for (const [name, input] of refused) {
         it(`refuses ${name}`, () => {
-            assert.throws(() => resolveConfig(input as WayuseBuilder.Config), ConfigError)
+            assert.throws(() => resolveConfig(input as WayuseBuild.Config), ConfigError)
         })
     }
 })
