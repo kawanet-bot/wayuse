@@ -60,10 +60,11 @@ export const createApp = async ({config, stderr, auth, runtimeDir, exec = realEx
     // The console's pages come before the check: a browser sends no token when it loads a page.
     app.route("/", createStaticApp(htdocsDir))
 
-    // Every route below needs a token, one that does not exist included.
-    app.use(jwtCheck(auth, c => c.json({error: {message: "invalid token"}}, 401)))
+    // Every route below needs a token, one that does not exist included. Only an image built without the check leaves it out.
+    if (config.auth !== false) app.use(jwtCheck(auth, c => c.json({error: {message: "invalid token"}}, 401)))
 
-    app.get("/auth/me", c => c.json({me: c.get("jwt")}))
+    // Without the check there are no claims, and a token that comes anyway is not read.
+    app.get("/auth/me", c => c.json({me: c.get("jwt") ?? {}}))
 
     app.route("/", createWayuseApp(deps))
     app.route("/", createSlotApp(deps))

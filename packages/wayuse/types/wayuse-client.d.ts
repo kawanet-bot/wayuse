@@ -15,6 +15,8 @@ export declare namespace WayuseClient {
         /** The size a screen has until a client resizes it. */
         screen: {width: number, height: number}
         packages: string[]
+        /** Whether the server asks for a token. Only false opens every API. */
+        auth: boolean
         /** Present only in an image that has the console. */
         console?: ConsoleConfig
     }
@@ -214,7 +216,8 @@ export declare namespace WayuseClient {
         fetch(path: string, init?: RequestInit): Promise<Response>
 
         /** The claims of the token, as the server reads them. */
-        getMe(): Promise<JwtClaims>
+        /** The claims of the token, or none of them from a server that asks for no token. */
+        getMe(): Promise<Partial<JwtClaims>>
         getConfig(): Promise<Config>
         getSlots(): Promise<Slot[]>
         getSlot(id: string): Promise<Slot>

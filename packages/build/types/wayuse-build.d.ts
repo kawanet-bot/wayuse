@@ -16,6 +16,8 @@ export declare namespace WayuseBuild {
         screen?: ScreenConfig
         /** Additional apt packages, fonts among them. */
         packages?: string[]
+        /** `false` builds an image whose server asks for no token: every API is open to whoever reaches its port. */
+        auth?: false
         /** The console's pages. `false` leaves the console out of the image, which then has the API alone. */
         console?: ConsoleConfig | false
     }

@@ -68,6 +68,8 @@ The server takes its routes from `/`. A reverse proxy may put a path ahead of th
 
 Every API needs `Authorization: Bearer <JWT>`, and answers 401 without a valid one. Only `/ok` and the files of `--htdocs` are open.
 
+An image built with `auth: false` asks for no token. Every API is open to whoever reaches the port, and `GET /auth/me` answers `{"me": {}}`. The server says so when it starts.
+
 The server verifies a token with a public key, which it reads from the environment of the container.
 The key is given when the container starts, not when the image is built, so one image serves any number of key pairs:
 

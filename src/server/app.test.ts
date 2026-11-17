@@ -63,6 +63,35 @@ describe(TITLE, () => {
         assert.deepEqual(await missing.json(), {error: {message: "Not Found"}})
     })
 
+    it("asks for no token in an image built without the check, and reads none", async () => {
+        const open = resolveConfig({auth: false, apps: {chrome: {}}})
+        const lines: string[] = []
+        const app = await createApp({
+            config: open, stderr: {write: text => lines.push(text)}, auth: keyless, runtimeDir: "/run/test", exec: async () => {
+                throw new Error("no command is expected to run")
+            },
+        })
+        const get = (path: string, headers: Record<string, string> = {}) => app.request(path, {headers})
+
+        assert.deepEqual(await (await get("/wayuse/config")).json(), open)
+        assert.deepEqual(await (await get("/auth/me")).json(), {me: {}})
+        assert.deepEqual(await (await get("/auth/me", bearer)).json(), {me: {}})
+        assert.deepEqual(await (await get("/auth/me", {authorization: "Bearer x.y.z"})).json(), {me: {}})
+        assert.equal((await get("/missing")).status, 404)
+    })
+
+    // A configuration from before the item was there has none, and its server keeps the check.
+    it("keeps the check where the configuration does not say false", async () => {
+        const {auth: _, ...old} = config
+        const lines: string[] = []
+        const app = await createApp({
+            config: old as typeof config, stderr: {write: text => lines.push(text)}, auth, runtimeDir: "/run/test", exec: async () => {
+                throw new Error("no command is expected to run")
+            },
+        })
+        assert.equal((await app.request("/wayuse/config")).status, 401)
+    })
+
     it("refuses every token while it has no public key", async () => {
         assert.equal((await run("/wayuse/config", bearer, keyless)).res.status, 401)
         assert.equal((await run("/ok", {}, keyless)).res.status, 200)

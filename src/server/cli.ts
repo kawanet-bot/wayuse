@@ -74,7 +74,11 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     const config = JSON.parse(readFileSync(options.config, "utf8")) as WayuseClient.Config
     const {WAYUSE_JWT_PUBLIC_KEY, WAYUSE_JWT_AUDIENCE} = process.env
     const publicKey = WAYUSE_JWT_PUBLIC_KEY ? parsePublicKey(WAYUSE_JWT_PUBLIC_KEY) : undefined
-    if (!publicKey) process.stderr.write("WAYUSE_JWT_PUBLIC_KEY is not set: every API that needs a token is refused\n")
+    if (config.auth === false) {
+        process.stderr.write("config.auth is false: every API is open, with no token\n")
+    } else if (!publicKey) {
+        process.stderr.write("WAYUSE_JWT_PUBLIC_KEY is not set: every API that needs a token is refused\n")
+    }
 
     const auth = {publicKey, audience: WAYUSE_JWT_AUDIENCE || DEFAULT_AUDIENCE}
     const tickets = createVncTickets()
