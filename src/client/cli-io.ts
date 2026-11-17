@@ -9,7 +9,7 @@ export interface CLIIO {
     stdout: {write(data: string | Uint8Array): unknown}
     stderr: {write(data: string): unknown}
     fetch?: WayuseClient.ClientOptions["fetch"]
-    /** Loads the package of a subcommand. Default: the one the project has, or else the one beside this package. */
+    /** Loads the package of a subcommand. Default: as Node.js finds it from this package. */
     load?: (name: string) => Promise<CommandPackage>
 }
 
