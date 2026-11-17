@@ -393,6 +393,14 @@ textarea.api-editable {
   text-overflow: ellipsis;
 }
 
+/* When the picture was taken. It changes with every capture, so it sits at the right, as the load does. */
+.monitor-time {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 .monitor-tile-head a {
   padding: 3px 6px;
   font-size: 12px;

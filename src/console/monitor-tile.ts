@@ -19,8 +19,8 @@ export interface Tile {
     frame: HTMLElement
     image: HTMLImageElement
     meta: HTMLElement
+    time: HTMLElement
     status: HTMLElement
-    clients: string
     capturing: boolean
     captureFailed: boolean
 }
@@ -58,7 +58,8 @@ export const capture = async (tile: Tile): Promise<void> => {
         // A window opened since may have resized the screen, and the picture is what tells.
         const {naturalWidth, naturalHeight} = tile.image
         resize(tile, naturalWidth, naturalHeight)
-        tile.meta.textContent = `${naturalWidth}x${naturalHeight} · ${tile.clients} · ${timeOf()}`
+        tile.meta.textContent = `${naturalWidth}x${naturalHeight}`
+        tile.time.textContent = timeOf()
 
         // Only a failed capture is cleared here. The result of a click stays until the next click.
         if (tile.captureFailed) setStatus(tile.status, "")
@@ -94,7 +95,6 @@ const clickImage = async (tile: Tile, event: MouseEvent): Promise<void> => {
 }
 
 export const createTile = (slot: WayuseClient.Slot): Tile => {
-    const clients = `VNC ${slot.wayvnc.clients}`
     const {width, height} = slot.sway.output.rect
 
     // The link's target names the server and the slot, so opening the same screen twice returns to its tab.
@@ -104,8 +104,9 @@ export const createTile = (slot: WayuseClient.Slot): Tile => {
         <section class="monitor-tile">
             <div class="monitor-tile-head">
                 <span class="monitor-name">${slot.id}</span>
-                <span class="monitor-meta">${width}x${height} · ${clients}</span>
+                <span class="monitor-meta">${width}x${height}</span>
                 <span class="status"></span>
+                <span class="monitor-time"></span>
                 <a title="Open over VNC" href="${BASE}console/vnc/#!?slot=${encodeURIComponent(slot.id)}" target="vnc:${BASE}${slot.id}">↗</a>
             </div>
             <div class="monitor-frame">
@@ -120,8 +121,8 @@ export const createTile = (slot: WayuseClient.Slot): Tile => {
         frame: el.querySelector(".monitor-frame")!,
         image: el.querySelector(".monitor-image")!,
         meta: el.querySelector(".monitor-meta")!,
+        time: el.querySelector(".monitor-time")!,
         status: el.querySelector(".status")!,
-        clients,
         capturing: false,
         captureFailed: false,
     }

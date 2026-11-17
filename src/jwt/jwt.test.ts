@@ -41,7 +41,7 @@ describe(TITLE, () => {
     })
 
     it("refuses another audience, and a missing subject", () => {
-        assert.equal(verifyJwt(signJwt({...claims, aud: "front"}, pair.privateKey), auth), undefined)
+        assert.equal(verifyJwt(signJwt({...claims, aud: "other"}, pair.privateKey), auth), undefined)
         assert.equal(verifyJwt(signJwt({...claims, sub: ""}, pair.privateKey), auth), undefined)
     })
 

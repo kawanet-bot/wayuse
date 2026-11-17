@@ -23,9 +23,9 @@ describe(TITLE, () => {
 
     // The "#" has to be escaped, or the browser would take what follows it as the hash of the sign-in address.
     it("adds to the sign-in address where the token is to be brought back", () => {
-        const url = signInUrlOf("/front/screen-sign-in/?next=", "/screen/tokyo-1/console/")
-        assert.equal(url, "/front/screen-sign-in/?next=%2Fscreen%2Ftokyo-1%2Fconsole%2F%23!%3Fjwt%3D")
-        assert.equal(new URL(url, "https://example.com/").searchParams.get("next") + "JWT", "/screen/tokyo-1/console/#!?jwt=JWT")
+        const url = signInUrlOf("/sign-in/?next=", "/some/prefix/console/")
+        assert.equal(url, "/sign-in/?next=%2Fsome%2Fprefix%2Fconsole%2F%23!%3Fjwt%3D")
+        assert.equal(new URL(url, "https://example.com/").searchParams.get("next") + "JWT", "/some/prefix/console/#!?jwt=JWT")
     })
 
     // A token is shared by every server under one origin, and one that is down must not take it away.

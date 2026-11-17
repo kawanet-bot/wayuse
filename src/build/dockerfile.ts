@@ -6,6 +6,8 @@ type Resolved = WayuseClient.Config
 export interface BuildOptions {
     /** A @wayuse/server tarball to install in place of the one on npm. */
     serverTarball?: string
+    /** The values of console.vars, with the defaults among them. Default: the defaults alone. */
+    vars?: Record<string, string>
 }
 
 const UBUNTU = "ubuntu:26.04"
