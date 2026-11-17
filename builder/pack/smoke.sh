@@ -14,27 +14,13 @@ server=(
     --port "$port" --config "$rootfs/etc/wayuse/wayuse.json" --htdocs "$rootfs/opt/wayuse/htdocs"
 )
 
-# The image checks tokens, so its server does not start without the key. One that did start is not waited for.
-"${server[@]}" 2> /dev/null &
-for _ in $(seq 20); do
-    kill -0 $! 2> /dev/null || break
-    sleep 0.25
-done
-if kill $! 2> /dev/null; then
-    echo "the server started without a key" >&2
-    exit 1
-fi
-
-WAYUSE_JWT_PUBLIC_KEY=$(node "$wayuse" jwt keygen | sed -n 's/^WAYUSE_JWT_PUBLIC_KEY=//p')
-export WAYUSE_JWT_PUBLIC_KEY
-"${server[@]}" &
-trap 'kill $!' EXIT
-
-# The server answers within a second, and a port that never opens fails the first check below.
-for _ in $(seq 20); do
-    curl -sf -o /dev/null "$base/ok" && break
-    sleep 0.25
-done
+# The server answers within a second, and a port that never opens fails the first check after this.
+ready() {
+    for _ in $(seq 20); do
+        curl -s -o /dev/null "$base/ok" && break
+        sleep 0.25
+    done
+}
 
 # One line per check: the path, and the status it must answer with.
 check() {
@@ -44,6 +30,22 @@ check() {
     [ "$status" = "$2" ]
 }
 
+# The image checks tokens, so without the key its server is out of service wherever it is asked.
+"${server[@]}" 2> /dev/null &
+trap 'kill $! 2> /dev/null' EXIT
+ready
+check /ok 503
+check /console/ 503
+check /wayuse/config 503
+
+# The port is free for the next server only once this one is gone.
+kill $!
+wait $! 2> /dev/null || true
+
+WAYUSE_JWT_PUBLIC_KEY=$(node "$wayuse" jwt keygen | sed -n 's/^WAYUSE_JWT_PUBLIC_KEY=//p')
+export WAYUSE_JWT_PUBLIC_KEY
+"${server[@]}" &
+ready
 check /ok 200
 check /console/ 200
 check /console/js/monitor.js 200
