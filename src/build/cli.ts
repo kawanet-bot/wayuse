@@ -2,7 +2,7 @@ import type * as declared from "@wayuse/build"
 import {resolve} from "node:path"
 import {pathToFileURL} from "node:url"
 import {parseArgs} from "node:util"
-import {findConfigFile} from "./config-file.ts"
+import {findConfigFile, isFile} from "./config-file.ts"
 import {ConfigError, consoleTerserOf, consoleVarsOf, resolveConfig} from "./config.ts"
 import {writeBuildDir} from "./files.ts"
 import {VERSION} from "./version.ts"
@@ -31,6 +31,8 @@ const readArgs = (args: string[]) => parseArgs({
 
 // Node strips the types of a .ts file outside node_modules, so the file is imported as it is.
 const loadConfig = async (file: string): Promise<unknown> => {
+    // Checked ahead, so a module the configuration itself imports is not taken for the configuration.
+    if (!await isFile(file)) throw new ConfigError("not found")
     const module = await import(pathToFileURL(resolve(file)).href) as {default?: unknown}
     if (module.default == null) throw new ConfigError(`${file} has no default export`)
     return module.default
