@@ -9,7 +9,7 @@ import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
 import {shellEnvOf} from "./shell-env.ts"
 import {swayConfigOf} from "./sway-config.ts"
-import {bundleVendor} from "./vendor.ts"
+import {TERSER, bundleVendor} from "./vendor.ts"
 
 type Resolved = WayuseClient.Config
 
@@ -51,7 +51,7 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
 const VENDORS: [string, string][] = [["@novnc/novnc", "novnc.js"], ["html-ele", "html-ele.js"]]
 
 // A script of the console's own is made small one file at a time, so its imports stay as they are.
-const minifyScript = async (code: string): Promise<string> => (await minify(code, {module: true, compress: true, mangle: true})).code ?? code
+const minifyScript = async (code: string): Promise<string> => (await minify(code, {...TERSER, module: true})).code ?? code
 
 // A page of assets/ has {{name}} where a value of console.vars goes. The value is text, so it is escaped.
 const fillVars = async (dir: string, vars: Record<string, string>): Promise<void> => {
