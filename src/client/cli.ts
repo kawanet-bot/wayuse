@@ -4,10 +4,15 @@ import {ApiError} from "../api/api-client.ts"
 import {DEFAULT_URL, runApi} from "./cli-api.ts"
 import {type CLIIO, UsageError} from "./cli-io.ts"
 import {runJwt} from "./cli-jwt.ts"
+import {runPackage} from "./cli-package.ts"
 import {VERSION} from "./version.ts"
+
+// The package of `wayuse build`. A project installs it by itself, and this package does not depend on it.
+const BUILD_PACKAGE = "wayuse-build"
 
 const USAGE = `
 Usage: wayuse <command> [options]
+  build [options]                 write the Docker build directory, with the ${BUILD_PACKAGE} the project has installed
   auth me                         print the claims of WAYUSE_JWT, as the server reads them
   config                          print the configuration the image was built from
   slot list                       print every screen
@@ -55,6 +60,9 @@ const EXIT_USAGE = 2
  * The command line with everything it touches passed in. CLI() below fills in the process's own.
  */
 export const runCLI = async (args: string[], io: CLIIO): Promise<number> => {
+    // What follows is for the other package, whose options the parser below would refuse.
+    if (args[0] === "build") return runPackage(BUILD_PACKAGE, args.slice(1), io)
+
     try {
         const {positionals, values} = parseArgs({
             args,

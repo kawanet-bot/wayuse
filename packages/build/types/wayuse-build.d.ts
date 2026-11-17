@@ -57,7 +57,7 @@ export declare namespace WayuseBuild {
     }
 
     interface CLIOptions {
-        /** The arguments as the executable gets them: process.argv.slice(2). */
+        /** The arguments as the executable gets them: process.argv.slice(2). `wayuse build` gives those after `build`. */
         args: string[]
     }
 }

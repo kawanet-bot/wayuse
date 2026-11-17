@@ -20,6 +20,26 @@ describe(TITLE, () => {
         return {code, out, stdout: out.join(""), stderr: err.join("")}
     }
 
+    it("hands what follows build to the package of that name, and returns its exit code", async () => {
+        const seen: unknown[] = []
+        const err: string[] = []
+        const io = {env: {}, stdout: {write: () => 0}, stderr: {write: (data: string) => err.push(data)}}
+        const load = async (name: string) => ({CLI: async ({args}: {args: string[]}) => seen.push(name, args) + 5})
+        assert.equal(await runCLI(["build", "--server-tarball", "server.tgz", "-o", "out"], {...io, load}), 7)
+        assert.deepEqual(seen, ["wayuse-build", ["--server-tarball", "server.tgz", "-o", "out"]])
+        assert.deepEqual(err, [])
+    })
+
+    it("tells how to install the package of build where there is none", async () => {
+        const err: string[] = []
+        const io = {env: {}, stdout: {write: () => 0}, stderr: {write: (data: string) => err.push(data)}}
+        const load = async () => {
+            throw Object.assign(new Error("Cannot find package"), {code: "ERR_MODULE_NOT_FOUND"})
+        }
+        assert.equal(await runCLI(["build"], {...io, load}), 2)
+        assert.equal(err.join(""), "wayuse-build is not installed: npm install -D wayuse-build\n")
+    })
+
     it("prints what an API returns as indented JSON", async () => {
         const {code, stdout} = await run(["slot", "list"])
         assert.equal(code, 0)

@@ -44,6 +44,7 @@ test-cli:
 	cd ../.. && ./$(CLIENT_PKG)/bin/wayuse.js -v | grep "^wayuse " > /dev/null
 	cd ../.. && ./$(BUILD_PKG)/bin/wayuse-build.js -v | grep "^wayuse-build " > /dev/null
 	cd ../.. && ./$(SERVER_PKG)/bin/wayuse-server.js -v | grep "^wayuse-server " > /dev/null
+	cd ../.. && ./$(CLIENT_PKG)/bin/wayuse.js build -v | grep "^wayuse-build " > /dev/null
 	cd ../.. && [ "$$(./$(CLIENT_PKG)/bin/wayuse.js jwt keygen | grep -c '^WAYUSE_JWT_')" = 2 ]
 
 # The sample's build directory as a user makes it, noVNC bundled from the dependency of wayuse-build.
