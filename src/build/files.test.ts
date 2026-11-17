@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import {readFileSync} from "node:fs"
-import {mkdtemp, readFile, rm, stat, writeFile} from "node:fs/promises"
+import {mkdtemp, readFile, readdir, rm, stat, writeFile} from "node:fs/promises"
 import {tmpdir} from "node:os"
 import {join} from "node:path"
 import {describe, it} from "node:test"
@@ -125,6 +125,21 @@ describe(TITLE, () => {
             await writeBuildDir(config, outdir)
             assert.ok((await readFile(script, "utf8")).length < built.length)
             assert.ok((await readFile(vendor, "utf8")).length < plain.length)
+        } finally {
+            await rm(outdir, {recursive: true, force: true})
+        }
+    })
+
+    it("writes nothing for a browser into an image without the console", async () => {
+        const bare = resolveConfig({console: false})
+        assert.equal(generatedFilesOf(bare)["rootfs/opt/wayuse/htdocs/console/config.json"], undefined)
+        const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
+        try {
+            const paths = await writeBuildDir(bare, outdir)
+            assert.deepEqual(await readdir(join(outdir, "rootfs", DEFAULT_HTDOCS)), [])
+            assert.deepEqual(paths.filter(path => path.includes("htdocs")), [])
+            const script = await stat(join(outdir, "rootfs/opt/wayuse/bin/supervise.sh"))
+            assert.equal(script.mode & 0o111, 0o111)
         } finally {
             await rm(outdir, {recursive: true, force: true})
         }

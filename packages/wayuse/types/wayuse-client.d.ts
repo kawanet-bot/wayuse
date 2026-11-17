@@ -15,7 +15,8 @@ export declare namespace WayuseClient {
         /** The size a screen has until a client resizes it. */
         screen: {width: number, height: number}
         packages: string[]
-        console: ConsoleConfig
+        /** Present only in an image that has the console. */
+        console?: ConsoleConfig
     }
 
     interface ChromeConfig {

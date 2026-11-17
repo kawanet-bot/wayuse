@@ -9,6 +9,8 @@ An image that `@wayuse/build` builds has pages for a person, at `/console/` of i
 | `/console/vnc/#!?slot=HEADLESS-1` | One screen over VNC, seen and operated in the browser. |
 | `/console/api/` | A form that tries each API, and shows its URL and the `wayuse` command that does the same. |
 
+An image leaves the console out with `console: false` in `wayuse.config.ts`. Its `htdocs/` is then empty, and its server answers the API alone.
+
 The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
 A link of the form `/console/#!?jwt=<JWT>` signs in with the token in it. A browser sends what follows the `#` to no server.
 The pages and their scripts need no token to load, as they carry no secret. Every API they call does.

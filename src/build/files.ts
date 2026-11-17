@@ -32,9 +32,10 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
         "rootfs/etc/wayuse/wayuse.json": JSON.stringify(config, null, 2) + "\n",
         "rootfs/etc/wayuse/sway/config": swayConfigOf(config),
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
-        // The entry reads it before it has a token, which the API would ask for.
-        [`${CONSOLE}/config.json`]: JSON.stringify(config.console, null, 2) + "\n",
     }
+
+    // The entry reads it before it has a token, which the API would ask for.
+    if (config.console) files[`${CONSOLE}/config.json`] = JSON.stringify(config.console, null, 2) + "\n"
 
     const {chrome, redir} = config.apps
     if (chrome) files["rootfs/etc/wayuse/chrome.env"] = shellEnvOf(chrome.env)
@@ -66,23 +67,13 @@ const fillVars = async (dir: string, vars: Record<string, string>): Promise<void
 }
 
 /**
- * Writes the build directory anew and returns the paths of what it generated.
+ * Writes the console into the build directory, and returns the paths of what it generated.
  */
-export const writeBuildDir = async (config: Resolved, outdir: string, options: BuildOptions = {}): Promise<string[]> => {
-    // A file an earlier configuration generated must not linger and reach the image.
-    await rm(outdir, {recursive: true, force: true})
-    await cp(assetsRoot(), outdir, {recursive: true})
-    await fillVars(join(outdir, HTDOCS), options.vars ?? DEFAULT_VARS)
-
-    const files = generatedFilesOf(config, options)
-    for (const [path, content] of Object.entries(files)) {
-        const file = join(outdir, path)
-        await mkdir(dirname(file), {recursive: true})
-        await writeFile(file, content)
-    }
-
-    const paths = Object.keys(files)
+const writeConsole = async (outdir: string, options: BuildOptions): Promise<string[]> => {
+    const paths: string[] = []
     const small = options.terser ?? true
+
+    await fillVars(join(outdir, HTDOCS), options.vars ?? DEFAULT_VARS)
 
     // The pages are already there, written by hand in assets/. Their scripts join them.
     await mkdir(join(outdir, CONSOLE, "js"), {recursive: true})
@@ -99,6 +90,33 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
         await bundleVendor(name, join(outdir, vendor), small)
         paths.push(vendor)
     }
+
+    return paths
+}
+
+/**
+ * Writes the build directory anew and returns the paths of what it generated.
+ */
+export const writeBuildDir = async (config: Resolved, outdir: string, options: BuildOptions = {}): Promise<string[]> => {
+    // A file an earlier configuration generated must not linger and reach the image.
+    await rm(outdir, {recursive: true, force: true})
+    await cp(assetsRoot(), outdir, {recursive: true})
+
+    // An image without the console keeps the directory the server serves, with nothing of the console in it.
+    if (!config.console) {
+        await rm(join(outdir, HTDOCS), {recursive: true})
+        await mkdir(join(outdir, HTDOCS))
+    }
+
+    const files = generatedFilesOf(config, options)
+    for (const [path, content] of Object.entries(files)) {
+        const file = join(outdir, path)
+        await mkdir(dirname(file), {recursive: true})
+        await writeFile(file, content)
+    }
+
+    const paths = Object.keys(files)
+    if (config.console) paths.push(...await writeConsole(outdir, options))
 
     if (options.serverTarball != null) {
         const path = `rootfs/opt/wayuse/${SERVER_TARBALL}`

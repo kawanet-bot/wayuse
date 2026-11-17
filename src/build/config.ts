@@ -144,7 +144,9 @@ export const resolveConfig = (input: Input): Resolved => {
     const node = recordOf(config.node, "config.node", ["version"])
     const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])
-    const signIn = stringOf(recordOf(config.console, "config.console", ["signIn", "vars", "terser"]).signIn, "config.console.signIn", SIGN_IN, "")
+    // false alone leaves the console out. Its other items say how it is written, and take an object.
+    const pages = config.console === false ? undefined : recordOf(config.console, "config.console", ["signIn", "vars", "terser"])
+    const signIn = stringOf(pages?.signIn, "config.console.signIn", SIGN_IN, "")
 
     const installed: Resolved["apps"] = {}
     if (apps.chrome != null) installed.chrome = chromeOf(apps.chrome)
@@ -170,6 +172,6 @@ export const resolveConfig = (input: Input): Resolved => {
             height: sizeOf(screen.height, "config.screen.height", 960),
         },
         packages,
-        console: signIn ? {signIn} : {},
+        ...(pages && {console: signIn ? {signIn} : {}}),
     }
 }

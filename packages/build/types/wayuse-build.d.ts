@@ -16,8 +16,8 @@ export declare namespace WayuseBuild {
         screen?: ScreenConfig
         /** Additional apt packages, fonts among them. */
         packages?: string[]
-        /** The console's pages. */
-        console?: ConsoleConfig
+        /** The console's pages. `false` leaves the console out of the image, which then has the API alone. */
+        console?: ConsoleConfig | false
     }
 
     interface NodeConfig {
