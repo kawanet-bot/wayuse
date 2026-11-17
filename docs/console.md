@@ -50,8 +50,8 @@ The header of the pages shows an icon and a title, and the title is in the tab o
 export default defineConfig({
     console: {
         vars: {
-            icon: "🐟",
-            title: "fishprint",
+            icon: "🚀",
+            title: "my-wayuse",
         },
     },
 })

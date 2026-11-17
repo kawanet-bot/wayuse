@@ -34,7 +34,7 @@ describe(TITLE, () => {
             timezone: "Asia/Tokyo",
             screen: {width: 1920, height: 1080},
             packages: ["fonts-noto-cjk"],
-            console: {signIn: "../../front/screen-sign-in/?next=", vars: {title: "fishprint"}},
+            console: {signIn: "../../front/screen-sign-in/?next=", vars: {title: "my-wayuse"}},
         })
         assert.equal(config.node.version, "24.11.1")
         // The policies given are all there is: the defaults are not kept beside them.
@@ -61,7 +61,7 @@ describe(TITLE, () => {
 
     it("takes the values of the pages as given, an empty one among them, and the defaults for the rest", () => {
         assert.deepEqual(consoleVarsOf({}), {icon: "🖥️", title: "wayuse"})
-        assert.deepEqual(consoleVarsOf({console: {vars: {title: "fishprint"}}}), {icon: "🖥️", title: "fishprint"})
+        assert.deepEqual(consoleVarsOf({console: {vars: {title: "my-wayuse"}}}), {icon: "🖥️", title: "my-wayuse"})
         assert.deepEqual(consoleVarsOf({console: {vars: {icon: "", notice: "<b>"}}}), {icon: "", title: "wayuse", notice: "<b>"})
         const title = null as unknown as string
         assert.deepEqual(consoleVarsOf({console: {vars: {title}}}), {icon: "🖥️", title: "wayuse"})
@@ -70,7 +70,7 @@ describe(TITLE, () => {
     it("refuses a value of the pages that is not a string", () => {
         const vars = {title: 1} as unknown as Record<string, string>
         assert.throws(() => consoleVarsOf({console: {vars}}), ConfigError)
-        const list = ["fishprint"] as unknown as Record<string, string>
+        const list = ["my-wayuse"] as unknown as Record<string, string>
         assert.throws(() => consoleVarsOf({console: {vars: list}}), ConfigError)
     })
 
