@@ -1,5 +1,5 @@
 {
-  "name": "wayuse-client",
+  "name": "wayuse",
   "description": "The API client and CLI for a wayuse container.",
   "version": "0.0.0",
   "author": "Kawanet",
@@ -26,7 +26,7 @@
     "README.md",
     "types/*.d.ts"
   ],
-  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-client#readme",
+  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse#readme",
   "keywords": [
     "cli",
     "client",
@@ -37,7 +37,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/wayuse.git",
-    "directory": "packages/wayuse-client"
+    "directory": "packages/wayuse"
   },
   "type": "module",
   "types": "./types/wayuse-client.d.ts"

@@ -1,8 +1,10 @@
-# wayuse-client
+# wayuse
 
-[![npm version](https://img.shields.io/npm/v/wayuse-client)](https://www.npmjs.com/package/wayuse-client)
+[![npm version](https://img.shields.io/npm/v/wayuse)](https://www.npmjs.com/package/wayuse)
 
 The API client and CLI for a wayuse container.
+
+This package is the client alone. [wayuse-build](../wayuse-build/README.md) builds the image of the container, and [wayuse-server](../wayuse-server/README.md) runs inside it.
 
 ## SYNOPSIS
 
@@ -23,7 +25,7 @@ The container and the server each need a setting for that: see [wayuse-build](..
 The same from a program. It uses web standards alone, so it runs in Node.js and in a browser:
 
 ```ts
-import {createClient} from "wayuse-client"
+import {createClient} from "wayuse"
 
 const client = createClient({url: "http://127.0.0.1:9580/", token: process.env.WAYUSE_JWT})
 const tab = await client.openChromeTab({url: "https://example.com/"})
@@ -80,12 +82,14 @@ The private key stays with whoever issues the tokens, outside the container.
 
 ```sh
 npx wayuse jwt keygen > .env         # WAYUSE_JWT_PRIVATE_KEY= and WAYUSE_JWT_PUBLIC_KEY=
+chmod 600 .env                       # the private key is for its owner alone
 set -a; . ./.env; set +a
 npx wayuse jwt sign --sub alice      # a JWT for "alice"
 npx wayuse jwt public-key            # WAYUSE_JWT_PUBLIC_KEY= again, from the private key
 ```
 
 Give the container `WAYUSE_JWT_PUBLIC_KEY`, and never the private key.
+`jwt keygen` makes a new pair each time, and tokens signed with an earlier one stop working. Keep `.env` out of version control.
 
 | Environment variable | Read by | Meaning |
 |---|---|---|
@@ -99,7 +103,7 @@ A token carries `aud`, `sub` and `iat`. It never expires unless it carries `exp`
 The same from a program:
 
 ```ts
-import {generateKeyPair, signJwt} from "wayuse-client"
+import {generateKeyPair, signJwt} from "wayuse"
 
 const {privateKey, publicKey} = generateKeyPair()
 const jwt = signJwt({aud: "wayuse", sub: "alice"}, privateKey)

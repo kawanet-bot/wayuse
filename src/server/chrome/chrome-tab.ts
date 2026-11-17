@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {withTimeout} from "../utils/with-timeout.ts"
 import type {BrowserContexts} from "./browser-context.ts"
 import type {CDP} from "./cdp.ts"

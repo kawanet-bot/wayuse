@@ -1,7 +1,7 @@
 // The client of wayuse-server that the CLI and the console share: web standards alone, no node: import.
 
-import type * as declared from "wayuse-client"
-import type {WayuseClient} from "wayuse-client"
+import type * as declared from "wayuse"
+import type {WayuseClient} from "wayuse"
 
 export class ApiError extends Error implements declared.ApiError {
     status: number

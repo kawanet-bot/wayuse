@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {HttpError} from "../http-error.ts"
 import {withTimeout} from "../utils/with-timeout.ts"
 import {checkTarget, withCDP} from "./cdp.ts"

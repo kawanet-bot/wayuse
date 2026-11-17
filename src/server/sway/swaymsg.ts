@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import type {Exec} from "../exec.ts"
 import {HttpError} from "../http-error.ts"
 

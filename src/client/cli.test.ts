@@ -94,6 +94,6 @@ describe(TITLE, () => {
 
     it("prints the usage and the version", async () => {
         assert.match((await run(["--help"])).stdout, /^Usage: wayuse <command>/)
-        assert.match((await run(["-v"])).stdout, /^wayuse-client \d+\.\d+\.\d+\n$/)
+        assert.match((await run(["-v"])).stdout, /^wayuse \d+\.\d+\.\d+\n$/)
     })
 })

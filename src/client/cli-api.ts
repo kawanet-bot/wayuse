@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {createClient} from "../api/api-client.ts"
 import {runChrome} from "./cli-chrome.ts"
 import {type ApiValues, type CLIIO, UsageError, pointOf, printJson, writeOutput} from "./cli-io.ts"

@@ -1,5 +1,5 @@
 import {writeFile} from "node:fs/promises"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 
 export type Env = Record<string, string | undefined>
 

@@ -1,6 +1,6 @@
+import type {WayuseClient} from "wayuse"
 import type * as declared from "wayuse-build"
 import type {WayuseBuild} from "wayuse-build"
-import type {WayuseClient} from "wayuse-client"
 import {VERSION} from "./version.ts"
 
 type Input = WayuseBuild.Config

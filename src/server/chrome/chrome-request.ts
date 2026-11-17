@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {HttpError} from "../http-error.ts"
 import {type Modifier, parseCombo} from "../input/combo.ts"
 

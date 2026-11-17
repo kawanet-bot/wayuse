@@ -1,6 +1,6 @@
 import {Hono} from "hono"
 import type {ContentfulStatusCode} from "hono/utils/http-status"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {type AuthEnv, jwtCheck} from "../jwt/jwt-check-hono.ts"
 import type {AuthOptions} from "../jwt/jwt-verify.ts"
 import {createAppsApp} from "./apps/apps-api.ts"

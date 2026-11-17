@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import type {ServerDeps} from "../deps.ts"
 import {HttpError} from "../http-error.ts"
 import {getSwayOutputs, getSwayWindows, swayCommand} from "../sway/swaymsg.ts"

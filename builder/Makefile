@@ -15,7 +15,7 @@ ROLLUP_SRC := $(wildcard ./*.ts)
 
 BUILD_DST := ../packages/wayuse-build/dist/wayuse-build.js
 SERVER_DST := ../packages/wayuse-server/dist/wayuse-server.js
-CLIENT_DST := ../packages/wayuse-client/dist/wayuse-client.js
+CLIENT_DST := ../packages/wayuse/dist/wayuse-client.js
 CONSOLE_DST := ../packages/wayuse-build/dist/console/login.js
 
 BUILD_CONFIG := ./rollup-build.config.ts
@@ -67,7 +67,7 @@ $(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../pac
 	@echo ""
 
 # src/jwt/ is bundled here and into the server, and src/api/ here and, later, into the console.
-$(CLIENT_DST): $(CLIENT_CONFIG) $(CLIENT_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/wayuse-client/package.json
+$(CLIENT_DST): $(CLIENT_CONFIG) $(CLIENT_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/wayuse/package.json
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@

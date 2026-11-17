@@ -1,6 +1,6 @@
 {
   "name": "wayuse-workspace",
-  "description": "Workspace for wayuse-build, wayuse-server and wayuse-client.",
+  "description": "Workspace for wayuse-build, wayuse-server and wayuse.",
   "author": "Kawanet",
   "devDependencies": {
     "@rollup/plugin-json": "^6.1.0",
@@ -28,7 +28,7 @@
   },
   "scripts": {
     "build": "make -C builder",
-    "fixpack": "fixpack && fixpack packages/wayuse-build/package.json && fixpack packages/wayuse-server/package.json && fixpack packages/wayuse-client/package.json",
+    "fixpack": "fixpack && fixpack packages/wayuse-build/package.json && fixpack packages/wayuse-server/package.json && fixpack packages/wayuse/package.json",
     "prepare": "make -C builder is-not-buildable 2> /dev/null || make -C builder clean all test",
     "test": "make -C builder test",
     "ts-refine": "./node_modules/.bin/ts-refine format && ./node_modules/.bin/ts-refine imports"
@@ -37,6 +37,6 @@
   "workspaces": [
     "packages/wayuse-build",
     "packages/wayuse-server",
-    "packages/wayuse-client"
+    "packages/wayuse"
   ]
 }

@@ -1,7 +1,7 @@
 import {copyFile, cp, mkdir, readdir, rm, writeFile} from "node:fs/promises"
 import {dirname, join} from "node:path"
 import {fileURLToPath} from "node:url"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {bundleNovnc} from "./novnc.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"

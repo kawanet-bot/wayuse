@@ -1,6 +1,6 @@
 // The entry of the console: goes on to the monitor with a token the server accepts, and asks for one otherwise.
 
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {createClient} from "../api/api-client.ts"
 import {$, BASE, getToken, setToken} from "./console-client.ts"
 import {failureOf, isRefusal, signInUrlOf, tokenOfHash} from "./console-util.ts"

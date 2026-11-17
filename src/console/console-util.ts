@@ -1,6 +1,6 @@
 // What the console's pages work out without touching the page, kept apart so a test reads it without a browser.
 
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 
 /** The server's root as the page sees it: everything ahead of "console/", a reverse proxy's prefix included. */
 export const basePathOf = (pathname: string): string => pathname.replace(/console\/.*$/, "")

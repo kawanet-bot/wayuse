@@ -1,5 +1,5 @@
 import type {Context, MiddlewareHandler} from "hono"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {type AuthOptions, verifyJwt} from "./jwt-verify.ts"
 
 /** The Hono environment of a route behind jwtCheck(). */

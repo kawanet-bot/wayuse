@@ -73,6 +73,7 @@ The key is given when the container starts, not when the image is built, so one 
 
 ```sh
 npx wayuse jwt keygen > .env    # once: WAYUSE_JWT_PRIVATE_KEY= and WAYUSE_JWT_PUBLIC_KEY=
+chmod 600 .env                  # the private key is for its owner alone
 set -a; . ./.env; set +a
 docker run -e WAYUSE_JWT_PUBLIC_KEY ... my-wayuse
 ```
@@ -86,7 +87,7 @@ services:
       WAYUSE_JWT_PUBLIC_KEY: "${WAYUSE_JWT_PUBLIC_KEY}"
 ```
 
-The private key never goes to the container. [wayuse-client](../wayuse-client/README.md) makes the key pair and signs the tokens with it.
+The private key never goes to the container. [wayuse](../wayuse/README.md) makes the key pair and signs the tokens with it.
 
 | Environment variable | Meaning |
 |---|---|

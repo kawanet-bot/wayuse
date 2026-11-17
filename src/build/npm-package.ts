@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 
 // The wayuse-server that wayuse-build was written against. A tarball stands in while that is not on npm.
 const SERVER_RANGE = "^0.0.0"

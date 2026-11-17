@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import type {Exec} from "./exec.ts"
 import type {SwayLocks} from "./sway/sway-lock.ts"
 import type {VncTickets} from "./wayvnc/vnc-ticket.ts"
