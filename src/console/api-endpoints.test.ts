@@ -74,8 +74,10 @@ describe(TITLE, () => {
     })
 
     it("groups the endpoints by the first part of the path, each under its place in the list", () => {
-        const endpoints = [find("GET slot/"), find("GET clipboard"), find("POST slot/:slot/click")]
-        const [slot, clipboard] = endpointGroupsOf(endpoints, "/base/").map(node => node.outerHTML)
+        const endpoints = [find("GET slot/"), find("GET clipboard"), find("POST slot/:slot/click"), find("GET app/chrome/tab/")]
+        const [slot, clipboard, chrome] = endpointGroupsOf(endpoints, "/base/").map(node => node.outerHTML)
+        // An application has a group of its own, named by its place under app/.
+        assert.equal(chrome, `<optgroup label="app/chrome"><option value="3">GET    /base/app/chrome/tab/</option></optgroup>`)
         assert.equal(slot, `<optgroup label="slot"><option value="0">GET    /base/slot/</option><option value="2">POST   /base/slot/:slot/click</option></optgroup>`)
         assert.equal(clipboard, `<optgroup label="clipboard"><option value="1">GET    /base/clipboard</option></optgroup>`)
     })

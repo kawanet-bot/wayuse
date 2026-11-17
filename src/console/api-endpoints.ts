@@ -1,6 +1,7 @@
 // The APIs the console's form offers, each with the wayuse command that does the same.
 
 import {type ENode, EN} from "html-ele"
+import {CHROME_CLICKABLE, CHROME_ENDPOINTS} from "./api-endpoints-chrome.ts"
 
 /** The form's fields. A path takes them as `:name`, a body as its items, a command as its arguments. */
 export type Field = "slot" | "id" | "url" | "width" | "height" | "context" | "x" | "y" | "button" | "keys" | "text" | "expression"
@@ -24,8 +25,6 @@ export interface Endpoint {
 
 const NUMBERS: Field[] = ["width", "height", "x", "y"]
 
-const OPEN: Field[] = ["url", "slot", "width", "height", "context"]
-
 export const ENDPOINTS: Endpoint[] = [
     {method: "GET", path: "slot/", cli: ["slot", "list"], note: "Every screen."},
     {method: "GET", path: "slot/:slot", cli: ["slot", "show", "--slot", ":slot"], note: "One screen: its sway output, the windows on it, and the number of VNC clients."},
@@ -34,15 +33,7 @@ export const ENDPOINTS: Endpoint[] = [
     {method: "POST", path: "slot/:slot/click", body: ["x", "y", "button"], cli: ["slot", "click", ":x", ":y", "--slot", ":slot", "--button", ":button"], note: "Clicks a pixel of the screen's capture, whatever is there. The button is in the notation of sway's bindsym."},
     {method: "POST", path: "slot/:slot/key", body: ["keys"], cli: ["slot", "key", ":keys", "--slot", ":slot"], note: "Sends keys to the screen, in the notation of sway's bindsym separated by spaces. Two dots pause for 200ms."},
     {method: "POST", path: "slot/:slot/vnc-ticket", cli: ["slot", "vnc", "--slot", ":slot"], note: "Issues a ticket to connect to the screen once, by VNC over a WebSocket."},
-    {method: "GET", path: "app/chrome/tab/", app: "chrome", cli: ["chrome", "list"], note: "Every tab of Chrome."},
-    {method: "PUT", path: "app/chrome/tab/", app: "chrome", body: OPEN, cli: ["chrome", "open", ":url", "--slot", ":slot", "--size", ":size", "--context", ":context"], note: "Closes every window on the slot, sets the screen to the size, and opens the URL in a window that fills it."},
-    {method: "POST", path: "app/chrome/tab/", app: "chrome", body: OPEN, cli: ["chrome", "open", ":url", "--add", "--slot", ":slot", "--size", ":size", "--context", ":context"], note: "Opens the URL in one more window of the size, over what is on the slot."},
-    {method: "GET", path: "app/chrome/tab/:id", app: "chrome", cli: ["chrome", "show", "--tab", ":id"], note: "One tab."},
-    {method: "DELETE", path: "app/chrome/tab/:id", app: "chrome", cli: ["chrome", "close", "--tab", ":id"], note: "Closes the tab, and returns it as it was."},
-    {method: "GET", path: "app/chrome/tab/:id/capture.jpg", app: "chrome", shows: "image", cli: ["chrome", "capture", "--tab", ":id", "-o", "capture.jpg"], note: "A JPEG of what the tab shows. A click on the picture is sent as a click at that pixel."},
-    {method: "GET", path: "app/chrome/tab/:id/capture.html", app: "chrome", shows: "text", cli: ["chrome", "html", "--tab", ":id", "-o", "capture.html"], note: "The tab's DOM as it is now, as HTML without scripts and styles."},
-    {method: "POST", path: "app/chrome/tab/:id/click", app: "chrome", body: ["x", "y", "button"], cli: ["chrome", "click", ":x", ":y", "--tab", ":id", "--button", ":button"], note: "Clicks a pixel of the tab's capture. It reaches the page alone."},
-    {method: "POST", path: "app/chrome/tab/:id/evaluate", app: "chrome", body: ["expression"], cli: ["chrome", "eval", ":expression", "--tab", ":id"], note: "Evaluates JavaScript in the tab's page. A promise is awaited, and an exception is a 400."},
+    ...CHROME_ENDPOINTS,
     {method: "GET", path: "clipboard", cli: ["clipboard", "get"], note: "The text on the clipboard, which all screens share."},
     {method: "PUT", path: "clipboard", body: ["text"], cli: ["clipboard", "set", ":text"], note: "Puts the text on the clipboard. Pasting it is a key press: ctrl+v."},
     {method: "GET", path: "wayuse/status", cli: ["status"], note: "The load and the memory of the host."},
@@ -57,18 +48,19 @@ export const keyOf = (endpoint: Endpoint): string => `${endpoint.method} ${endpo
 /** The capture a click on the shown picture is sent to, by the path of the capture it came from. */
 export const CLICKABLE: Record<string, {field: "slot" | "id", click: string}> = {
     "slot/:slot/capture.png": {field: "slot", click: "POST slot/:slot/click"},
-    "app/chrome/tab/:id/capture.jpg": {field: "id", click: "POST app/chrome/tab/:id/click"},
+    ...CHROME_CLICKABLE,
 }
 
 /** The choices of a pull-down, each a value and the words shown for it. A tab's title is among the words, so they are escaped. */
 export const optionsOf = (items: [string, string][]): ENode[] =>
     items.map(([value, label]) => EN`<option value="${value}">${label}</option>`)
 
-/** The endpoints as the choices of a pull-down, grouped by the first part of the path, as the server's routes are. */
+/** The endpoints as the choices of a pull-down, grouped as the server's routes are: by the first part of the path, and by the application under app/. */
 export const endpointGroupsOf = (endpoints: Endpoint[], base: string): ENode[] => {
     const groups = new Map<string, ENode[]>()
     endpoints.forEach((endpoint, i) => {
-        const name = endpoint.path.split("/")[0]!
+        const [first, second] = endpoint.path.split("/")
+        const name = first === "app" ? `app/${second}` : first!
         const options = groups.get(name) ?? []
         groups.set(name, options)
         options.push(EN`<option value="${i}">${endpoint.method.padEnd(6, " ")} ${base}${endpoint.path}</option>`)
