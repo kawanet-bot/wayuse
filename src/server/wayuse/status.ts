@@ -1,6 +1,6 @@
 import {readFile} from "node:fs/promises"
 import os from "node:os"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 
 type Meminfo = WayuseClient.Meminfo
 

@@ -1,7 +1,7 @@
 import {serve} from "@hono/node-server"
 import {readFileSync} from "node:fs"
 import {parseArgs} from "node:util"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import type * as declared from "wayuse-server"
 import {DEFAULT_AUDIENCE} from "../jwt/jwt-format.ts"
 import {parsePublicKey} from "../jwt/jwt-verify.ts"

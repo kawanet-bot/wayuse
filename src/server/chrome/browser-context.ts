@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import type {CDP} from "./cdp.ts"
 
 type Kind = WayuseClient.ChromeContext

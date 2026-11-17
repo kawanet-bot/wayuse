@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 
 type Resolved = WayuseClient.Config
 

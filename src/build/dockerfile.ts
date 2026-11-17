@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {SERVER_TARBALL} from "./npm-package.ts"
 
 type Resolved = WayuseClient.Config

@@ -1,6 +1,6 @@
 // The client the console's pages share: the server beside the page, with the token the browser keeps.
 
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {createClient} from "../api/api-client.ts"
 import {basePathOf} from "./console-util.ts"
 

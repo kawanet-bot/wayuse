@@ -86,7 +86,7 @@ services:
       WAYUSE_JWT_PUBLIC_KEY: "${WAYUSE_JWT_PUBLIC_KEY}"
 ```
 
-The private key never goes to the container. [wayuse-client](../wayuse-client/README.md) makes the key pair and signs the tokens with it.
+The private key never goes to the container. [wayuse](../wayuse/README.md) makes the key pair and signs the tokens with it.
 
 | Environment variable | Meaning |
 |---|---|

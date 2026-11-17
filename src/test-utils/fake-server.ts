@@ -1,7 +1,7 @@
 // A wayuse-server for the tests: the real application over recorded answers of sway, with no container.
 
 import {readFileSync} from "node:fs"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {resolveConfig} from "../build/config.ts"
 import {generateKeyPair, signJwt} from "../jwt/jwt-sign.ts"
 import {parsePublicKey} from "../jwt/jwt-verify.ts"

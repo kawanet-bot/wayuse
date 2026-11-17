@@ -1,5 +1,5 @@
 import {Hono} from "hono"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import type {ServerDeps} from "../deps.ts"
 import {HttpError} from "../http-error.ts"
 

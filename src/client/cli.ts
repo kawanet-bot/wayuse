@@ -1,5 +1,5 @@
 import {parseArgs} from "node:util"
-import type * as declared from "wayuse-client"
+import type * as declared from "wayuse"
 import {ApiError} from "../api/api-client.ts"
 import {DEFAULT_URL, runApi} from "./cli-api.ts"
 import {type CLIIO, UsageError} from "./cli-io.ts"
@@ -77,7 +77,7 @@ export const runCLI = async (args: string[], io: CLIIO): Promise<number> => {
         if (values.help) {
             io.stdout.write(USAGE)
         } else if (values.version) {
-            io.stdout.write(`wayuse-client ${VERSION}\n`)
+            io.stdout.write(`wayuse ${VERSION}\n`)
         } else if (positionals[0] === "jwt") {
             io.stdout.write(runJwt(positionals[1], values, io.env))
         } else {

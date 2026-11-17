@@ -1,4 +1,4 @@
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {type ApiValues, type CLIIO, UsageError, pointOf, printJson, writeOutput} from "./cli-io.ts"
 
 type Client = WayuseClient.Client

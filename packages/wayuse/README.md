@@ -1,6 +1,6 @@
-# wayuse-client
+# wayuse
 
-[![npm version](https://img.shields.io/npm/v/wayuse-client)](https://www.npmjs.com/package/wayuse-client)
+[![npm version](https://img.shields.io/npm/v/wayuse)](https://www.npmjs.com/package/wayuse)
 
 The API client and CLI for a wayuse container.
 
@@ -23,7 +23,7 @@ The container and the server each need a setting for that: see [wayuse-build](..
 The same from a program. It uses web standards alone, so it runs in Node.js and in a browser:
 
 ```ts
-import {createClient} from "wayuse-client"
+import {createClient} from "wayuse"
 
 const client = createClient({url: "http://127.0.0.1:9580/", token: process.env.WAYUSE_JWT})
 const tab = await client.openChromeTab({url: "https://example.com/"})
@@ -99,7 +99,7 @@ A token carries `aud`, `sub` and `iat`. It never expires unless it carries `exp`
 The same from a program:
 
 ```ts
-import {generateKeyPair, signJwt} from "wayuse-client"
+import {generateKeyPair, signJwt} from "wayuse"
 
 const {privateKey, publicKey} = generateKeyPair()
 const jwt = signJwt({aud: "wayuse", sub: "alice"}, privateKey)

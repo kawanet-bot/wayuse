@@ -1,5 +1,5 @@
 import {type KeyObject, createPublicKey, verify} from "node:crypto"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {JWT_HEADER} from "./jwt-format.ts"
 
 type Claims = WayuseClient.JwtClaims

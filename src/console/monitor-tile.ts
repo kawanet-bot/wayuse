@@ -1,7 +1,7 @@
 // One screen of the monitor, as a tile. It shows the screen's picture, and sends a click on it to the screen.
 
 import {ELE} from "html-ele"
-import type {WayuseClient} from "wayuse-client"
+import type {WayuseClient} from "wayuse"
 import {BASE, createConsoleClient} from "./console-client.ts"
 import {buttonOf, imagePixelOf} from "./console-util.ts"
 
