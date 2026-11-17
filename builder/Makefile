@@ -13,10 +13,10 @@ CONSOLE_SRC := $(shell find ../src/console -name '*.ts' -not -name '*.test.ts')
 TYPES := $(wildcard ../packages/*/types/*.d.ts)
 ROLLUP_SRC := $(wildcard ./*.ts)
 
-BUILD_DST := ../packages/wayuse-build/dist/wayuse-build.js
-SERVER_DST := ../packages/wayuse-server/dist/wayuse-server.js
+BUILD_DST := ../packages/build/dist/wayuse-build.js
+SERVER_DST := ../packages/server/dist/wayuse-server.js
 CLIENT_DST := ../packages/wayuse/dist/wayuse-client.js
-CONSOLE_DST := ../packages/wayuse-build/dist/console/login.js
+CONSOLE_DST := ../packages/build/dist/console/login.js
 
 BUILD_CONFIG := ./rollup-build.config.ts
 SERVER_CONFIG := ./rollup-server.config.ts
@@ -48,7 +48,7 @@ is-not-buildable:
 	@ [ "$(BUILDABLE)" != "YES" ] || [ ! -f ../node_modules/.bin/rollup ]
 
 # The package name resolves to this file, for bin/wayuse-build.js and for a wayuse.config.ts alike.
-$(BUILD_DST): $(BUILD_CONFIG) $(BUILD_SRC) $(ROLLUP_SRC) ../packages/wayuse-build/package.json
+$(BUILD_DST): $(BUILD_CONFIG) $(BUILD_SRC) $(ROLLUP_SRC) ../packages/build/package.json
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@
@@ -56,7 +56,7 @@ $(BUILD_DST): $(BUILD_CONFIG) $(BUILD_SRC) $(ROLLUP_SRC) ../packages/wayuse-buil
 	@echo ""
 
 # Node strips no types under node_modules, so the image runs this file and never the sources.
-$(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/wayuse-server/package.json
+$(SERVER_DST): $(SERVER_CONFIG) $(SERVER_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/server/package.json
 	@mkdir -p $(dir $@)
 	@/bin/rm -fr $(dir $@)server
 	../node_modules/.bin/rollup -c $<

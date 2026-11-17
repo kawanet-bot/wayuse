@@ -1,5 +1,5 @@
 {
-  "name": "wayuse-build",
+  "name": "@wayuse/build",
   "description": "Build the wayuse Docker image.",
   "version": "0.0.0",
   "author": "Kawanet",
@@ -36,17 +36,20 @@
     "sample/wayuse.config.ts",
     "types/*.d.ts"
   ],
-  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-build#readme",
+  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/build#readme",
   "keywords": [
     "docker",
     "wayland",
     "wayuse"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/wayuse.git",
-    "directory": "packages/wayuse-build"
+    "directory": "packages/build"
   },
   "type": "module",
   "types": "./types/wayuse-build.d.ts"

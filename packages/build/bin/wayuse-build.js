@@ -2,7 +2,7 @@
 
 // exitCode rather than exit(), so output still on its way to a pipe is not cut off.
 
-import {CLI} from "wayuse-build"
+import {CLI} from "@wayuse/build"
 
 CLI({
     args: process.argv.slice(2),

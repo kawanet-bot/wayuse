@@ -1,4 +1,4 @@
-// A wayuse-server for the tests: the real application over recorded answers of sway, with no container.
+// A @wayuse/server for the tests: the real application over recorded answers of sway, with no container.
 
 import {readFileSync} from "node:fs"
 import type {WayuseClient} from "wayuse"

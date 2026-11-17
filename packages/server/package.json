@@ -1,5 +1,5 @@
 {
-  "name": "wayuse-server",
+  "name": "@wayuse/server",
   "description": "The HTTP server that runs inside the wayuse container.",
   "version": "0.0.0",
   "author": "Kawanet",
@@ -32,7 +32,7 @@
     "README.md",
     "types/*.d.ts"
   ],
-  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-server#readme",
+  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/server#readme",
   "keywords": [
     "server",
     "wayland",
@@ -47,10 +47,13 @@
       "optional": true
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/wayuse.git",
-    "directory": "packages/wayuse-server"
+    "directory": "packages/server"
   },
   "type": "module",
   "types": "./types/wayuse-server.d.ts"

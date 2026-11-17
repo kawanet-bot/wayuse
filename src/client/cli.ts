@@ -4,10 +4,15 @@ import {ApiError} from "../api/api-client.ts"
 import {DEFAULT_URL, runApi} from "./cli-api.ts"
 import {type CLIIO, UsageError} from "./cli-io.ts"
 import {runJwt} from "./cli-jwt.ts"
+import {packageOf, runPackage} from "./cli-package.ts"
 import {VERSION} from "./version.ts"
+
+// The commands this package has. Any other belongs to a package of its own, which a project installs by itself.
+const COMMANDS = ["auth", "config", "status", "slot", "clipboard", "chrome", "jwt"]
 
 const USAGE = `
 Usage: wayuse <command> [options]
+  build [options]                 write the Docker build directory, with @wayuse/build
   auth me                         print the claims of WAYUSE_JWT, as the server reads them
   config                          print the configuration the image was built from
   slot list                       print every screen
@@ -56,6 +61,10 @@ const EXIT_USAGE = 2
  */
 export const runCLI = async (args: string[], io: CLIIO): Promise<number> => {
     try {
+        // What follows the command is for the other package, whose options the parser below would refuse.
+        const other = COMMANDS.includes(args[0]!) ? undefined : packageOf(args[0])
+        if (other) return await runPackage(other, args.slice(1), io)
+
         const {positionals, values} = parseArgs({
             args,
             allowPositionals: true,

@@ -1,6 +1,6 @@
-# wayuse-build
+# @wayuse/build
 
-[![npm version](https://img.shields.io/npm/v/wayuse-build)](https://www.npmjs.com/package/wayuse-build)
+[![npm version](https://img.shields.io/npm/v/@wayuse/build)](https://www.npmjs.com/package/@wayuse/build)
 
 Build the wayuse Docker image.
 
@@ -9,7 +9,7 @@ Build the wayuse Docker image.
 `wayuse.config.ts` defines what the image holds:
 
 ```ts
-import {defineConfig} from "wayuse-build"
+import {defineConfig} from "@wayuse/build"
 
 export default defineConfig({
     node: {
@@ -32,10 +32,12 @@ export default defineConfig({
 })
 ```
 
-`wayuse-build` writes the build directory, and Docker builds the image from it:
+Install this package beside [wayuse](../wayuse/README.md), whose `build` command runs it.
+It writes the build directory, and Docker builds the image from it:
 
 ```sh
-npx wayuse-build
+npm install -D wayuse @wayuse/build
+npx wayuse build
 docker build -t my-wayuse .wayuse
 docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
@@ -44,10 +46,10 @@ The package ships a `wayuse.config.ts` in [sample/](sample/) that writes out the
 Copy them, make the keys once, and start the container:
 
 ```sh
-cp node_modules/wayuse-build/sample/* .
+cp node_modules/@wayuse/build/sample/* .
 npx wayuse jwt keygen > .env
 chmod 600 .env
-npx wayuse-build && docker compose up --build -d
+npx wayuse build && docker compose up --build -d
 ```
 
 Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
@@ -60,7 +62,7 @@ Every item may be left out.
 
 | Item | Default | Meaning |
 |---|---|---|
-| `node.version` | the Node.js that runs `wayuse-build` | Node.js in the image. A full version: ranges are refused. |
+| `node.version` | the Node.js that runs `@wayuse/build` | Node.js in the image. A full version: ranges are refused. |
 | `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
 | `apps.chrome.env` | `{}` | Environment variables for the Chrome process alone. `LANGUAGE` sets Chrome's language. No secrets: they are baked into the image. |
@@ -78,14 +80,16 @@ Every item may be left out.
 Usage: wayuse-build [options]
   -c, --config <file>      the configuration to read (default: wayuse.config.ts)
   -o, --outdir <dir>       the build directory to write, emptied first (default: .wayuse)
-  --server-tarball <file>  a wayuse-server tarball to install in place of the one on npm
+  --server-tarball <file>  a @wayuse/server tarball to install in place of the one on npm
   -v, --version            print this package's version
   -h, --help               print this usage
 ```
 
+`npx wayuse build` takes the same options and passes them on.
+
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
 The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in it as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are. The server serves that `htdocs/` without a token.
-`wayuse-build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
+`@wayuse/build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
 noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
 It copies [html-ele](https://github.com/kawanet/html-ele) beside it, as `console/vendor/html-ele.mjs`, for the console's pages to build their elements with.
 The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
@@ -97,18 +101,18 @@ The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
 | `--shm-size 256m` | Required. sway dies of a bus error on the 64MB Docker gives by default. |
 | `-e WAYUSE_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: 1. |
 | `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: Chrome's own. |
-| `-e WAYUSE_JWT_PUBLIC_KEY=<key>` | The key wayuse-server verifies tokens with. Without it, every API that needs a token is refused. |
+| `-e WAYUSE_JWT_PUBLIC_KEY=<key>` | The key @wayuse/server verifies tokens with. Without it, every API that needs a token is refused. |
 | `-e WAYUSE_JWT_AUDIENCE=<string>` | The `aud` a token must carry. Default: `wayuse`. |
 | `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |
 | `--uts=host` | Optional. `GET /wayuse/status` then reports the host's name in place of the container's id. |
 
 The container runs as the user `wayuse` (uid 1000).
-It keeps a session D-Bus, sway, wayvnc, Chrome and wayuse-server running: one that exits is started again.
+It keeps a session D-Bus, sway, wayvnc, Chrome and @wayuse/server running: one that exits is started again.
 tini is PID 1 in the image, so `--init` is not needed.
 
 | Port | Listener |
 |---|---|
-| 9580 | wayuse-server. Publish it with `-p` to reach the container from outside |
+| 9580 | @wayuse/server. Publish it with `-p` to reach the container from outside |
 | 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
 | 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
 
@@ -134,7 +138,7 @@ docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -p 127.0.0.1:9222:9223 my
 curl http://127.0.0.1:9222/json/version
 ```
 
-Chrome DevTools Protocol has no authentication, and it passes by the token of wayuse-server.
+Chrome DevTools Protocol has no authentication, and it passes by the token of @wayuse/server.
 Whoever reaches the port drives Chrome, reads its cookies and opens `file://` in the container.
 Connect by an IP address or `localhost`. Chrome refuses a request whose `Host` header is another name.
 

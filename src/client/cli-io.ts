@@ -9,6 +9,13 @@ export interface CLIIO {
     stdout: {write(data: string | Uint8Array): unknown}
     stderr: {write(data: string): unknown}
     fetch?: WayuseClient.ClientOptions["fetch"]
+    /** Loads the package of a subcommand. Default: as Node.js finds it from this package. */
+    load?: (name: string) => Promise<CommandPackage>
+}
+
+/** A package that holds a subcommand. Its CLI() takes the arguments after the subcommand, and resolves to the exit code. */
+export interface CommandPackage {
+    CLI(options: {args: string[]}): Promise<number>
 }
 
 /** The options of the commands that call the server, as parseArgs gives them. */

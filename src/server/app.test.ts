@@ -32,7 +32,7 @@ describe(TITLE, () => {
         assert.equal(await res.text(), "")
     })
 
-    it("returns the resolved configuration as wayuse-build wrote it", async () => {
+    it("returns the resolved configuration as @wayuse/build wrote it", async () => {
         const {res} = await run("/wayuse/config", bearer)
         assert.equal(res.status, 200)
         assert.deepEqual(await res.json(), config)

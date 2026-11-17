@@ -6,7 +6,7 @@ export declare namespace WayuseClient {
 
     /** What the image was defined to hold, with every default filled in. Baked in as /etc/wayuse/wayuse.json. */
     interface Config {
-        /** The wayuse-build that filled in the defaults. */
+        /** The @wayuse/build that filled in the defaults. */
         wayuse: {build: {version: string}}
         node: {version: string}
         /** The installed applications. A key is present only for an installed one. */
@@ -176,7 +176,7 @@ export declare namespace WayuseClient {
         videoGeometry?: string
     }
 
-    /** The claims wayuse-server reads. Any other claim passes through to GET /auth/me. */
+    /** The claims @wayuse/server reads. Any other claim passes through to GET /auth/me. */
     interface JwtClaims {
         /** Must equal the server's WAYUSE_JWT_AUDIENCE. */
         aud: string
@@ -207,7 +207,7 @@ export declare namespace WayuseClient {
         fetch?: (input: URL, init?: RequestInit) => Promise<Response>
     }
 
-    /** One method per API of wayuse-server. Each rejects with an ApiError when the server refuses. */
+    /** One method per API of @wayuse/server. Each rejects with an ApiError when the server refuses. */
     interface Client {
         /** Any path of the server with the token, as the response itself: a refusal is returned, not thrown. */
         fetch(path: string, init?: RequestInit): Promise<Response>
@@ -264,7 +264,7 @@ export declare function generateKeyPair(): WayuseClient.KeyPair
 /** The public key that belongs to a private key. */
 export declare function publicKeyOf(privateKey: string): string
 
-/** Signs a JWT that wayuse-server verifies with the public key. */
+/** Signs a JWT that @wayuse/server verifies with the public key. */
 export declare function signJwt(claims: WayuseClient.JwtInput, privateKey: string): string
 
 /** The server's answer when it is not a success: its status, and its message as the error's message. */
@@ -274,7 +274,7 @@ export declare class ApiError extends Error {
     constructor(status: number, message: string)
 }
 
-/** A client of wayuse-server on web standards alone, so the same code runs in Node.js and in a browser. */
+/** A client of @wayuse/server on web standards alone, so the same code runs in Node.js and in a browser. */
 export declare function createClient(options: WayuseClient.ClientOptions): WayuseClient.Client
 
 /** Runs the command line once per process and resolves to its exit code. The caller ends the process. */

@@ -1,6 +1,6 @@
 # The console
 
-An image that `wayuse-build` builds has pages for a person, at `/console/` of its server:
+An image that `@wayuse/build` builds has pages for a person, at `/console/` of its server:
 
 | Page | What it is |
 |---|---|
@@ -44,8 +44,8 @@ The page adds a JWT at the end of what it was given, and goes there:
 
 ## FILES
 
-`wayuse-build` writes the console into the build directory as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are.
-The image has it as `/opt/wayuse/htdocs/console/`, and [wayuse-server](../packages/wayuse-server/README.md) serves that `htdocs/`.
+`@wayuse/build` writes the console into the build directory as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are.
+The image has it as `/opt/wayuse/htdocs/console/`, and [@wayuse/server](../packages/server/README.md) serves that `htdocs/`.
 
 | Under `console/` | What it is |
 |---|---|

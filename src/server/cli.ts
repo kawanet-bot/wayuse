@@ -1,8 +1,8 @@
 import {serve} from "@hono/node-server"
+import type * as declared from "@wayuse/server"
 import {readFileSync} from "node:fs"
 import {parseArgs} from "node:util"
 import type {WayuseClient} from "wayuse"
-import type * as declared from "wayuse-server"
 import {DEFAULT_AUDIENCE} from "../jwt/jwt-format.ts"
 import {parsePublicKey} from "../jwt/jwt-verify.ts"
 import {createApp, defaultVncPort} from "./app.ts"
@@ -13,7 +13,7 @@ import {createWayvncProxy} from "./wayvnc/wayvnc-proxy.ts"
 // Assigned to nothing at IANA and no development server's own, so it seldom meets another server on a host.
 export const DEFAULT_PORT = 9580
 
-// Where wayuse-build puts the console in the image.
+// Where @wayuse/build puts the console in the image.
 export const DEFAULT_HTDOCS = "/opt/wayuse/htdocs"
 
 const USAGE = `
@@ -67,7 +67,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     }
 
     if (options.version) {
-        process.stdout.write(`wayuse-server ${VERSION}\n`)
+        process.stdout.write(`@wayuse/server ${VERSION}\n`)
         return 0
     }
 
@@ -81,7 +81,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     const app = await createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets, htdocsDir: options.htdocs})
 
     const server = serve({fetch: app.fetch, port: options.port}, ({port}) => {
-        process.stderr.write(`wayuse-server ${VERSION} http://localhost:${port}/ok\n`)
+        process.stderr.write(`@wayuse/server ${VERSION} http://localhost:${port}/ok\n`)
     })
 
     // A WebSocket never reaches the application: the relay answers the upgrade itself, by the ticket in its path.

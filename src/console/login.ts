@@ -7,7 +7,7 @@ import {failureOf, isRefusal, signInUrlOf, tokenOfHash} from "./console-util.ts"
 
 type ConsoleConfig = WayuseClient.Config["console"]
 
-// What wayuse-build wrote beside this page. A console served without the file has no sign-in address.
+// What @wayuse/build wrote beside this page. A console served without the file has no sign-in address.
 const signInOf = async (): Promise<string | undefined> => {
     const res = await fetch("config.json").catch(() => undefined)
     const config: ConsoleConfig | undefined = res?.ok ? await res.json().catch(() => undefined) : undefined

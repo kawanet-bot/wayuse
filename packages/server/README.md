@@ -1,10 +1,10 @@
-# wayuse-server
+# @wayuse/server
 
-[![npm version](https://img.shields.io/npm/v/wayuse-server)](https://www.npmjs.com/package/wayuse-server)
+[![npm version](https://img.shields.io/npm/v/@wayuse/server)](https://www.npmjs.com/package/@wayuse/server)
 
 The HTTP server that runs inside the wayuse container.
 
-The image [wayuse-build](../wayuse-build/README.md) builds installs and starts it. It listens on port 9580 there.
+The image [@wayuse/build](../build/README.md) builds installs and starts it. It listens on port 9580 there.
 
 ## API
 
@@ -97,7 +97,7 @@ The private key never goes to the container. [wayuse](../wayuse/README.md) makes
 ## HTDOCS
 
 The server serves the files of one directory without a token, the one `--htdocs` names.
-In an image it is `/opt/wayuse/htdocs`, where wayuse-build puts the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md). Its pages are at `/console/`.
+In an image it is `/opt/wayuse/htdocs`, where @wayuse/build puts the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md). Its pages are at `/console/`.
 
 A file answers before the API does, so the directory takes no file at a path of the API, such as `slot/`.
 Without the directory, the server has its API alone.
