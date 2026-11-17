@@ -42,6 +42,30 @@ The page adds a JWT at the end of what it was given, and goes there:
 - A token that comes back and is refused is not sent for again. The entry shows the refusal and asks for a token.
 - The other pages come back to the entry when the server refuses their token, so a token that has run out takes the same way.
 
+## CUSTOM
+
+Every page loads a style sheet and a script from `custom/`, beside `console/`. Both are empty in the image, for a user of the image to put its own in their place.
+
+| URL | In the image |
+|---|---|
+| `/custom/styles.css` | `/opt/wayuse/htdocs/custom/styles.css` |
+| `/custom/script.js` | `/opt/wayuse/htdocs/custom/script.js` |
+
+A page loads them after its own. A rule of the style sheet wins over one of the same weight, and the script runs after the page's.
+The `<body>` of each page has an id, which tells the pages apart for both:
+
+| Page | `<body id>` |
+|---|---|
+| `/console/` | `wayuse-login` |
+| `/console/monitor/` | `wayuse-monitor` |
+| `/console/api/` | `wayuse-api` |
+| `/console/vnc/` | `wayuse-vnc` |
+
+- The two files are replaced by a directory mounted over `/opt/wayuse/htdocs/custom`, or by a web server in front that answers `/custom/` itself.
+- The ids and the names of the two files are what the pages keep. The classes and the structure inside a page may change with any version.
+- The monitor draws its screens after it has loaded. A script waits for an element it wants.
+- The script runs in the page, so it can read the token the page keeps.
+
 ## FILES
 
 `@wayuse/build` writes the console into the build directory as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are.

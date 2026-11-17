@@ -117,6 +117,21 @@ describe(TITLE, () => {
             assert.match(await readFile(join(console, "js/vnc.js"), "utf8"), /from '\.\.\/vendor\/novnc\.js'/)
             assert.match(await readFile(join(console, "js/monitor.js"), "utf8"), /from '\.\.\/vendor\/html-ele\.mjs'/)
 
+            // What a user of the image replaces: beside the console, empty, and loaded by every page after its own.
+            const custom = join(outdir, "rootfs", DEFAULT_HTDOCS, "custom")
+            assert.equal(await readFile(join(custom, "styles.css"), "utf8"), "/* styles.css */\n")
+            assert.equal(await readFile(join(custom, "script.js"), "utf8"), "/* script.js */\n")
+            const entry = await readFile(join(console, "index.html"), "utf8")
+            assert.match(entry, /<body id="wayuse-login">/)
+            assert.match(entry, /href="css\/console\.css">\n +<link rel="stylesheet" href="\.\.\/custom\/styles\.css">/)
+            assert.match(entry, /src="js\/login\.js"><\/script>\n +<script type="module" src="\.\.\/custom\/script\.js">/)
+            const monitor = await readFile(join(console, "monitor/index.html"), "utf8")
+            assert.match(monitor, /<body id="wayuse-monitor">/)
+            assert.match(monitor, /href="\.\.\/css\/console\.css">\n +<link rel="stylesheet" href="\.\.\/\.\.\/custom\/styles\.css">/)
+            assert.match(monitor, /src="\.\.\/js\/monitor\.js"><\/script>\n +<script type="module" src="\.\.\/\.\.\/custom\/script\.js">/)
+            assert.match(await readFile(join(console, "api/index.html"), "utf8"), /<body id="wayuse-api">/)
+            assert.match(await readFile(join(console, "vnc/index.html"), "utf8"), /<body id="wayuse-vnc">/)
+
             // noVNC as one module for the vnc page, with the notices its license asks to keep.
             const novnc = await readFile(join(console, "vendor/novnc.js"), "utf8")
             assert.match(novnc, /Licensed under MPL 2\.0/)
