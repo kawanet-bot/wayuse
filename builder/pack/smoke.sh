@@ -31,7 +31,8 @@ check() {
 }
 
 # The image checks tokens, so without the key its server is out of service wherever it is asked.
-"${server[@]}" 2> /dev/null &
+# A key the caller's shell has is left out, as it would put the server in service.
+env -u WAYUSE_JWT_PUBLIC_KEY "${server[@]}" 2> /dev/null &
 trap 'kill $! 2> /dev/null' EXIT
 ready
 check /ok 503
