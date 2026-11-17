@@ -4,15 +4,16 @@ import {ApiError} from "../api/api-client.ts"
 import {DEFAULT_URL, runApi} from "./cli-api.ts"
 import {type CLIIO, UsageError} from "./cli-io.ts"
 import {runJwt} from "./cli-jwt.ts"
-import {runPackage} from "./cli-package.ts"
+import {packageOf, runPackage} from "./cli-package.ts"
 import {VERSION} from "./version.ts"
 
-// The package of `wayuse build`. A project installs it by itself, and this package does not depend on it.
-const BUILD_PACKAGE = "@wayuse/build"
+// The commands this package has. Any other belongs to a package of its own, which a project installs by itself.
+const COMMANDS = ["auth", "config", "status", "slot", "clipboard", "chrome", "jwt"]
 
 const USAGE = `
 Usage: wayuse <command> [options]
-  build [options]                 write the Docker build directory, with the ${BUILD_PACKAGE} the project has installed
+  build [options]                 write the Docker build directory, with @wayuse/build
+  <name> [options]                any other command is that of @wayuse/<name>, where the project has it installed
   auth me                         print the claims of WAYUSE_JWT, as the server reads them
   config                          print the configuration the image was built from
   slot list                       print every screen
@@ -60,10 +61,11 @@ const EXIT_USAGE = 2
  * The command line with everything it touches passed in. CLI() below fills in the process's own.
  */
 export const runCLI = async (args: string[], io: CLIIO): Promise<number> => {
-    // What follows is for the other package, whose options the parser below would refuse.
-    if (args[0] === "build") return runPackage(BUILD_PACKAGE, args.slice(1), io)
-
     try {
+        // What follows the command is for the other package, whose options the parser below would refuse.
+        const other = COMMANDS.includes(args[0]!) ? undefined : packageOf(args[0])
+        if (other) return await runPackage(other, args.slice(1), io)
+
         const {positionals, values} = parseArgs({
             args,
             allowPositionals: true,

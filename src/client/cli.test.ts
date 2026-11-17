@@ -5,7 +5,7 @@ import {join} from "node:path"
 import {describe, it} from "node:test"
 import {publicKeyOf} from "../jwt/jwt-sign.ts"
 import {PNG_SIGNATURE, createFakeServer} from "../test-utils/fake-server.ts"
-import type {Env} from "./cli-io.ts"
+import type {CLIIO, Env} from "./cli-io.ts"
 import {runCLI} from "./cli.ts"
 
 const TITLE = "client/cli.test.ts"
@@ -13,10 +13,10 @@ const TITLE = "client/cli.test.ts"
 describe(TITLE, () => {
     const server = createFakeServer()
 
-    const run = async (args: string[], env: Env = {WAYUSE_JWT: server.jwt}) => {
+    const run = async (args: string[], env: Env = {WAYUSE_JWT: server.jwt}, load?: CLIIO["load"]) => {
         const out: (string | Uint8Array)[] = []
         const err: string[] = []
-        const code = await runCLI(args, {env, stdout: {write: data => out.push(data)}, stderr: {write: data => err.push(data)}, fetch: server.fetch})
+        const code = await runCLI(args, {env, stdout: {write: data => out.push(data)}, stderr: {write: data => err.push(data)}, fetch: server.fetch, load})
         return {code, out, stdout: out.join(""), stderr: err.join("")}
     }
 
@@ -30,14 +30,49 @@ describe(TITLE, () => {
         assert.deepEqual(err, [])
     })
 
-    it("tells how to install the package of build where there is none", async () => {
-        const err: string[] = []
-        const io = {env: {}, stdout: {write: () => 0}, stderr: {write: (data: string) => err.push(data)}}
-        const load = async () => {
-            throw Object.assign(new Error("Cannot find package"), {code: "ERR_MODULE_NOT_FOUND"})
+    it("takes a command it does not have as the package of that name", async () => {
+        const seen: unknown[] = []
+        const io = {env: {}, stdout: {write: () => 0}, stderr: {write: () => 0}}
+        const load = async (name: string) => ({CLI: async ({args}: {args: string[]}) => seen.push(name, args)})
+        assert.equal(await runCLI(["firefox", "open", "--new"], {...io, load}), 2)
+        assert.deepEqual(seen, ["@wayuse/firefox", ["open", "--new"]])
+    })
+
+    it("names the package that is not installed, and prints the usage", async () => {
+        const {code, stderr} = await run(["build"], {}, async name => {
+            throw Object.assign(new Error(`Cannot find package '${name}' imported from /app/wayuse.js`), {code: "ERR_MODULE_NOT_FOUND"})
+        })
+        assert.equal(code, 2)
+        assert.match(stderr, /^@wayuse\/build is not installed\nUsage: wayuse <command> /)
+    })
+
+    // Node.js itself looks for the package here, and finds none of that name.
+    it("takes a misspelled command the same way", async () => {
+        const {code, stderr} = await run(["slto", "list"])
+        assert.equal(code, 2)
+        assert.match(stderr, /^@wayuse\/slto is not installed\nUsage: wayuse <command> /)
+    })
+
+    it("says so when the package has no CLI()", async () => {
+        const {code, stderr} = await run(["build"], {}, async () => ({}) as never)
+        assert.equal(code, 1)
+        assert.equal(stderr, "@wayuse/build has no CLI()\n")
+    })
+
+    // The package is there, so telling to install it would hide what is missing.
+    it("leaves the failure of a package that cannot load a module of its own as it is", async () => {
+        const failure = Object.assign(new Error("Cannot find package 'rollup' imported from /app/node_modules/@wayuse/build/dist/wayuse-build.js"), {code: "ERR_MODULE_NOT_FOUND"})
+        await assert.rejects(run(["build"], {}, async () => {
+            throw failure
+        }), failure)
+    })
+
+    it("takes no path for a command", async () => {
+        for (const command of ["../build", "./build", "@wayuse/build", "Build", "build/x"]) {
+            const {code, stderr} = await run([command])
+            assert.equal(code, 2, command)
+            assert.match(stderr, /^unknown command: /, command)
         }
-        assert.equal(await runCLI(["build"], {...io, load}), 2)
-        assert.equal(err.join(""), "@wayuse/build is not installed: npm install -D @wayuse/build\n")
     })
 
     it("prints what an API returns as indented JSON", async () => {
