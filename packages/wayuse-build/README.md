@@ -46,10 +46,12 @@ Copy them, make the keys once, and start the container:
 ```sh
 cp node_modules/wayuse-build/sample/* .
 npx wayuse jwt keygen > .env
+chmod 600 .env
 npx wayuse-build && docker compose up --build -d
 ```
 
 Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
+The private key is in `.env` too. Keep the file to its owner and out of version control.
 The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `.wayuse` beside its file.
 
 ## CONFIGURATION

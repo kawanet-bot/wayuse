@@ -4,6 +4,8 @@
 
 The API client and CLI for a wayuse container.
 
+This package is the client alone. [wayuse-build](../wayuse-build/README.md) builds the image of the container, and [wayuse-server](../wayuse-server/README.md) runs inside it.
+
 ## SYNOPSIS
 
 ```sh
@@ -80,12 +82,14 @@ The private key stays with whoever issues the tokens, outside the container.
 
 ```sh
 npx wayuse jwt keygen > .env         # WAYUSE_JWT_PRIVATE_KEY= and WAYUSE_JWT_PUBLIC_KEY=
+chmod 600 .env                       # the private key is for its owner alone
 set -a; . ./.env; set +a
 npx wayuse jwt sign --sub alice      # a JWT for "alice"
 npx wayuse jwt public-key            # WAYUSE_JWT_PUBLIC_KEY= again, from the private key
 ```
 
 Give the container `WAYUSE_JWT_PUBLIC_KEY`, and never the private key.
+`jwt keygen` makes a new pair each time, and tokens signed with an earlier one stop working. Keep `.env` out of version control.
 
 | Environment variable | Read by | Meaning |
 |---|---|---|
