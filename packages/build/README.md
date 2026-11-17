@@ -32,10 +32,12 @@ export default defineConfig({
 })
 ```
 
-`wayuse-build` writes the build directory, and Docker builds the image from it:
+Install this package beside [wayuse](../wayuse/README.md), whose `build` command runs it.
+It writes the build directory, and Docker builds the image from it:
 
 ```sh
-npx wayuse-build
+npm install -D wayuse wayuse-build
+npx wayuse build
 docker build -t my-wayuse .wayuse
 docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
@@ -47,7 +49,7 @@ Copy them, make the keys once, and start the container:
 cp node_modules/wayuse-build/sample/* .
 npx wayuse jwt keygen > .env
 chmod 600 .env
-npx wayuse-build && docker compose up --build -d
+npx wayuse build && docker compose up --build -d
 ```
 
 Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
@@ -82,6 +84,8 @@ Usage: wayuse-build [options]
   -v, --version            print this package's version
   -h, --help               print this usage
 ```
+
+`npx wayuse build` takes the same options and passes them on.
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
 The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in it as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are. The server serves that `htdocs/` without a token.
