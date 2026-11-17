@@ -11,6 +11,9 @@ const DEFAULT_NODE_VERSION = process.versions.node
 
 const CHANNELS = ["stable", "beta", "unstable"] as const
 
+// What the pages show where their HTML has {{icon}} and {{title}}, for an image that names neither.
+export const DEFAULT_VARS: Record<string, string> = {icon: "🖥️", title: "wayuse"}
+
 // They keep Chrome to its one profile. Policies given in a configuration replace them.
 export const DEFAULT_POLICIES: Record<string, unknown> = {BrowserGuestModeEnabled: false, BrowserAddPersonEnabled: false}
 
@@ -108,6 +111,23 @@ const redirOf = (value: unknown): WayuseClient.RedirConfig => {
 }
 
 /**
+ * The values the pages are written with. They go into the HTML alone, and the resolved configuration does not have them.
+ */
+export const consoleVarsOf = (input: Input): Record<string, string> => {
+    const given = isRecord(input) && isRecord(input.console) ? input.console.vars : undefined
+    if (given != null && !isRecord(given)) throw new ConfigError("config.console.vars must be an object")
+
+    const vars = {...DEFAULT_VARS}
+    for (const [name, value] of Object.entries(given ?? {})) {
+        // An empty string is a value. Only no value at all leaves the default.
+        if (value == null) continue
+        if (typeof value !== "string") throw new ConfigError(`config.console.vars.${name} must be a string`)
+        vars[name] = value
+    }
+    return vars
+}
+
+/**
  * Fills in every default and refuses what the generated files could not carry.
  */
 export const resolveConfig = (input: Input): Resolved => {
@@ -115,7 +135,7 @@ export const resolveConfig = (input: Input): Resolved => {
     const node = recordOf(config.node, "config.node", ["version"])
     const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])
-    const signIn = stringOf(recordOf(config.console, "config.console", ["signIn"]).signIn, "config.console.signIn", SIGN_IN, "")
+    const signIn = stringOf(recordOf(config.console, "config.console", ["signIn", "vars"]).signIn, "config.console.signIn", SIGN_IN, "")
 
     const installed: Resolved["apps"] = {}
     if (apps.chrome != null) installed.chrome = chromeOf(apps.chrome)

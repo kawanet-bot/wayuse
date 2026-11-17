@@ -1,7 +1,9 @@
-import {copyFile, cp, mkdir, readdir, rm, writeFile} from "node:fs/promises"
+import {EN} from "html-ele"
+import {copyFile, cp, mkdir, readFile, readdir, rm, writeFile} from "node:fs/promises"
 import {dirname, join} from "node:path"
 import {fileURLToPath} from "node:url"
 import type {WayuseClient} from "wayuse"
+import {DEFAULT_VARS} from "./config.ts"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {bundleNovnc} from "./novnc.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
@@ -16,8 +18,9 @@ const assetsRoot = (): string => fileURLToPath(new URL("../assets/", import.meta
 // The console's scripts are built from src/console/, beside this package's own file.
 const consoleScripts = (): string => fileURLToPath(new URL("./console/", import.meta.resolve("@wayuse/build")))
 
-// Where the image has the console, laid out as its URLs are.
-const CONSOLE = "rootfs/opt/wayuse/htdocs/console"
+// Where the image has what the server serves, and the console in it, laid out as its URLs are.
+const HTDOCS = "rootfs/opt/wayuse/htdocs"
+const CONSOLE = `${HTDOCS}/console`
 
 /**
  * The generated files by their path in the build directory. rootfs/ mirrors the image's file system.
@@ -42,6 +45,19 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
     return files
 }
 
+// A page of assets/ has {{name}} where a value of console.vars goes. The value is text, so it is escaped.
+const fillVars = async (dir: string, vars: Record<string, string>): Promise<void> => {
+    for (const name of await readdir(dir, {recursive: true})) {
+        if (!name.endsWith(".html")) continue
+        const file = join(dir, name)
+        const html = (await readFile(file, "utf8")).replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
+            if (vars[key] == null) throw new Error(`${name} has {{${key}}}, which has no value`)
+            return String(EN`${vars[key]}`)
+        })
+        await writeFile(file, html)
+    }
+}
+
 /**
  * Writes the build directory anew and returns the paths of what it generated.
  */
@@ -49,6 +65,7 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     // A file an earlier configuration generated must not linger and reach the image.
     await rm(outdir, {recursive: true, force: true})
     await cp(assetsRoot(), outdir, {recursive: true})
+    await fillVars(join(outdir, HTDOCS), options.vars ?? DEFAULT_VARS)
 
     const files = generatedFilesOf(config, options)
     for (const [path, content] of Object.entries(files)) {

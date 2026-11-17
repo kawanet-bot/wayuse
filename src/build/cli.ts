@@ -2,7 +2,7 @@ import type * as declared from "@wayuse/build"
 import {resolve} from "node:path"
 import {pathToFileURL} from "node:url"
 import {parseArgs} from "node:util"
-import {ConfigError, resolveConfig} from "./config.ts"
+import {ConfigError, consoleVarsOf, resolveConfig} from "./config.ts"
 import {writeBuildDir} from "./files.ts"
 import {VERSION} from "./version.ts"
 
@@ -56,8 +56,9 @@ export const CLI: typeof declared.CLI = async ({args}) => {
     }
 
     try {
-        const config = resolveConfig(await loadConfig(options.config) as declared.WayuseBuild.Config)
-        const files = await writeBuildDir(config, options.outdir, {serverTarball: options["server-tarball"]})
+        const input = await loadConfig(options.config) as declared.WayuseBuild.Config
+        const config = resolveConfig(input)
+        const files = await writeBuildDir(config, options.outdir, {serverTarball: options["server-tarball"], vars: consoleVarsOf(input)})
         for (const file of files) process.stdout.write(`${options.outdir}/${file}\n`)
         return 0
     } catch (error) {

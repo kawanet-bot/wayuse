@@ -42,6 +42,27 @@ The page adds a JWT at the end of what it was given, and goes there:
 - A token that comes back and is refused is not sent for again. The entry shows the refusal and asks for a token.
 - The other pages come back to the entry when the server refuses their token, so a token that has run out takes the same way.
 
+## ICON AND TITLE
+
+The header of the pages shows an icon and a title, and the title is in the tab of the browser too. An image names its own:
+
+```ts
+export default defineConfig({
+    console: {
+        vars: {
+            icon: "🐟",
+            title: "fishprint",
+        },
+    },
+})
+```
+
+`wayuse build` writes the values into the pages, where their HTML has `{{icon}}` and `{{title}}`. The image has the pages as they are shown.
+
+- A value is text. A tag in it is shown as it is written.
+- An empty string is a value, and shows nothing. Without a value, `icon` is `🖥️` and `title` is `wayuse`.
+- Anyone can read a value in the page, as the pages need no token. `GET /wayuse/config` does not have them.
+
 ## CUSTOM
 
 Every page loads a style sheet and a script from `custom/`, beside `console/`. Both are empty in the image, for a user of the image to put its own in their place.

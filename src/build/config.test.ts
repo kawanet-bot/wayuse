@@ -1,7 +1,7 @@
 import type {WayuseBuild} from "@wayuse/build"
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {ConfigError, DEFAULT_POLICIES, resolveConfig} from "./config.ts"
+import {ConfigError, DEFAULT_POLICIES, consoleVarsOf, resolveConfig} from "./config.ts"
 
 const TITLE = "build/config.test.ts"
 
@@ -34,7 +34,7 @@ describe(TITLE, () => {
             timezone: "Asia/Tokyo",
             screen: {width: 1920, height: 1080},
             packages: ["fonts-noto-cjk"],
-            console: {signIn: "../../front/screen-sign-in/?next="},
+            console: {signIn: "../../front/screen-sign-in/?next=", vars: {title: "fishprint"}},
         })
         assert.equal(config.node.version, "24.11.1")
         // The policies given are all there is: the defaults are not kept beside them.
@@ -42,6 +42,7 @@ describe(TITLE, () => {
         assert.equal(config.timezone, "Asia/Tokyo")
         assert.deepEqual(config.screen, {width: 1920, height: 1080})
         assert.deepEqual(config.packages, ["fonts-noto-cjk"])
+        // The values of vars go into the pages alone. The server would show this object to a client.
         assert.deepEqual(config.console, {signIn: "../../front/screen-sign-in/?next="})
     })
 
@@ -56,6 +57,21 @@ describe(TITLE, () => {
         const {default: sample} = await import("../../packages/build/sample/wayuse.config.ts")
         assert.deepEqual(sample.apps?.chrome?.policies, DEFAULT_POLICIES)
         assert.deepEqual(sample.screen, resolveConfig({}).screen)
+    })
+
+    it("takes the values of the pages as given, an empty one among them, and the defaults for the rest", () => {
+        assert.deepEqual(consoleVarsOf({}), {icon: "🖥️", title: "wayuse"})
+        assert.deepEqual(consoleVarsOf({console: {vars: {title: "fishprint"}}}), {icon: "🖥️", title: "fishprint"})
+        assert.deepEqual(consoleVarsOf({console: {vars: {icon: "", notice: "<b>"}}}), {icon: "", title: "wayuse", notice: "<b>"})
+        const title = null as unknown as string
+        assert.deepEqual(consoleVarsOf({console: {vars: {title}}}), {icon: "🖥️", title: "wayuse"})
+    })
+
+    it("refuses a value of the pages that is not a string", () => {
+        const vars = {title: 1} as unknown as Record<string, string>
+        assert.throws(() => consoleVarsOf({console: {vars}}), ConfigError)
+        const list = ["fishprint"] as unknown as Record<string, string>
+        assert.throws(() => consoleVarsOf({console: {vars: list}}), ConfigError)
     })
 
     it("leaves out a package without a value", () => {
