@@ -38,7 +38,6 @@ const png = await client.captureSlot(tab.sway.output)
 ```
 Usage: wayuse <command> [options]
   build [options]                 write the Docker build directory, with @wayuse/build
-  <name> [options]                any other command is that of @wayuse/<name>, where the project has it installed
   auth me                         print the claims of WAYUSE_JWT, as the server reads them
   config                          print the configuration the image was built from
   slot list                       print every screen
