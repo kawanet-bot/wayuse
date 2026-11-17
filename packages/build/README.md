@@ -39,8 +39,10 @@ It writes the build directory, and Docker builds the image from it:
 npm install -D wayuse @wayuse/build
 npx wayuse build
 docker build -t my-wayuse .wayuse
-docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -v my-wayuse-config:/home/wayuse/.config my-wayuse
+docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -e WAYUSE_JWT_PUBLIC_KEY -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
+
+The server in the image starts only with `WAYUSE_JWT_PUBLIC_KEY`, the public key of the tokens it is to take. [@wayuse/server](../server/README.md#tokens) shows how to make the pair.
 
 The package ships a `wayuse.config.ts` in [sample/](sample/) that writes out the defaults too, with a [docker-compose.yml](sample/docker-compose.yml) that runs its image.
 Copy them, make the keys once, and start the container:
@@ -72,7 +74,7 @@ Every item may be left out.
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |
 | `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
 | `packages` | `[]` | Additional apt packages, fonts among them. |
-| `auth` | tokens are checked | `false` builds an image whose server asks for no token. Every API is then open to whoever reaches its port, so publish the port to no one else. |
+| `auth` | tokens are checked | `false` builds an image whose server asks for no token. Every API is then open to whoever reaches its port, so publish the port to no one else. Its server does not start when it is given a key. |
 | `console` | in the image | `false` leaves the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) out of the image. Nothing of it is built or copied, and the image has the API alone. |
 | `console.vars` | `icon` and `title` | What the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s pages show as their icon and title. A value is text, written into the HTML of the image. |
 | `console.terser` | `true` | Makes the console's scripts, and the packages they load, small with terser. `false` writes them as they are. |

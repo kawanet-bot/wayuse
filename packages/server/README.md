@@ -70,6 +70,8 @@ Every API needs `Authorization: Bearer <JWT>`, and answers 401 without a valid o
 
 An image built with `auth: false` asks for no token. Every API is open to whoever reaches the port, and `GET /auth/me` answers `{"me": {}}`. The server says so when it starts.
 
+A key and an image have to agree. The server of an image that checks tokens does not start without the key, and that of an image built with `auth: false` does not start with one. The container stays up, and its log gives the reason.
+
 The server verifies a token with a public key, which it reads from the environment of the container.
 The key is given when the container starts, not when the image is built, so one image serves any number of key pairs:
 
@@ -93,7 +95,7 @@ The private key never goes to the container. [wayuse](../wayuse/README.md) makes
 
 | Environment variable | Meaning |
 |---|---|
-| `WAYUSE_JWT_PUBLIC_KEY` | The key tokens are verified with. Without it, every API that needs a token is refused. |
+| `WAYUSE_JWT_PUBLIC_KEY` | The key tokens are verified with. The server starts only with it, unless the image checks no token. |
 | `WAYUSE_JWT_AUDIENCE` | The `aud` a token must carry. Default: `wayuse`. |
 
 ## HTDOCS
