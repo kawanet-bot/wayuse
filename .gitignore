@@ -13,6 +13,7 @@
 .codex
 .copilot
 .cursor
+.env
 .gemini
 .idea
 .mcp.json
@@ -20,6 +21,7 @@
 .opencode
 .pnpm-debug.log*
 .vscode
+.wayuse
 CLAUDE.local.md
 browser/tests
 builder/tests
