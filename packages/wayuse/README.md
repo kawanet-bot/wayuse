@@ -4,7 +4,7 @@
 
 The API client and CLI for a wayuse container.
 
-This package is the client alone. [wayuse-build](../wayuse-build/README.md) builds the image of the container, and [wayuse-server](../wayuse-server/README.md) runs inside it.
+This package is the client alone. [wayuse-build](../build/README.md) builds the image of the container, and [wayuse-server](../server/README.md) runs inside it.
 
 ## SYNOPSIS
 
@@ -20,7 +20,7 @@ npx wayuse slot list                        # every screen, as JSON
 ```
 
 A server on the host, such as `wrangler dev`, is opened as `http://host.docker.internal:<port>/`.
-The container and the server each need a setting for that: see [wayuse-build](../wayuse-build/README.md#a-server-on-the-host).
+The container and the server each need a setting for that: see [wayuse-build](../build/README.md#a-server-on-the-host).
 
 The same from a program. It uses web standards alone, so it runs in Node.js and in a browser:
 

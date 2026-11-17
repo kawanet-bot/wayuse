@@ -11,7 +11,7 @@ const rollupConfig: RollupOptions = {
 
     // An application's code is imported only in an image that has it, so each is a file of its own beside the entry.
     output: {
-        dir: "../packages/wayuse-server/dist",
+        dir: "../packages/server/dist",
         format: "esm",
         entryFileNames: "wayuse-server.js",
         chunkFileNames: "server/[name].js",

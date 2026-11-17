@@ -16,7 +16,7 @@ const rollupConfig: RollupOptions = {
     external: [/^[^.\/]/],
 
     output: {
-        dir: "../packages/wayuse-build/dist/console",
+        dir: "../packages/build/dist/console",
         format: "esm",
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",

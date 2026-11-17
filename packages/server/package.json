@@ -32,7 +32,7 @@
     "README.md",
     "types/*.d.ts"
   ],
-  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-server#readme",
+  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/server#readme",
   "keywords": [
     "server",
     "wayland",
@@ -50,7 +50,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/wayuse.git",
-    "directory": "packages/wayuse-server"
+    "directory": "packages/server"
   },
   "type": "module",
   "types": "./types/wayuse-server.d.ts"

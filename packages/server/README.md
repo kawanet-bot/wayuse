@@ -4,7 +4,7 @@
 
 The HTTP server that runs inside the wayuse container.
 
-The image [wayuse-build](../wayuse-build/README.md) builds installs and starts it. It listens on port 9580 there.
+The image [wayuse-build](../build/README.md) builds installs and starts it. It listens on port 9580 there.
 
 ## API
 

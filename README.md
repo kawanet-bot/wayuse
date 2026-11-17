@@ -4,8 +4,8 @@ A Wayland screen in a Docker container, shared by humans and AI agents.
 
 Three packages, one repository:
 
-- [wayuse-build](packages/wayuse-build/README.md): Build the wayuse Docker image.
-- [wayuse-server](packages/wayuse-server/README.md): The HTTP server that runs inside the wayuse container.
+- [wayuse-build](packages/build/README.md): Build the wayuse Docker image.
+- [wayuse-server](packages/server/README.md): The HTTP server that runs inside the wayuse container.
 - [wayuse](packages/wayuse/README.md): The API client and CLI for a wayuse container.
 
 More in [docs/](docs/):

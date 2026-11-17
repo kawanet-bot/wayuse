@@ -68,7 +68,7 @@ describe(TITLE, () => {
 
     // wayuse-build does not depend on the server, so nothing but this test holds the two lists together.
     it("names for the applications exactly the server's optional peers, at the same ranges", () => {
-        const server = JSON.parse(readFileSync(new URL("../../packages/wayuse-server/package.json", import.meta.url), "utf8"))
+        const server = JSON.parse(readFileSync(new URL("../../packages/server/package.json", import.meta.url), "utf8"))
         assert.deepEqual(Object.assign({}, ...Object.values(APP_PACKAGES)), server.peerDependencies)
         assert.deepEqual(Object.keys(server.peerDependenciesMeta), Object.keys(server.peerDependencies))
         for (const meta of Object.values(server.peerDependenciesMeta)) assert.deepEqual(meta, {optional: true})
@@ -80,11 +80,11 @@ describe(TITLE, () => {
         assert.equal(new URL(DEFAULT_URL).port, port)
         assert.equal(generatedFilesOf(config)["Dockerfile"]!.match(/^EXPOSE (\d+)$/m)?.[1], port)
 
-        const start = readFileSync(new URL("../../packages/wayuse-build/assets/rootfs/opt/wayuse/bin/server-start.sh", import.meta.url), "utf8")
+        const start = readFileSync(new URL("../../packages/build/assets/rootfs/opt/wayuse/bin/server-start.sh", import.meta.url), "utf8")
         assert.equal(start.match(/ --port=(\d+)$/m)?.[1], port)
 
         // The sample publishes the port under its own number, which is where the client's default looks.
-        const sample = readFileSync(new URL("../../packages/wayuse-build/sample/docker-compose.yml", import.meta.url), "utf8")
+        const sample = readFileSync(new URL("../../packages/build/sample/docker-compose.yml", import.meta.url), "utf8")
         assert.equal(sample.match(/^ +- "\$\{WAYUSE_PUBLISH:-127\.0\.0\.1:(\d+)\}:(\d+)"$/m)?.slice(1).join(), `${port},${port}`)
     })
 

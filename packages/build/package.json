@@ -36,7 +36,7 @@
     "sample/wayuse.config.ts",
     "types/*.d.ts"
   ],
-  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/wayuse-build#readme",
+  "homepage": "https://github.com/kawanet/wayuse/tree/main/packages/build#readme",
   "keywords": [
     "docker",
     "wayland",
@@ -46,7 +46,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/wayuse.git",
-    "directory": "packages/wayuse-build"
+    "directory": "packages/build"
   },
   "type": "module",
   "types": "./types/wayuse-build.d.ts"

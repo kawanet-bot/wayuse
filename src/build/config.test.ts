@@ -53,7 +53,7 @@ describe(TITLE, () => {
 
     // The sample names the defaults for a reader to change, so it has to name them as they are.
     it("has in the sample the defaults it would fill in", async () => {
-        const {default: sample} = await import("../../packages/wayuse-build/sample/wayuse.config.ts")
+        const {default: sample} = await import("../../packages/build/sample/wayuse.config.ts")
         assert.deepEqual(sample.apps?.chrome?.policies, DEFAULT_POLICIES)
         assert.deepEqual(sample.screen, resolveConfig({}).screen)
     })
