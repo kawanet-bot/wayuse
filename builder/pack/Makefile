@@ -63,7 +63,7 @@ test-build:
 # Run through bash: an artifact passed between jobs keeps no executable bit.
 test-server: test-build
 	npm install --prefix tmp/.wayuse/rootfs/opt/wayuse --omit=dev --no-audit --no-fund
-	bash smoke.sh tmp/.wayuse/rootfs $(PORT)
+	bash smoke.sh tmp/.wayuse/rootfs $(PORT) ../../$(CLIENT_PKG)/bin/wayuse.js
 
 # Run in place against the checkout's own packages, with no tarball installed.
 test-dist:

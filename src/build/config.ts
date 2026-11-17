@@ -140,7 +140,7 @@ export const consoleTerserOf = (input: Input): boolean => {
  * Fills in every default and refuses what the generated files could not carry.
  */
 export const resolveConfig = (input: Input): Resolved => {
-    const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages", "console"])
+    const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages", "auth", "console"])
     const node = recordOf(config.node, "config.node", ["version"])
     const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])
@@ -151,6 +151,8 @@ export const resolveConfig = (input: Input): Resolved => {
     const installed: Resolved["apps"] = {}
     if (apps.chrome != null) installed.chrome = chromeOf(apps.chrome)
     if (apps.redir != null) installed.redir = redirOf(apps.redir)
+
+    if (config.auth != null && typeof config.auth !== "boolean") throw new ConfigError("config.auth must be false, or left out")
 
     const given = config.packages ?? []
     if (!Array.isArray(given)) throw new ConfigError("config.packages must be an array")
@@ -172,6 +174,8 @@ export const resolveConfig = (input: Input): Resolved => {
             height: sizeOf(screen.height, "config.screen.height", 960),
         },
         packages,
+        // Written out either way, so the server opens its APIs for false alone and never for a missing item.
+        auth: config.auth !== false,
         ...(pages && {console: signIn ? {signIn} : {}}),
     }
 }

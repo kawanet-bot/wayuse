@@ -6,6 +6,7 @@ import type {WayuseClient} from "wayuse"
 import {DEFAULT_AUDIENCE} from "../jwt/jwt-format.ts"
 import {parsePublicKey} from "../jwt/jwt-verify.ts"
 import {createApp, defaultVncPort} from "./app.ts"
+import {createUnavailableApp} from "./unavailable.ts"
 import {VERSION} from "./version.ts"
 import {createVncTickets} from "./wayvnc/vnc-ticket.ts"
 import {createWayvncProxy} from "./wayvnc/wayvnc-proxy.ts"
@@ -24,11 +25,25 @@ Usage: wayuse-server [options]
   -v, --version        print this package's version
   -h, --help           print this usage
 Environment:
-  WAYUSE_JWT_PUBLIC_KEY  the key tokens are verified with: without it, every API that needs a token is refused
+  WAYUSE_JWT_PUBLIC_KEY  the key tokens are verified with: without it every request gets 503, unless the image checks no token
   WAYUSE_JWT_AUDIENCE    the aud a token must carry (default: wayuse)
 `.trimStart()
 
 const EXIT_USAGE = 2
+
+/**
+ * Why a server is out of service: it was given a key and its image checks no token, or the other way round.
+ */
+export const keyProblemOf = (auth: boolean | undefined, key: string | undefined): string | undefined => {
+    if (auth === false && key) return "config.auth is false, and WAYUSE_JWT_PUBLIC_KEY is set: the image checks no token. Build it again, or leave the key out."
+    if (auth !== false && !key) return "WAYUSE_JWT_PUBLIC_KEY is not set: the image checks tokens. Give it the key, or build it with auth: false."
+}
+
+// The exit code comes only once the server is closed: until then the process is the server.
+const closed = (server: ReturnType<typeof serve>): Promise<number> => new Promise((resolve, reject) => {
+    server.on("close", () => resolve(0))
+    server.on("error", reject)
+})
 
 class UsageError extends Error {
 }
@@ -73,23 +88,29 @@ export const CLI: typeof declared.CLI = async ({args}) => {
 
     const config = JSON.parse(readFileSync(options.config, "utf8")) as WayuseClient.Config
     const {WAYUSE_JWT_PUBLIC_KEY, WAYUSE_JWT_AUDIENCE} = process.env
+
+    const listen = (fetch: Parameters<typeof serve>[0]["fetch"]) => serve({fetch, port: options.port}, ({port}) => {
+        process.stderr.write(`@wayuse/server ${VERSION} http://localhost:${port}/ok\n`)
+    })
+
+    // Whoever gives a key takes the tokens to be checked. Nothing of the application is built: whoever asks gets the reason.
+    const problem = keyProblemOf(config.auth, WAYUSE_JWT_PUBLIC_KEY)
+    if (problem) {
+        process.stderr.write(`${problem}\n`)
+        return closed(listen(createUnavailableApp(problem, process.stderr).fetch))
+    }
+
     const publicKey = WAYUSE_JWT_PUBLIC_KEY ? parsePublicKey(WAYUSE_JWT_PUBLIC_KEY) : undefined
-    if (!publicKey) process.stderr.write("WAYUSE_JWT_PUBLIC_KEY is not set: every API that needs a token is refused\n")
+    if (!publicKey) process.stderr.write("config.auth is false: every API is open, with no token\n")
 
     const auth = {publicKey, audience: WAYUSE_JWT_AUDIENCE || DEFAULT_AUDIENCE}
     const tickets = createVncTickets()
     const app = await createApp({config, stderr: process.stderr, auth, runtimeDir: process.env.XDG_RUNTIME_DIR ?? "", tickets, htdocsDir: options.htdocs})
 
-    const server = serve({fetch: app.fetch, port: options.port}, ({port}) => {
-        process.stderr.write(`@wayuse/server ${VERSION} http://localhost:${port}/ok\n`)
-    })
+    const server = listen(app.fetch)
 
     // A WebSocket never reaches the application: the relay answers the upgrade itself, by the ticket in its path.
     server.on("upgrade", createWayvncProxy({tickets, vncPort: defaultVncPort, log: message => process.stderr.write(`${message}\n`)}))
 
-    // The exit code comes only once the server is closed: until then the process is the server.
-    return new Promise<number>((resolve, reject) => {
-        server.on("close", () => resolve(0))
-        server.on("error", reject)
-    })
+    return closed(server)
 }

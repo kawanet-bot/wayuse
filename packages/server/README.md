@@ -68,6 +68,10 @@ The server takes its routes from `/`. A reverse proxy may put a path ahead of th
 
 Every API needs `Authorization: Bearer <JWT>`, and answers 401 without a valid one. Only `/ok` and the files of `--htdocs` are open.
 
+An image built with `auth: false` asks for no token. Every API is open to whoever reaches the port, and `GET /auth/me` answers `{"me": {}}`. The server says so when it starts.
+
+A key and an image have to agree. The server of an image that checks tokens is out of service without the key. So is that of an image built with `auth: false` that is given one. It then answers every request with `503` and the reason, `GET /ok` and the console among them.
+
 The server verifies a token with a public key, which it reads from the environment of the container.
 The key is given when the container starts, not when the image is built, so one image serves any number of key pairs:
 
@@ -91,7 +95,7 @@ The private key never goes to the container. [wayuse](../wayuse/README.md) makes
 
 | Environment variable | Meaning |
 |---|---|
-| `WAYUSE_JWT_PUBLIC_KEY` | The key tokens are verified with. Without it, every API that needs a token is refused. |
+| `WAYUSE_JWT_PUBLIC_KEY` | The key tokens are verified with. Without it, the server answers every request with `503`, unless the image checks no token. |
 | `WAYUSE_JWT_AUDIENCE` | The `aud` a token must carry. Default: `wayuse`. |
 
 ## HTDOCS

@@ -14,6 +14,7 @@ describe(TITLE, () => {
         assert.equal(config.timezone, "Etc/UTC")
         assert.deepEqual(config.screen, {width: 1280, height: 960})
         assert.deepEqual(config.packages, [])
+        assert.equal(config.auth, true)
         assert.deepEqual(config.console, {})
     })
 
@@ -82,6 +83,12 @@ describe(TITLE, () => {
         assert.throws(() => consoleTerserOf({console: {terser}}), ConfigError)
     })
 
+    it("opens the APIs for false alone", () => {
+        assert.equal(resolveConfig({auth: false}).auth, false)
+        const auth = true as unknown as false
+        assert.equal(resolveConfig({auth}).auth, true)
+    })
+
     it("leaves the console out of an image that says false for it", () => {
         assert.equal(resolveConfig({console: false}).console, undefined)
         const console = null as unknown as undefined
@@ -118,6 +125,8 @@ describe(TITLE, () => {
         ["a package with shell syntax", {packages: ["curl && true"]}],
         ["packages that are not an array", {packages: "fonts-noto-cjk"}],
         ["a console that is only said to be there", {console: true}],
+        ["an auth that is a word", {auth: "off"}],
+        ["an auth that is a number", {auth: 0}],
         ["a sign-in address on another origin", {console: {signIn: "https://example.com/sign-in/?next="}}],
         ["a sign-in address that starts with two slashes", {console: {signIn: "//example.com/sign-in/?next="}}],
         ["a sign-in address that runs a script", {console: {signIn: "javascript:alert(1)//"}}],

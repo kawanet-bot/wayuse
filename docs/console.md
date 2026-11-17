@@ -14,6 +14,7 @@ An image leaves the console out with `console: false` in `wayuse.config.ts`. Its
 The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
 A link of the form `/console/#!?jwt=<JWT>` signs in with the token in it. A browser sends what follows the `#` to no server.
 The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
+In an image built with `auth: false`, the entry goes on to the monitor without one.
 
 ## SIGN IN
 

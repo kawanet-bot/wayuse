@@ -80,6 +80,7 @@ Usage: wayuse <command> [options]
 
 @wayuse/server takes a JWT signed with Ed25519, and holds the public key alone.
 The private key stays with whoever issues the tokens, outside the container.
+A server of an image built with `auth: false` asks for no token, and needs none of this.
 
 ```sh
 npx wayuse jwt keygen > .env         # WAYUSE_JWT_PRIVATE_KEY= and WAYUSE_JWT_PUBLIC_KEY=

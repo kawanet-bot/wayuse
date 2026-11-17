@@ -16,7 +16,7 @@ const signInOf = async (): Promise<string | undefined> => {
 
 // Not the console's client: here a refused token is an answer to show, not a reason to come back to this page.
 // Only the server's own 401 is a refusal. Anything else is thrown, and leaves the token as it is.
-const accepts = async (jwt: string): Promise<boolean> =>
+const accepts = async (jwt: string | undefined): Promise<boolean> =>
     createClient({url: location.origin + BASE, token: jwt}).getMe().then(() => true, error => {
         if (isRefusal(error)) return false
         throw new Error(`The server gave no answer on the token: ${failureOf(error)}`)
@@ -38,8 +38,9 @@ const start = async (): Promise<void> => {
         setToken(linked)
     }
 
+    // Asked without a token too: a server that checks none lets the visitor in as they are.
     const saved = getToken()
-    if (saved && await accepts(saved)) return enter()
+    if (await accepts(saved)) return enter()
 
     // Every server under this origin shares the saved token, so only a refusal takes it away.
     setToken(undefined)
