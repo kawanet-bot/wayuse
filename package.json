@@ -1,6 +1,6 @@
 {
   "name": "wayuse-workspace",
-  "description": "Workspace for wayuse-build, wayuse-server and wayuse.",
+  "description": "Workspace for @wayuse/build, @wayuse/server and wayuse.",
   "author": "Kawanet",
   "devDependencies": {
     "@rollup/plugin-json": "^6.1.0",

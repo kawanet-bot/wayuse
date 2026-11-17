@@ -11,10 +11,10 @@ import {swayConfigOf} from "./sway-config.ts"
 type Resolved = WayuseClient.Config
 
 // Resolved by name, so the sources under test and the built copy find the same assets.
-const assetsRoot = (): string => fileURLToPath(new URL("../assets/", import.meta.resolve("wayuse-build")))
+const assetsRoot = (): string => fileURLToPath(new URL("../assets/", import.meta.resolve("@wayuse/build")))
 
 // The console's scripts are built from src/console/, beside this package's own file.
-const consoleScripts = (): string => fileURLToPath(new URL("./console/", import.meta.resolve("wayuse-build")))
+const consoleScripts = (): string => fileURLToPath(new URL("./console/", import.meta.resolve("@wayuse/build")))
 
 // Where the image has the console, laid out as its URLs are.
 const CONSOLE = "rootfs/opt/wayuse/htdocs/console"

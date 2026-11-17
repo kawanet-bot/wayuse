@@ -8,7 +8,7 @@ import {createFakeServer} from "../test-utils/fake-server.ts"
 const TITLE = "server/static.test.ts"
 
 describe(TITLE, () => {
-    // What wayuse-build would have put into the image, and a file beside it that is not to be served.
+    // What @wayuse/build would have put into the image, and a file beside it that is not to be served.
     const base = mkdtempSync(join(tmpdir(), "wayuse-"))
     const htdocsDir = join(base, "htdocs")
     const files: Record<string, string> = {

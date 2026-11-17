@@ -1,6 +1,6 @@
+import type {WayuseBuild} from "@wayuse/build"
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import type {WayuseBuild} from "wayuse-build"
 import {ConfigError, DEFAULT_POLICIES, resolveConfig} from "./config.ts"
 
 const TITLE = "build/config.test.ts"

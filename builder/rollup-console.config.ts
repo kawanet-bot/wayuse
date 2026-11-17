@@ -21,7 +21,7 @@ const rollupConfig: RollupOptions = {
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
 
-        // Neither is bundled here. wayuse-build puts them beside these scripts when it writes the build directory.
+        // Neither is bundled here. @wayuse/build puts them beside these scripts when it writes the build directory.
         paths: {
             "@novnc/novnc": "../vendor/novnc.js",
             "html-ele": "../vendor/html-ele.mjs",

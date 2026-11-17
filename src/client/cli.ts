@@ -8,7 +8,7 @@ import {runPackage} from "./cli-package.ts"
 import {VERSION} from "./version.ts"
 
 // The package of `wayuse build`. A project installs it by itself, and this package does not depend on it.
-const BUILD_PACKAGE = "wayuse-build"
+const BUILD_PACKAGE = "@wayuse/build"
 
 const USAGE = `
 Usage: wayuse <command> [options]

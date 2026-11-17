@@ -6,8 +6,8 @@ SHELL := bash
 .NOTPARALLEL:
 
 # Where the three packages under test sit: installed after `unpack`, or the checkout's own for a run in place.
-BUILD_PKG ?= node_modules/wayuse-build
-SERVER_PKG ?= node_modules/wayuse-server
+BUILD_PKG ?= node_modules/@wayuse/build
+SERVER_PKG ?= node_modules/@wayuse/server
 CLIENT_PKG ?= node_modules/wayuse
 
 # The port the server under test listens on, where nothing else on a build host is expected.
@@ -42,12 +42,12 @@ test-bin:
 # Each executable starts and names its own package, and the keys come out without a server.
 test-cli:
 	cd ../.. && ./$(CLIENT_PKG)/bin/wayuse.js -v | grep "^wayuse " > /dev/null
-	cd ../.. && ./$(BUILD_PKG)/bin/wayuse-build.js -v | grep "^wayuse-build " > /dev/null
-	cd ../.. && ./$(SERVER_PKG)/bin/wayuse-server.js -v | grep "^wayuse-server " > /dev/null
-	cd ../.. && ./$(CLIENT_PKG)/bin/wayuse.js build -v | grep "^wayuse-build " > /dev/null
+	cd ../.. && ./$(BUILD_PKG)/bin/wayuse-build.js -v | grep "^@wayuse/build " > /dev/null
+	cd ../.. && ./$(SERVER_PKG)/bin/wayuse-server.js -v | grep "^@wayuse/server " > /dev/null
+	cd ../.. && ./$(CLIENT_PKG)/bin/wayuse.js build -v | grep "^@wayuse/build " > /dev/null
 	cd ../.. && [ "$$(./$(CLIENT_PKG)/bin/wayuse.js jwt keygen | grep -c '^WAYUSE_JWT_')" = 2 ]
 
-# The sample's build directory as a user makes it, noVNC bundled from the dependency of wayuse-build.
+# The sample's build directory as a user makes it, noVNC bundled from the dependency of @wayuse/build.
 test-build:
 	/bin/rm -fr tmp
 	mkdir -p tmp

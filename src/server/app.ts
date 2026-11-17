@@ -35,7 +35,7 @@ export interface AppOptions {
     vncPort?: (n: number) => number
     /** The tickets the WebSocket relay takes. Default: ones no relay shares. */
     tickets?: VncTickets
-    /** Where the image has what a browser loads without a token. Default: where wayuse-build puts it. */
+    /** Where the image has what a browser loads without a token. Default: where @wayuse/build puts it. */
     htdocsDir?: string
 }
 

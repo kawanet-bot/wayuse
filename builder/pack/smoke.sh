@@ -1,5 +1,5 @@
 #!/bin/bash
-# Starts wayuse-server from an image's file tree and asks it what needs neither sway nor Chrome.
+# Starts @wayuse/server from an image's file tree and asks it what needs neither sway nor Chrome.
 # Usage: smoke.sh <rootfs> <port>
 set -eu
 
@@ -7,7 +7,7 @@ rootfs=$1
 port=$2
 base=http://127.0.0.1:$port
 
-node "$rootfs/opt/wayuse/node_modules/wayuse-server/bin/wayuse-server.js" \
+node "$rootfs/opt/wayuse/node_modules/@wayuse/server/bin/wayuse-server.js" \
     --port "$port" --config "$rootfs/etc/wayuse/wayuse.json" --htdocs "$rootfs/opt/wayuse/htdocs" &
 trap 'kill $!' EXIT
 

@@ -4,12 +4,12 @@
 
 The API client and CLI for a wayuse container.
 
-This package is the client alone. [wayuse-build](../build/README.md) builds the image of the container, and [wayuse-server](../server/README.md) runs inside it.
+This package is the client alone. [@wayuse/build](../build/README.md) builds the image of the container, and [@wayuse/server](../server/README.md) runs inside it.
 
 ## SYNOPSIS
 
 ```sh
-export WAYUSE_URL=http://127.0.0.1:9580/    # where wayuse-server is reached
+export WAYUSE_URL=http://127.0.0.1:9580/    # where @wayuse/server is reached
 export WAYUSE_JWT=...                       # see TOKENS below
 
 npx wayuse chrome open https://example.com/ # open the URL in Chrome, filling the screen
@@ -20,7 +20,7 @@ npx wayuse slot list                        # every screen, as JSON
 ```
 
 A server on the host, such as `wrangler dev`, is opened as `http://host.docker.internal:<port>/`.
-The container and the server each need a setting for that: see [wayuse-build](../build/README.md#a-server-on-the-host).
+The container and the server each need a setting for that: see [@wayuse/build](../build/README.md#a-server-on-the-host).
 
 The same from a program. It uses web standards alone, so it runs in Node.js and in a browser:
 
@@ -37,7 +37,7 @@ const png = await client.captureSlot(tab.sway.output)
 
 ```
 Usage: wayuse <command> [options]
-  build [options]                 write the Docker build directory, with the wayuse-build the project has installed
+  build [options]                 write the Docker build directory, with the @wayuse/build the project has installed
   auth me                         print the claims of WAYUSE_JWT, as the server reads them
   config                          print the configuration the image was built from
   slot list                       print every screen
@@ -78,7 +78,7 @@ Usage: wayuse <command> [options]
 
 ## TOKENS
 
-wayuse-server takes a JWT signed with Ed25519, and holds the public key alone.
+@wayuse/server takes a JWT signed with Ed25519, and holds the public key alone.
 The private key stays with whoever issues the tokens, outside the container.
 
 ```sh
@@ -95,7 +95,7 @@ Give the container `WAYUSE_JWT_PUBLIC_KEY`, and never the private key.
 | Environment variable | Read by | Meaning |
 |---|---|---|
 | `WAYUSE_JWT_PRIVATE_KEY` | `wayuse jwt sign`, `wayuse jwt public-key` | The key tokens are signed with. |
-| `WAYUSE_JWT_PUBLIC_KEY` | wayuse-server | The key tokens are verified with. |
+| `WAYUSE_JWT_PUBLIC_KEY` | @wayuse/server | The key tokens are verified with. |
 | `WAYUSE_JWT_AUDIENCE` | both | The `aud` of a token. It must be the same on both sides. Default: `wayuse`. |
 
 A token carries `aud`, `sub` and `iat`. It never expires unless it carries `exp`.

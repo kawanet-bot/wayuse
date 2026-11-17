@@ -1,12 +1,12 @@
+import type * as declared from "@wayuse/build"
+import type {WayuseBuild} from "@wayuse/build"
 import type {WayuseClient} from "wayuse"
-import type * as declared from "wayuse-build"
-import type {WayuseBuild} from "wayuse-build"
 import {VERSION} from "./version.ts"
 
 type Input = WayuseBuild.Config
 type Resolved = WayuseClient.Config
 
-// The Node.js that runs wayuse-build: the one the image's owner already develops and tests with.
+// The Node.js that runs @wayuse/build: the one the image's owner already develops and tests with.
 const DEFAULT_NODE_VERSION = process.versions.node
 
 const CHANNELS = ["stable", "beta", "unstable"] as const

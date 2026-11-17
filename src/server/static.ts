@@ -8,7 +8,7 @@ import {existsSync} from "node:fs"
 export const createStaticApp = (htdocsDir: string): Hono => {
     const app = new Hono()
 
-    // wayuse-build puts the directory into the image. Outside an image there is none, and the server has its API alone.
+    // @wayuse/build puts the directory into the image. Outside an image there is none, and the server has its API alone.
     if (!existsSync(htdocsDir)) return app
 
     // A relative link in a page resolves against the directory only when its URL ends with the slash.

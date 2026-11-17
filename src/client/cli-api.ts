@@ -5,7 +5,7 @@ import {type ApiValues, type CLIIO, UsageError, pointOf, printJson, writeOutput}
 
 type Client = WayuseClient.Client
 
-// The port wayuse-server listens on, published on the same host: what the sample container gives.
+// The port @wayuse/server listens on, published on the same host: what the sample container gives.
 export const DEFAULT_URL = "http://127.0.0.1:9580/"
 
 // As the server does for a window it opens: without a name, the first screen.

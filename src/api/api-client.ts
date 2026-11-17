@@ -1,4 +1,4 @@
-// The client of wayuse-server that the CLI and the console share: web standards alone, no node: import.
+// The client of @wayuse/server that the CLI and the console share: web standards alone, no node: import.
 
 import type * as declared from "wayuse"
 import type {WayuseClient} from "wayuse"
