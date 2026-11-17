@@ -73,6 +73,7 @@ Every item may be left out.
 | `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
 | `packages` | `[]` | Additional apt packages, fonts among them. |
 | `console.vars` | `icon` and `title` | What the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s pages show as their icon and title. A value is text, written into the HTML of the image. |
+| `console.terser` | `true` | Makes the console's scripts, and the packages they load, small with terser. `false` writes them as they are. |
 | `console.signIn` | none | Where the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s entry sends a visitor without a token, on the console's own origin. Without it, the entry asks for a token. |
 
 ## COMMAND
@@ -92,7 +93,7 @@ The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the imag
 The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in it as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are. The server serves that `htdocs/` without a token.
 `@wayuse/build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
 noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
-It copies [html-ele](https://github.com/kawanet/html-ele) beside it, as `console/vendor/html-ele.mjs`, for the console's pages to build their elements with.
+It bundles [html-ele](https://github.com/kawanet/html-ele) beside it the same way, as `console/vendor/html-ele.js`, for the console's pages to build their elements with.
 The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
 
 ## CONTAINER

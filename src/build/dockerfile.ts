@@ -8,6 +8,8 @@ export interface BuildOptions {
     serverTarball?: string
     /** The values of console.vars, with the defaults among them. Default: the defaults alone. */
     vars?: Record<string, string>
+    /** Whether the console's scripts and the packages beside them are made small. Default: true. */
+    terser?: boolean
 }
 
 const UBUNTU = "ubuntu:26.04"

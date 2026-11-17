@@ -111,6 +111,25 @@ describe(TITLE, () => {
         }
     })
 
+    it("writes the console's scripts as they were built where terser is off, and smaller where it is on", async () => {
+        const built = await readFile(new URL("../../packages/build/dist/console/monitor.js", import.meta.url), "utf8")
+        const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
+        try {
+            const script = join(outdir, "rootfs", DEFAULT_HTDOCS, "console/js/monitor.js")
+            const vendor = join(outdir, "rootfs", DEFAULT_HTDOCS, "console/vendor/html-ele.js")
+
+            await writeBuildDir(config, outdir, {terser: false})
+            assert.equal(await readFile(script, "utf8"), built)
+            const plain = await readFile(vendor, "utf8")
+
+            await writeBuildDir(config, outdir)
+            assert.ok((await readFile(script, "utf8")).length < built.length)
+            assert.ok((await readFile(vendor, "utf8")).length < plain.length)
+        } finally {
+            await rm(outdir, {recursive: true, force: true})
+        }
+    })
+
     it("writes the build directory anew, the scripts executable", async () => {
         const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
         try {
@@ -125,9 +144,9 @@ describe(TITLE, () => {
             const console = join(outdir, "rootfs", DEFAULT_HTDOCS, "console")
             assert.match(await readFile(join(console, "index.html"), "utf8"), /<script type="module" src="js\/login\.js">/)
             assert.match(await readFile(join(console, "vnc/index.html"), "utf8"), /<script type="module" src="\.\.\/js\/vnc\.js">/)
-            assert.match(await readFile(join(console, "js/login.js"), "utf8"), /from '\.\/console-client\.js'/)
-            assert.match(await readFile(join(console, "js/vnc.js"), "utf8"), /from '\.\.\/vendor\/novnc\.js'/)
-            assert.match(await readFile(join(console, "js/monitor.js"), "utf8"), /from '\.\.\/vendor\/html-ele\.mjs'/)
+            assert.match(await readFile(join(console, "js/login.js"), "utf8"), /from\s*"\.\/console-client\.js"/)
+            assert.match(await readFile(join(console, "js/vnc.js"), "utf8"), /from\s*"\.\.\/vendor\/novnc\.js"/)
+            assert.match(await readFile(join(console, "js/monitor.js"), "utf8"), /from\s*"\.\.\/vendor\/html-ele\.js"/)
 
             // The values of console.vars, written into the pages as text.
             const api = await readFile(join(console, "api/index.html"), "utf8")
@@ -155,7 +174,7 @@ describe(TITLE, () => {
             assert.match(novnc, /export\s*\{\s*\w+ as default\s*\}/)
 
             // html-ele under the name the console's scripts import it by.
-            const htmlEle = await readFile(join(console, "vendor/html-ele.mjs"), "utf8")
+            const htmlEle = await readFile(join(console, "vendor/html-ele.js"), "utf8")
             assert.match(htmlEle, /export\s*\{[^}]*\bELE\b[^}]*\}/)
         } finally {
             await rm(outdir, {recursive: true, force: true})

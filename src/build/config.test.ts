@@ -1,7 +1,7 @@
 import type {WayuseBuild} from "@wayuse/build"
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {ConfigError, DEFAULT_POLICIES, consoleVarsOf, resolveConfig} from "./config.ts"
+import {ConfigError, DEFAULT_POLICIES, consoleTerserOf, consoleVarsOf, resolveConfig} from "./config.ts"
 
 const TITLE = "build/config.test.ts"
 
@@ -72,6 +72,14 @@ describe(TITLE, () => {
         assert.throws(() => consoleVarsOf({console: {vars}}), ConfigError)
         const list = ["my-wayuse"] as unknown as Record<string, string>
         assert.throws(() => consoleVarsOf({console: {vars: list}}), ConfigError)
+    })
+
+    it("makes the console's scripts small unless the configuration says not to", () => {
+        assert.equal(consoleTerserOf({}), true)
+        assert.equal(consoleTerserOf({console: {terser: false}}), false)
+        assert.equal(consoleTerserOf({console: {terser: true}}), true)
+        const terser = "no" as unknown as boolean
+        assert.throws(() => consoleTerserOf({console: {terser}}), ConfigError)
     })
 
     it("leaves out a package without a value", () => {

@@ -24,7 +24,7 @@ const rollupConfig: RollupOptions = {
         // Neither is bundled here. @wayuse/build puts them beside these scripts when it writes the build directory.
         paths: {
             "@novnc/novnc": "../vendor/novnc.js",
-            "html-ele": "../vendor/html-ele.mjs",
+            "html-ele": "../vendor/html-ele.js",
         },
     },
 

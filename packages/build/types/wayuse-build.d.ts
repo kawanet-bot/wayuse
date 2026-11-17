@@ -56,6 +56,8 @@ export declare namespace WayuseBuild {
         signIn?: string
         /** What the pages show where their HTML has {{name}}: `icon` and `title` in the header. A value is text, and anyone can read it in the page. */
         vars?: Record<string, string>
+        /** Whether the scripts of the pages, and the packages they load, are made small with terser. Default: true. */
+        terser?: boolean
     }
 
     interface CLIOptions {
