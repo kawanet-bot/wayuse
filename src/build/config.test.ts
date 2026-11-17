@@ -34,7 +34,7 @@ describe(TITLE, () => {
             timezone: "Asia/Tokyo",
             screen: {width: 1920, height: 1080},
             packages: ["fonts-noto-cjk"],
-            console: {signIn: "../../front/screen-sign-in/?next=", vars: {title: "my-wayuse"}},
+            console: {signIn: "../../sign-in/?next=", vars: {title: "my-wayuse"}},
         })
         assert.equal(config.node.version, "24.11.1")
         // The policies given are all there is: the defaults are not kept beside them.
@@ -43,7 +43,7 @@ describe(TITLE, () => {
         assert.deepEqual(config.screen, {width: 1920, height: 1080})
         assert.deepEqual(config.packages, ["fonts-noto-cjk"])
         // The values of vars go into the pages alone. The server would show this object to a client.
-        assert.deepEqual(config.console, {signIn: "../../front/screen-sign-in/?next="})
+        assert.deepEqual(config.console, {signIn: "../../sign-in/?next="})
     })
 
     it("gives Chrome no policy for an empty object, and the defaults for no value", () => {

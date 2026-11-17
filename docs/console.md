@@ -20,21 +20,21 @@ Without a token, the entry asks for one to be pasted. An image can send the visi
 ```ts
 export default defineConfig({
     console: {
-        signIn: "/front/screen-sign-in/?next=",
+        signIn: "/sign-in/?next=",
     },
 })
 ```
 
-`signIn` is the address of that page, written up to where the entry adds the path to come back to. Opened as `/screen/tokyo-1/console/`, the entry goes to:
+`signIn` is the address of that page, written up to where the entry adds the path to come back to. Opened as `/some/prefix/console/`, the entry goes to:
 
 ```
-/front/screen-sign-in/?next=%2Fscreen%2Ftokyo-1%2Fconsole%2F%23!%3Fjwt%3D
+/sign-in/?next=%2Fsome%2Fprefix%2Fconsole%2F%23!%3Fjwt%3D
 ```
 
 The page adds a JWT at the end of what it was given, and goes there:
 
 ```
-/screen/tokyo-1/console/#!?jwt=<JWT>
+/some/prefix/console/#!?jwt=<JWT>
 ```
 
 - The page is on the origin of the console. `signIn` is a path, or an address relative to the entry, and what comes back is a path.
