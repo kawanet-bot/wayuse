@@ -16,8 +16,8 @@ export declare namespace WayuseBuild {
         screen?: ScreenConfig
         /** Additional apt packages, fonts among them. */
         packages?: string[]
-        /** The console's pages. */
-        console?: ConsoleConfig
+        /** The console's pages. `false` leaves the console out of the image, which then has the API alone. */
+        console?: ConsoleConfig | false
     }
 
     interface NodeConfig {
@@ -56,6 +56,8 @@ export declare namespace WayuseBuild {
         signIn?: string
         /** What the pages show where their HTML has {{name}}: `icon` and `title` in the header. A value is text, and anyone can read it in the page. */
         vars?: Record<string, string>
+        /** Whether the scripts of the pages, and the packages they load, are made small with terser. Default: true. */
+        terser?: boolean
     }
 
     interface CLIOptions {

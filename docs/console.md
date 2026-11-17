@@ -9,6 +9,8 @@ An image that `@wayuse/build` builds has pages for a person, at `/console/` of i
 | `/console/vnc/#!?slot=HEADLESS-1` | One screen over VNC, seen and operated in the browser. |
 | `/console/api/` | A form that tries each API, and shows its URL and the `wayuse` command that does the same. |
 
+An image leaves the console out with `console: false` in `wayuse.config.ts`. Its `htdocs/` is then empty, and its server answers the API alone.
+
 The pages keep the token in the browser's `localStorage`, as `wayuse:jwt`.
 A link of the form `/console/#!?jwt=<JWT>` signs in with the token in it. A browser sends what follows the `#` to no server.
 The pages and their scripts need no token to load, as they carry no secret. Every API they call does.
@@ -96,10 +98,10 @@ The image has it as `/opt/wayuse/htdocs/console/`, and [@wayuse/server](../packa
 |---|---|
 | `index.html`, `monitor/`, `api/`, `vnc/` | The pages. |
 | `css/` | Their styles. |
-| `js/` | Their scripts, built from `src/console/`. |
-| `vendor/novnc.js` | [noVNC](https://github.com/novnc/noVNC), bundled when the build directory is written. It is under the MPL 2.0, and its notices stay in the bundle. |
+| `js/` | Their scripts, built from `src/console/` and made small with terser. |
+| `vendor/novnc.js` | [noVNC](https://github.com/novnc/noVNC), bundled into one file when the build directory is written. It is under the MPL 2.0, and its notices stay in the file. |
 | `config.json` | The `console` of the configuration, which the entry reads before it has a token. |
-| `vendor/html-ele.mjs` | [html-ele](https://github.com/kawanet/html-ele), as npm installed it. The pages build their elements with it. |
+| `vendor/html-ele.js` | [html-ele](https://github.com/kawanet/html-ele), bundled the same way. The pages build their elements with it. |
 
 A server that runs outside an image has no such directory, and no console.
 

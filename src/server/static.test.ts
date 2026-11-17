@@ -51,7 +51,11 @@ describe(TITLE, () => {
         assert.equal((await get("/console/nosuch.html", {authorization: `Bearer ${server.jwt}`})).status, 404)
     })
 
-    it("has no console where the image has no such directory", async () => {
+    it("has no console where the image has none in the directory, or no such directory", async () => {
+        mkdirSync(join(base, "empty"))
+        const empty = createFakeServer({htdocsDir: join(base, "empty")})
+        assert.equal((await empty.fetch(new URL("/console", "http://wayuse.test/"))).status, 401)
+
         const bare = createFakeServer({htdocsDir: join(base, "nosuch")})
         for (const path of ["/console", "/console/"]) {
             assert.equal((await bare.fetch(new URL(path, "http://wayuse.test/"))).status, 401, path)

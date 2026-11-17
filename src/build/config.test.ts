@@ -1,7 +1,7 @@
 import type {WayuseBuild} from "@wayuse/build"
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {ConfigError, DEFAULT_POLICIES, consoleVarsOf, resolveConfig} from "./config.ts"
+import {ConfigError, DEFAULT_POLICIES, consoleTerserOf, consoleVarsOf, resolveConfig} from "./config.ts"
 
 const TITLE = "build/config.test.ts"
 
@@ -74,6 +74,20 @@ describe(TITLE, () => {
         assert.throws(() => consoleVarsOf({console: {vars: list}}), ConfigError)
     })
 
+    it("makes the console's scripts small unless the configuration says not to", () => {
+        assert.equal(consoleTerserOf({}), true)
+        assert.equal(consoleTerserOf({console: {terser: false}}), false)
+        assert.equal(consoleTerserOf({console: {terser: true}}), true)
+        const terser = "no" as unknown as boolean
+        assert.throws(() => consoleTerserOf({console: {terser}}), ConfigError)
+    })
+
+    it("leaves the console out of an image that says false for it", () => {
+        assert.equal(resolveConfig({console: false}).console, undefined)
+        const console = null as unknown as undefined
+        assert.deepEqual(resolveConfig({console}).console, {})
+    })
+
     it("leaves out a package without a value", () => {
         const packages = ["curl", null, undefined, "git"] as string[]
         assert.deepEqual(resolveConfig({packages}).packages, ["curl", "git"])
@@ -103,6 +117,7 @@ describe(TITLE, () => {
         ["a time zone that climbs out of zoneinfo", {timezone: "../../etc/passwd"}],
         ["a package with shell syntax", {packages: ["curl && true"]}],
         ["packages that are not an array", {packages: "fonts-noto-cjk"}],
+        ["a console that is only said to be there", {console: true}],
         ["a sign-in address on another origin", {console: {signIn: "https://example.com/sign-in/?next="}}],
         ["a sign-in address that starts with two slashes", {console: {signIn: "//example.com/sign-in/?next="}}],
         ["a sign-in address that runs a script", {console: {signIn: "javascript:alert(1)//"}}],
