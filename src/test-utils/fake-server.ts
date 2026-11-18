@@ -49,7 +49,7 @@ export interface FakeServerOptions {
     htdocsDir?: string
 }
 
-export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}}), vncPort, tickets, htdocsDir}: FakeServerOptions = {}): FakeServer => {
+export const createFakeServer = ({exec = fakeExec, config = resolveConfig({apps: {chrome: {}}}, "wayuse.config.ts"), vncPort, tickets, htdocsDir}: FakeServerOptions = {}): FakeServer => {
     const pair = generateKeyPair()
     const lines: string[] = []
 

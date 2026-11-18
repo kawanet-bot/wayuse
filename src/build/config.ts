@@ -138,8 +138,9 @@ export const consoleTerserOf = (input: Input): boolean => {
 
 /**
  * Fills in every default and refuses what the generated files could not carry.
+ * file is the file name of the configuration, given without its directory.
  */
-export const resolveConfig = (input: Input): Resolved => {
+export const resolveConfig = (input: Input, file: string): Resolved => {
     const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages", "auth", "console"])
     const node = recordOf(config.node, "config.node", ["version"])
     const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
@@ -164,7 +165,7 @@ export const resolveConfig = (input: Input): Resolved => {
     })
 
     return {
-        wayuse: {build: {version: VERSION}},
+        wayuse: {build: {version: VERSION, config: file}},
         // The default is checked like a given value: a nightly build of Node.js has no release to download.
         node: {version: stringOf(node.version ?? DEFAULT_NODE_VERSION, "config.node.version", NODE_VERSION, "")},
         apps: installed,

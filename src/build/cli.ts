@@ -1,5 +1,5 @@
 import type * as declared from "@wayuse/build"
-import {resolve} from "node:path"
+import {basename, resolve} from "node:path"
 import {pathToFileURL} from "node:url"
 import {parseArgs} from "node:util"
 import {findConfigFile, isFile} from "./config-file.ts"
@@ -67,7 +67,8 @@ export const CLI: typeof declared.CLI = async ({args}) => {
 
     try {
         const input = await loadConfig(configFile) as declared.WayuseBuild.Config
-        const config = resolveConfig(input)
+        // The directory is left out, so the image tells nothing of where it was built.
+        const config = resolveConfig(input, basename(configFile))
         const files = await writeBuildDir(config, options.outdir, {serverTarball: options["server-tarball"], vars: consoleVarsOf(input), terser: consoleTerserOf(input)})
         for (const file of files) process.stdout.write(`${options.outdir}/${file}\n`)
         return 0
