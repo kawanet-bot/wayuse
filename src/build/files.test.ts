@@ -197,6 +197,18 @@ describe(TITLE, () => {
         }
     })
 
+    it("writes into a directory whose parent is not there yet", async () => {
+        const bare = resolveConfig({console: false}, "wayuse.config.ts")
+        const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
+        try {
+            await writeBuildDir(bare, join(outdir, "docker/my-wayuse"))
+            await stat(join(outdir, "docker/my-wayuse/Dockerfile"))
+            await stat(join(outdir, "docker/my-wayuse/rootfs/etc/wayuse/wayuse.json"))
+        } finally {
+            await rm(outdir, {recursive: true, force: true})
+        }
+    })
+
     it("writes the build directory, the scripts executable", async () => {
         const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
         try {

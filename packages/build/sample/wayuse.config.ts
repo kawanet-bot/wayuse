@@ -28,6 +28,6 @@ export default defineConfig({
         "fonts-morisawa-bizud-mincho",
     ],
     output: {
-        dir: "my-wayuse",
+        dir: "docker/my-wayuse",
     },
 })

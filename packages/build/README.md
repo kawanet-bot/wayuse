@@ -37,8 +37,8 @@ It writes the build directory, and Docker builds the image from it:
 
 ```sh
 npm install -D wayuse @wayuse/build
-npx wayuse build -d my-wayuse
-docker build -t my-wayuse my-wayuse
+npx wayuse build -d docker/my-wayuse
+docker build -t my-wayuse docker/my-wayuse
 docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -e WAYUSE_JWT_PUBLIC_KEY -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
 
@@ -56,7 +56,7 @@ npx wayuse build && docker compose up --build -d
 
 Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
 The private key is in `.env` too. Keep the file to its owner and out of version control.
-The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `my-wayuse` beside its file.
+The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `docker/my-wayuse` beside its file.
 
 ## CONFIGURATION
 
@@ -79,7 +79,7 @@ Every item may be left out.
 | `console.vars` | `icon` and `title` | What the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s pages show as their icon and title. A value is text, written into the HTML of the image. |
 | `console.terser` | `true` | Makes the console's scripts, and the packages they load, small with terser. `false` writes them as they are. |
 | `console.signIn` | none | Where the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s entry sends a visitor without a token, on the console's own origin. Without it, the entry asks for a token. |
-| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `my-wayuse`. |
+| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `docker/my-wayuse`. |
 
 ## COMMAND
 

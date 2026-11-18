@@ -53,17 +53,17 @@ test-build:
 	mkdir -p tmp
 	cp ../../$(BUILD_PKG)/sample/* tmp/
 	cd tmp && ../../../$(BUILD_PKG)/bin/wayuse-build.js --server-tarball ../server.tgz > /dev/null
-	[ -s tmp/my-wayuse/Dockerfile ]
-	[ -x tmp/my-wayuse/rootfs/opt/wayuse/bin/supervise.sh ]
-	grep -q "Licensed under MPL 2.0" tmp/my-wayuse/rootfs/opt/wayuse/htdocs/console/vendor/novnc.js
-	[ -s tmp/my-wayuse/rootfs/opt/wayuse/htdocs/console/vendor/html-ele.js ]
-	grep -q '"html-slim"' tmp/my-wayuse/rootfs/opt/wayuse/package.json
+	[ -s tmp/docker/my-wayuse/Dockerfile ]
+	[ -x tmp/docker/my-wayuse/rootfs/opt/wayuse/bin/supervise.sh ]
+	grep -q "Licensed under MPL 2.0" tmp/docker/my-wayuse/rootfs/opt/wayuse/htdocs/console/vendor/novnc.js
+	[ -s tmp/docker/my-wayuse/rootfs/opt/wayuse/htdocs/console/vendor/html-ele.js ]
+	grep -q '"html-slim"' tmp/docker/my-wayuse/rootfs/opt/wayuse/package.json
 
 # What the image does, without Docker: install the generated package.json, start the server, and ask it.
 # Run through bash: an artifact passed between jobs keeps no executable bit.
 test-server: test-build
-	npm install --prefix tmp/my-wayuse/rootfs/opt/wayuse --omit=dev --no-audit --no-fund
-	bash smoke.sh tmp/my-wayuse/rootfs $(PORT) ../../$(CLIENT_PKG)/bin/wayuse.js
+	npm install --prefix tmp/docker/my-wayuse/rootfs/opt/wayuse --omit=dev --no-audit --no-fund
+	bash smoke.sh tmp/docker/my-wayuse/rootfs $(PORT) ../../$(CLIENT_PKG)/bin/wayuse.js
 
 # Run in place against the checkout's own packages, with no tarball installed.
 test-dist:
