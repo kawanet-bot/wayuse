@@ -147,7 +147,7 @@ export const outputDirOf = (input: Input, given?: string): string => {
     const output = recordOf(isRecord(input) ? input.output : undefined, "config.output", ["dir"])
     // Checked even where the command line gives the directory, so a mistake does not wait for the day it is used.
     const set = stringOf(output.dir, "config.output.dir", OUTPUT_DIR, "")
-    const dir = given || set
+    const dir = given ?? set
     if (!dir) throw new ConfigError("config.output.dir is not set, and --dir is not given")
     return dir
 }

@@ -114,6 +114,10 @@ describe(TITLE, () => {
         assert.equal(outputDirOf({}, "other"), "other")
     })
 
+    it("does not take an empty build directory of the command line for none", () => {
+        assert.throws(() => outputDirOf({output: {dir: "my-wayuse"}}, ""), ConfigError)
+    })
+
     it("refuses to build where neither gives the build directory", () => {
         assert.throws(() => outputDirOf({}), /config\.output\.dir is not set, and --dir is not given/)
         assert.throws(() => outputDirOf({output: {}}), ConfigError)
