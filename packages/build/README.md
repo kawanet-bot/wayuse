@@ -84,13 +84,15 @@ Every item may be left out.
 
 ```
 Usage: wayuse-build [options]
-  -c, --config <file>      the configuration to read (default: wayuse.config.ts)
+  -c, --config <file>      the configuration to read (default: wayuse.config.ts, .mjs or .js)
   -o, --outdir <dir>       the build directory to write, emptied first (default: .wayuse)
   --server-tarball <file>  a @wayuse/server tarball to install in place of the one on npm
   -v, --version            print this package's version
   -h, --help               print this usage
 ```
 
+Without `-c`, it reads the first of `wayuse.config.ts`, `wayuse.config.mjs` and `wayuse.config.js` in the current directory.
+Without any of them, it prints the usage.
 `npx wayuse build` takes the same options and passes them on.
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.

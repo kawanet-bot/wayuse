@@ -7,7 +7,7 @@ const TITLE = "build/config.test.ts"
 
 describe(TITLE, () => {
     it("fills in every default", () => {
-        const config = resolveConfig({})
+        const config = resolveConfig({}, "wayuse.config.ts")
         assert.match(config.wayuse.build.version, /^\d+\.\d+\.\d+/)
         assert.equal(config.node.version, process.versions.node)
         assert.deepEqual(config.apps, {})
@@ -18,14 +18,18 @@ describe(TITLE, () => {
         assert.deepEqual(config.console, {})
     })
 
+    it("keeps the file name of the configuration", () => {
+        assert.equal(resolveConfig({}, "chrome.config.ts").wayuse.build.config, "chrome.config.ts")
+    })
+
     it("installs Chrome only when its key is present", () => {
-        assert.deepEqual(resolveConfig({apps: {chrome: {}}}).apps, {chrome: {channel: "stable", env: {}, policies: DEFAULT_POLICIES}})
-        assert.deepEqual(resolveConfig({apps: {}}).apps, {})
+        assert.deepEqual(resolveConfig({apps: {chrome: {}}}, "wayuse.config.ts").apps, {chrome: {channel: "stable", env: {}, policies: DEFAULT_POLICIES}})
+        assert.deepEqual(resolveConfig({apps: {}}, "wayuse.config.ts").apps, {})
     })
 
     it("installs redir only when its key is present, with the ports as given", () => {
         const ports = {9223: "127.0.0.1:9222", 18081: "host.docker.internal:18081"}
-        assert.deepEqual(resolveConfig({apps: {redir: {ports}}}).apps, {redir: {ports}})
+        assert.deepEqual(resolveConfig({apps: {redir: {ports}}}, "wayuse.config.ts").apps, {redir: {ports}})
     })
 
     it("keeps what is given", () => {
@@ -36,7 +40,7 @@ describe(TITLE, () => {
             screen: {width: 1920, height: 1080},
             packages: ["fonts-noto-cjk"],
             console: {signIn: "../../sign-in/?next=", vars: {title: "my-wayuse"}},
-        })
+        }, "wayuse.config.ts")
         assert.equal(config.node.version, "24.11.1")
         // The policies given are all there is: the defaults are not kept beside them.
         assert.deepEqual(config.apps.chrome, {channel: "beta", env: {LANGUAGE: "ja"}, policies: {AutoplayAllowlist: ["https://www.youtube.com"]}})
@@ -48,16 +52,16 @@ describe(TITLE, () => {
     })
 
     it("gives Chrome no policy for an empty object, and the defaults for no value", () => {
-        assert.deepEqual(resolveConfig({apps: {chrome: {policies: {}}}}).apps.chrome?.policies, {})
+        assert.deepEqual(resolveConfig({apps: {chrome: {policies: {}}}}, "wayuse.config.ts").apps.chrome?.policies, {})
         const policies = null as unknown as undefined
-        assert.deepEqual(resolveConfig({apps: {chrome: {policies}}}).apps.chrome?.policies, DEFAULT_POLICIES)
+        assert.deepEqual(resolveConfig({apps: {chrome: {policies}}}, "wayuse.config.ts").apps.chrome?.policies, DEFAULT_POLICIES)
     })
 
     // The sample names the defaults for a reader to change, so it has to name them as they are.
     it("has in the sample the defaults it would fill in", async () => {
         const {default: sample} = await import("../../packages/build/sample/wayuse.config.ts")
         assert.deepEqual(sample.apps?.chrome?.policies, DEFAULT_POLICIES)
-        assert.deepEqual(sample.screen, resolveConfig({}).screen)
+        assert.deepEqual(sample.screen, resolveConfig({}, "wayuse.config.ts").screen)
     })
 
     it("takes the values of the pages as given, an empty one among them, and the defaults for the rest", () => {
@@ -84,20 +88,20 @@ describe(TITLE, () => {
     })
 
     it("opens the APIs for false alone", () => {
-        assert.equal(resolveConfig({auth: false}).auth, false)
+        assert.equal(resolveConfig({auth: false}, "wayuse.config.ts").auth, false)
         const auth = true as unknown as false
-        assert.equal(resolveConfig({auth}).auth, true)
+        assert.equal(resolveConfig({auth}, "wayuse.config.ts").auth, true)
     })
 
     it("leaves the console out of an image that says false for it", () => {
-        assert.equal(resolveConfig({console: false}).console, undefined)
+        assert.equal(resolveConfig({console: false}, "wayuse.config.ts").console, undefined)
         const console = null as unknown as undefined
-        assert.deepEqual(resolveConfig({console}).console, {})
+        assert.deepEqual(resolveConfig({console}, "wayuse.config.ts").console, {})
     })
 
     it("leaves out a package without a value", () => {
         const packages = ["curl", null, undefined, "git"] as string[]
-        assert.deepEqual(resolveConfig({packages}).packages, ["curl", "git"])
+        assert.deepEqual(resolveConfig({packages}, "wayuse.config.ts").packages, ["curl", "git"])
     })
 
     // Each case is a value that would otherwise reach a Dockerfile or a shell script.
@@ -138,7 +142,7 @@ describe(TITLE, () => {
 
     for (const [name, input] of refused) {
         it(`refuses ${name}`, () => {
-            assert.throws(() => resolveConfig(input as WayuseBuild.Config), ConfigError)
+            assert.throws(() => resolveConfig(input as WayuseBuild.Config, "wayuse.config.ts"), ConfigError)
         })
     }
 })

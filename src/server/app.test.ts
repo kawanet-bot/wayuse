@@ -8,7 +8,7 @@ import {createApp} from "./app.ts"
 const TITLE = "server/app.test.ts"
 
 describe(TITLE, () => {
-    const config = resolveConfig({apps: {chrome: {}}, screen: {width: 1920, height: 1080}})
+    const config = resolveConfig({apps: {chrome: {}}, screen: {width: 1920, height: 1080}}, "wayuse.config.ts")
     const pair = generateKeyPair()
     const auth: AuthOptions = {publicKey: parsePublicKey(pair.publicKey), audience: "wayuse"}
     const keyless: AuthOptions = {audience: "wayuse"}
@@ -64,7 +64,7 @@ describe(TITLE, () => {
     })
 
     it("asks for no token in an image built without the check, and reads none", async () => {
-        const open = resolveConfig({auth: false, apps: {chrome: {}}})
+        const open = resolveConfig({auth: false, apps: {chrome: {}}}, "wayuse.config.ts")
         const lines: string[] = []
         const app = await createApp({
             config: open, stderr: {write: text => lines.push(text)}, auth: keyless, runtimeDir: "/run/test", exec: async () => {

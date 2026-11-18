@@ -9,7 +9,7 @@ const TITLE = "server/chrome/chrome-request.test.ts"
 const status = (code: number, message: RegExp) => (error: unknown): boolean => error instanceof HttpError && error.status === code && message.test(error.message)
 
 describe(TITLE, () => {
-    const config = resolveConfig({screen: {width: 1920, height: 1080}})
+    const config = resolveConfig({screen: {width: 1920, height: 1080}}, "wayuse.config.ts")
     const slots = ["HEADLESS-1", "HEADLESS-2"]
 
     it("fills in the first slot, the configured size and the default context", () => {
