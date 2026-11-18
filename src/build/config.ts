@@ -157,7 +157,7 @@ export const outputDirOf = (input: Input, given?: string): string => {
  * file is the file name of the configuration, given without its directory.
  */
 export const resolveConfig = (input: Input, file: string): Resolved => {
-    const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages", "auth", "console", "output"])
+    const config = recordOf(input ?? {}, "config", ["output", "node", "apps", "timezone", "screen", "packages", "auth", "console"])
     const node = recordOf(config.node, "config.node", ["version"])
     const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])

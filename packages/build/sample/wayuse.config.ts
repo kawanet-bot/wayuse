@@ -1,6 +1,9 @@
 import {defineConfig} from "@wayuse/build"
 
 export default defineConfig({
+    output: {
+        dir: "docker/my-wayuse",
+    },
     node: {
         version: "26.13.1",
     },
@@ -27,7 +30,4 @@ export default defineConfig({
         "fonts-morisawa-bizud-gothic",
         "fonts-morisawa-bizud-mincho",
     ],
-    output: {
-        dir: "docker/my-wayuse",
-    },
 })

@@ -64,6 +64,7 @@ Every item may be left out.
 
 | Item | Default | Meaning |
 |---|---|---|
+| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `docker/my-wayuse`. |
 | `node.version` | the Node.js that runs `@wayuse/build` | Node.js in the image. A full version: ranges are refused. |
 | `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
@@ -79,7 +80,6 @@ Every item may be left out.
 | `console.vars` | `icon` and `title` | What the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s pages show as their icon and title. A value is text, written into the HTML of the image. |
 | `console.terser` | `true` | Makes the console's scripts, and the packages they load, small with terser. `false` writes them as they are. |
 | `console.signIn` | none | Where the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s entry sends a visitor without a token, on the console's own origin. Without it, the entry asks for a token. |
-| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `docker/my-wayuse`. |
 
 ## COMMAND
 
