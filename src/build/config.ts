@@ -142,7 +142,7 @@ export const consoleTerserOf = (input: Input): boolean => {
 const optionalDir = (value: unknown, name: string): string | undefined => {
     if (value == null) return undefined
     if (value === "") throw new ConfigError(`${name} must not be empty`)
-    if (typeof value !== "string" || !OUTPUT_DIR.test(value)) throw new ConfigError(`${name} is not a valid directory`)
+    if (typeof value !== "string" || !OUTPUT_DIR.test(value)) throw new ConfigError(`${name} is not valid: ${JSON.stringify(value)}`)
     return value
 }
 
