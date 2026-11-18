@@ -121,6 +121,10 @@ describe(TITLE, () => {
     it("refuses to build where neither gives the build directory", () => {
         assert.throws(() => outputDirOf({}), /config\.output\.dir is not set, and --dir is not given/)
         assert.throws(() => outputDirOf({output: {}}), ConfigError)
+    })
+
+    it("refuses an empty build directory of the configuration, with one of the command line or without", () => {
+        assert.throws(() => outputDirOf({output: {dir: ""}}), /config\.output\.dir must not be empty/)
         assert.throws(() => outputDirOf({output: {dir: ""}}, "other"), /config\.output\.dir must not be empty/)
     })
 
