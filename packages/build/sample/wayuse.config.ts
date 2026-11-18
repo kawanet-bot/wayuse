@@ -27,4 +27,7 @@ export default defineConfig({
         "fonts-morisawa-bizud-gothic",
         "fonts-morisawa-bizud-mincho",
     ],
+    output: {
+        dir: "my-wayuse",
+    },
 })

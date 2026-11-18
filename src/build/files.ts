@@ -23,6 +23,12 @@ const consoleScripts = (): string => fileURLToPath(new URL("./console/", import.
 const HTDOCS = "rootfs/opt/wayuse/htdocs"
 const CONSOLE = `${HTDOCS}/console`
 
+// The directories of the image that are this package's alone. A build writes them anew.
+const OWNED = ["rootfs/opt/wayuse", "rootfs/etc/wayuse"]
+
+// Chrome reads every file beside it, so the file is in a directory that is not this package's alone.
+const POLICIES = "rootfs/etc/opt/chrome/policies/managed/wayuse.json"
+
 /**
  * The generated files by their path in the build directory. rootfs/ mirrors the image's file system.
  */
@@ -40,7 +46,7 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
     const {chrome, redir} = config.apps
     if (chrome) files["rootfs/etc/wayuse/chrome.env"] = shellEnvOf(chrome.env)
     // One file holds every policy. Chrome does not say which wins when two files name the same one.
-    if (chrome) files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"] = JSON.stringify(chrome.policies, null, 2) + "\n"
+    if (chrome) files[POLICIES] = JSON.stringify(chrome.policies, null, 2) + "\n"
     // One line per redir, for the start script to read: the port to listen on, then where it forwards to.
     if (redir) files["rootfs/etc/wayuse/redir.conf"] = Object.entries(redir.ports).map(([port, target]) => `${port} ${target}\n`).join("")
 
@@ -95,11 +101,12 @@ const writeConsole = async (outdir: string, options: BuildOptions): Promise<stri
 }
 
 /**
- * Writes the build directory anew and returns the paths of what it generated.
+ * Writes the build directory and returns the paths of what it generated.
+ * The directory may be one that has other files, which are neither removed nor read.
  */
 export const writeBuildDir = async (config: Resolved, outdir: string, options: BuildOptions = {}): Promise<string[]> => {
     // A file an earlier configuration generated must not linger and reach the image.
-    await rm(outdir, {recursive: true, force: true})
+    for (const dir of OWNED) await rm(join(outdir, dir), {recursive: true, force: true})
     await cp(assetsRoot(), outdir, {recursive: true})
 
     // An image without the console keeps the directory the server serves, with nothing of the console in it.
@@ -109,6 +116,8 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     }
 
     const files = generatedFilesOf(config, options)
+    if (files[POLICIES] == null) await rm(join(outdir, POLICIES), {force: true})
+
     for (const [path, content] of Object.entries(files)) {
         const file = join(outdir, path)
         await mkdir(dirname(file), {recursive: true})

@@ -20,6 +20,8 @@ export declare namespace WayuseBuild {
         auth?: false
         /** The console's pages. `false` leaves the console out of the image, which then has the API alone. */
         console?: ConsoleConfig | false
+        /** Where the build directory is written. */
+        output?: OutputConfig
     }
 
     interface NodeConfig {
@@ -60,6 +62,11 @@ export declare namespace WayuseBuild {
         vars?: Record<string, string>
         /** Whether the scripts of the pages, and the packages they load, are made small with terser. Default: true. */
         terser?: boolean
+    }
+
+    interface OutputConfig {
+        /** The build directory to write, from the current directory. `--dir` of the command comes ahead of it, and one of the two is required. */
+        dir?: string
     }
 
     interface CLIOptions {

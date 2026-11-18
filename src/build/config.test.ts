@@ -1,7 +1,7 @@
 import type {WayuseBuild} from "@wayuse/build"
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
-import {ConfigError, DEFAULT_POLICIES, consoleTerserOf, consoleVarsOf, resolveConfig} from "./config.ts"
+import {ConfigError, DEFAULT_POLICIES, consoleTerserOf, consoleVarsOf, outputDirOf, resolveConfig} from "./config.ts"
 
 const TITLE = "build/config.test.ts"
 
@@ -105,6 +105,30 @@ describe(TITLE, () => {
     })
 
     // Each case is a value that would otherwise reach a Dockerfile or a shell script.
+    it("takes the build directory from the configuration", () => {
+        assert.equal(outputDirOf({output: {dir: "my-wayuse"}}), "my-wayuse")
+    })
+
+    it("takes the build directory of the command line ahead of the configuration's", () => {
+        assert.equal(outputDirOf({output: {dir: "my-wayuse"}}, "other"), "other")
+        assert.equal(outputDirOf({}, "other"), "other")
+    })
+
+    it("refuses to build where neither gives the build directory", () => {
+        assert.throws(() => outputDirOf({}), /config\.output\.dir is not set, and --dir is not given/)
+        assert.throws(() => outputDirOf({output: {}}), ConfigError)
+        assert.throws(() => outputDirOf({output: {dir: ""}}), ConfigError)
+    })
+
+    it("refuses a build directory that is not a string, and an item of output it does not know", () => {
+        assert.throws(() => outputDirOf({output: {dir: 1}} as unknown as WayuseBuild.Config, "other"), ConfigError)
+        assert.throws(() => outputDirOf({output: {file: "my-wayuse"}} as unknown as WayuseBuild.Config, "other"), ConfigError)
+    })
+
+    it("keeps the build directory out of the resolved configuration", () => {
+        assert.deepEqual(resolveConfig({output: {dir: "my-wayuse"}}, "wayuse.config.ts"), resolveConfig({}, "wayuse.config.ts"))
+    })
+
     const refused: [string, unknown][] = [
         ["a misspelled key", {timezome: "Asia/Tokyo"}],
         ["a version range", {node: {version: "^24"}}],

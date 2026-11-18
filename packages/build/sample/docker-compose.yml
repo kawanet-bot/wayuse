@@ -9,7 +9,7 @@ volumes:
 services:
   wayuse:
     build:
-      context: "./.wayuse/"
+      context: "./my-wayuse/"
     # sway dies of a bus error on the 64MB Docker gives by default.
     shm_size: "256mb"
     extra_hosts:

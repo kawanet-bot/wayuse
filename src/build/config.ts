@@ -26,6 +26,9 @@ const ENV_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/
 const REDIR_TARGET = /^[A-Za-z0-9][A-Za-z0-9.-]*:\d+$/
 
 // The entry comes back from there by a path alone, so the address has no scheme and no host of its own.
+// A path of the host that builds. It reaches no Dockerfile and no script, so any that is not empty will do.
+const OUTPUT_DIR = /^[^\0]+$/
+
 const SIGN_IN = /^(?![A-Za-z][A-Za-z0-9+.-]*:|[\/\\]{2})\S+$/
 
 // sway refuses nothing here, so the bounds are those of the screens the server resizes to.
@@ -137,11 +140,24 @@ export const consoleTerserOf = (input: Input): boolean => {
 }
 
 /**
+ * Where the build directory is written: the one the command line gives, or else config.output.dir.
+ * It is a path of the host that builds, and the resolved configuration does not have it.
+ */
+export const outputDirOf = (input: Input, given?: string): string => {
+    const output = recordOf(isRecord(input) ? input.output : undefined, "config.output", ["dir"])
+    // Checked even where the command line gives the directory, so a mistake does not wait for the day it is used.
+    const set = stringOf(output.dir, "config.output.dir", OUTPUT_DIR, "")
+    const dir = given || set
+    if (!dir) throw new ConfigError("config.output.dir is not set, and --dir is not given")
+    return dir
+}
+
+/**
  * Fills in every default and refuses what the generated files could not carry.
  * file is the file name of the configuration, given without its directory.
  */
 export const resolveConfig = (input: Input, file: string): Resolved => {
-    const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages", "auth", "console"])
+    const config = recordOf(input ?? {}, "config", ["node", "apps", "timezone", "screen", "packages", "auth", "console", "output"])
     const node = recordOf(config.node, "config.node", ["version"])
     const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
     const screen = recordOf(config.screen, "config.screen", ["width", "height"])

@@ -1,16 +1,16 @@
 import type * as declared from "@wayuse/build"
-import {basename, resolve} from "node:path"
+import {basename, join, resolve} from "node:path"
 import {pathToFileURL} from "node:url"
 import {parseArgs} from "node:util"
 import {findConfigFile, isFile} from "./config-file.ts"
-import {ConfigError, consoleTerserOf, consoleVarsOf, resolveConfig} from "./config.ts"
+import {ConfigError, consoleTerserOf, consoleVarsOf, outputDirOf, resolveConfig} from "./config.ts"
 import {writeBuildDir} from "./files.ts"
 import {VERSION} from "./version.ts"
 
 const USAGE = `
 Usage: wayuse-build [options]
   -c, --config <file>      the configuration to read (default: wayuse.config.ts, .mjs or .js)
-  -o, --outdir <dir>       the build directory to write, emptied first (default: .wayuse)
+  -d, --dir <dir>          the build directory to write (default: output.dir of the configuration)
   --server-tarball <file>  a @wayuse/server tarball to install in place of the one on npm
   -v, --version            print this package's version
   -h, --help               print this usage
@@ -22,7 +22,7 @@ const readArgs = (args: string[]) => parseArgs({
     args,
     options: {
         config: {type: "string", short: "c"},
-        outdir: {type: "string", short: "o", default: ".wayuse"},
+        dir: {type: "string", short: "d"},
         "server-tarball": {type: "string"},
         version: {type: "boolean", short: "v"},
         help: {type: "boolean", short: "h"},
@@ -69,8 +69,9 @@ export const CLI: typeof declared.CLI = async ({args}) => {
         const input = await loadConfig(configFile) as declared.WayuseBuild.Config
         // The directory is left out, so the image tells nothing of where it was built.
         const config = resolveConfig(input, basename(configFile))
-        const files = await writeBuildDir(config, options.outdir, {serverTarball: options["server-tarball"], vars: consoleVarsOf(input), terser: consoleTerserOf(input)})
-        for (const file of files) process.stdout.write(`${options.outdir}/${file}\n`)
+        const dir = outputDirOf(input, options.dir)
+        const files = await writeBuildDir(config, dir, {serverTarball: options["server-tarball"], vars: consoleVarsOf(input), terser: consoleTerserOf(input)})
+        for (const file of files) process.stdout.write(`${join(dir, file)}\n`)
         return 0
     } catch (error) {
         if (!(error instanceof ConfigError)) throw error

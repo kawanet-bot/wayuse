@@ -37,8 +37,8 @@ It writes the build directory, and Docker builds the image from it:
 
 ```sh
 npm install -D wayuse @wayuse/build
-npx wayuse build
-docker build -t my-wayuse .wayuse
+npx wayuse build -d my-wayuse
+docker build -t my-wayuse my-wayuse
 docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -e WAYUSE_JWT_PUBLIC_KEY -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
 
@@ -56,7 +56,7 @@ npx wayuse build && docker compose up --build -d
 
 Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
 The private key is in `.env` too. Keep the file to its owner and out of version control.
-The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `.wayuse` beside its file.
+The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `my-wayuse` beside its file.
 
 ## CONFIGURATION
 
@@ -79,13 +79,14 @@ Every item may be left out.
 | `console.vars` | `icon` and `title` | What the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s pages show as their icon and title. A value is text, written into the HTML of the image. |
 | `console.terser` | `true` | Makes the console's scripts, and the packages they load, small with terser. `false` writes them as they are. |
 | `console.signIn` | none | Where the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md)'s entry sends a visitor without a token, on the console's own origin. Without it, the entry asks for a token. |
+| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `my-wayuse`. |
 
 ## COMMAND
 
 ```
 Usage: wayuse-build [options]
   -c, --config <file>      the configuration to read (default: wayuse.config.ts, .mjs or .js)
-  -o, --outdir <dir>       the build directory to write, emptied first (default: .wayuse)
+  -d, --dir <dir>          the build directory to write (default: output.dir of the configuration)
   --server-tarball <file>  a @wayuse/server tarball to install in place of the one on npm
   -v, --version            print this package's version
   -h, --help               print this usage
@@ -93,9 +94,11 @@ Usage: wayuse-build [options]
 
 Without `-c`, it reads the first of `wayuse.config.ts`, `wayuse.config.mjs` and `wayuse.config.js` in the current directory.
 Without any of them, it prints the usage.
+Without `-d`, it writes to `output.dir` of the configuration. With neither, it stops and writes nothing.
 `npx wayuse build` takes the same options and passes them on.
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
+A build writes `rootfs/opt/wayuse/` and `rootfs/etc/wayuse/` anew, and its other files over those of the build before.
 The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in it as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are. The server serves that `htdocs/` without a token.
 `@wayuse/build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
 noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
