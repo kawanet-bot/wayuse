@@ -35,7 +35,7 @@ const POLICIES = "rootfs/etc/opt/chrome/policies/managed/wayuse.json"
 export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): Record<string, string> => {
     const files: Record<string, string> = {
         "Dockerfile": dockerfileOf(config, options),
-        "rootfs/etc/wayuse/wayuse.json": JSON.stringify(config, null, 2) + "\n",
+        "rootfs/etc/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
         "rootfs/etc/wayuse/sway/config": swayConfigOf(config),
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
     }

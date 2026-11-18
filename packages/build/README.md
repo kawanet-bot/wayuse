@@ -103,7 +103,7 @@ The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in
 `@wayuse/build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
 noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
 It bundles [html-ele](https://github.com/kawanet/html-ele) beside it the same way, as `console/vendor/html-ele.js`, for the console's pages to build their elements with.
-The resolved configuration is baked in as `/etc/wayuse/wayuse.json`.
+The resolved configuration is baked in as `/etc/wayuse/wayuse.config.json`.
 
 ## CONTAINER
 

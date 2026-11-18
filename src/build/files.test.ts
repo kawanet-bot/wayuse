@@ -34,7 +34,7 @@ describe(TITLE, () => {
         assert.match(files["rootfs/etc/wayuse/sway/config"]!, /^output \* resolution 1920x1080$/m)
         assert.equal(files["rootfs/etc/wayuse/chrome.env"], "LANGUAGE='ja'\n")
         assert.deepEqual(JSON.parse(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"]!), {AutoplayAllowlist: ["https://www.youtube.com"]})
-        assert.deepEqual(JSON.parse(files["rootfs/etc/wayuse/wayuse.json"]!), config)
+        assert.deepEqual(JSON.parse(files["rootfs/etc/wayuse/wayuse.config.json"]!), config)
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/htdocs/console/config.json"]!), {signIn: "/sign-in/?next="})
     })
 
@@ -203,7 +203,7 @@ describe(TITLE, () => {
         try {
             await writeBuildDir(bare, join(outdir, "docker/my-wayuse"))
             await stat(join(outdir, "docker/my-wayuse/Dockerfile"))
-            await stat(join(outdir, "docker/my-wayuse/rootfs/etc/wayuse/wayuse.json"))
+            await stat(join(outdir, "docker/my-wayuse/rootfs/etc/wayuse/wayuse.config.json"))
         } finally {
             await rm(outdir, {recursive: true, force: true})
         }
