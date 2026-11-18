@@ -139,6 +139,13 @@ export const consoleTerserOf = (input: Input): boolean => {
     return given ?? true
 }
 
+const optionalDir = (value: unknown, name: string): string | undefined => {
+    if (value == null) return undefined
+    if (value === "") throw new ConfigError(`${name} must not be empty`)
+    if (typeof value !== "string" || !OUTPUT_DIR.test(value)) throw new ConfigError(`${name} is not a valid directory`)
+    return value
+}
+
 /**
  * Where the build directory is written: the one the command line gives, or else config.output.dir.
  * It is a path of the host that builds, and the resolved configuration does not have it.
@@ -146,8 +153,8 @@ export const consoleTerserOf = (input: Input): boolean => {
 export const outputDirOf = (input: Input, given?: string): string => {
     const output = recordOf(isRecord(input) ? input.output : undefined, "config.output", ["dir"])
     // Checked even where the command line gives the directory, so a mistake does not wait for the day it is used.
-    const set = stringOf(output.dir, "config.output.dir", OUTPUT_DIR, "")
-    const dir = given ?? set
+    const set = optionalDir(output.dir, "config.output.dir")
+    const dir = optionalDir(given, "--dir") ?? set
     if (!dir) throw new ConfigError("config.output.dir is not set, and --dir is not given")
     return dir
 }

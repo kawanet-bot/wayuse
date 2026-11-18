@@ -18,23 +18,16 @@ Usage: wayuse-build [options]
 
 const EXIT_USAGE = 2
 
-const readArgs = (args: string[]) => {
-    const {values} = parseArgs({
-        args,
-        options: {
-            config: {type: "string", short: "c"},
-            dir: {type: "string", short: "d"},
-            "server-tarball": {type: "string"},
-            version: {type: "boolean", short: "v"},
-            help: {type: "boolean", short: "h"},
-        },
-    })
-
-    // An empty value is a variable that a script did not set. Taken for no option, it would write to another directory.
-    if (values.dir === "") throw new Error("--dir takes a directory")
-
-    return values
-}
+const readArgs = (args: string[]) => parseArgs({
+    args,
+    options: {
+        config: {type: "string", short: "c"},
+        dir: {type: "string", short: "d"},
+        "server-tarball": {type: "string"},
+        version: {type: "boolean", short: "v"},
+        help: {type: "boolean", short: "h"},
+    },
+}).values
 
 // Node strips the types of a .ts file outside node_modules, so the file is imported as it is.
 const loadConfig = async (file: string): Promise<unknown> => {
