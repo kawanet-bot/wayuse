@@ -21,11 +21,11 @@
 .opencode
 .pnpm-debug.log*
 .vscode
-.wayuse
 CLAUDE.local.md
 browser/tests
 builder/tests
 dist
+docker/my-wayuse
 node_modules
 nohup.out
 npm-debug.log*

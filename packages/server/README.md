@@ -123,7 +123,7 @@ This package is under the MIT license, but for what it carries of others:
 ```
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: 9580)
-  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)
+  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.config.json)
   --htdocs <dir>       the files a browser loads without a token (default: /opt/wayuse/htdocs)
   -v, --version        print this package's version
   -h, --help           print this usage

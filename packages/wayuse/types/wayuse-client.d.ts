@@ -4,7 +4,7 @@ export {} // external module indicator
 
 export declare namespace WayuseClient {
 
-    /** What the image was defined to hold, with every default filled in. Baked in as /etc/wayuse/wayuse.json. */
+    /** What the image was defined to hold, with every default filled in. Baked in as /etc/wayuse/wayuse.config.json. */
     interface Config {
         /** The @wayuse/build that filled in the defaults, and the file name of the configuration it read. */
         wayuse: {build: {version: string, config: string}}

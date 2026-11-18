@@ -20,7 +20,7 @@ export const DEFAULT_HTDOCS = "/opt/wayuse/htdocs"
 const USAGE = `
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: ${DEFAULT_PORT})
-  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.json)
+  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.config.json)
   --htdocs <dir>       the files a browser loads without a token (default: ${DEFAULT_HTDOCS})
   -v, --version        print this package's version
   -h, --help           print this usage
@@ -53,7 +53,7 @@ const readArgs = (args: string[]) => {
         args,
         options: {
             port: {type: "string", short: "p", default: String(DEFAULT_PORT)},
-            config: {type: "string", short: "c", default: "/etc/wayuse/wayuse.json"},
+            config: {type: "string", short: "c", default: "/etc/wayuse/wayuse.config.json"},
             htdocs: {type: "string", default: DEFAULT_HTDOCS},
             version: {type: "boolean", short: "v"},
             help: {type: "boolean", short: "h"},

@@ -1,6 +1,9 @@
 import {defineConfig} from "@wayuse/build"
 
 export default defineConfig({
+    output: {
+        dir: "docker/my-wayuse",
+    },
     node: {
         version: "26.13.1",
     },
