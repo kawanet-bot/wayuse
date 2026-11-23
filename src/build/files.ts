@@ -1,6 +1,6 @@
 import {EN} from "html-ele"
 import {copyFile, cp, mkdir, readFile, readdir, rm, writeFile} from "node:fs/promises"
-import {dirname, join} from "node:path"
+import {dirname, join, relative} from "node:path"
 import {fileURLToPath} from "node:url"
 import {minify} from "terser"
 import type {WayuseClient} from "wayuse"
@@ -107,14 +107,20 @@ const writeConsole = async (outdir: string, options: BuildOptions): Promise<stri
     return paths
 }
 
+// Every file under the directory, by its path from there.
+const filesUnder = async (dir: string): Promise<string[]> =>
+    (await readdir(dir, {recursive: true, withFileTypes: true})).filter(entry => entry.isFile()).map(entry => relative(dir, join(entry.parentPath, entry.name)))
+
 /**
- * Writes the build directory and returns the paths of what it generated.
+ * Writes the build directory and returns the paths of the files it wrote.
  * The directory may be one that has other files, which are neither removed nor read.
  */
 export const writeBuildDir = async (config: Resolved, outdir: string, options: BuildOptions = {}): Promise<string[]> => {
     // A file an earlier configuration generated must not linger and reach the image.
     await rm(join(outdir, OWNED), {recursive: true, force: true})
     await cp(assetsRoot(), outdir, {recursive: true})
+    // Listed with the generated files, as the next build writes over these too.
+    const copied = await filesUnder(assetsRoot())
 
     // An image without the console keeps the directory the server serves, with nothing of the console in it.
     if (!config.console) {
@@ -130,7 +136,7 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
         await writeFile(file, content, path.startsWith(`${BIN}/`) ? {mode: 0o755} : {})
     }
 
-    const paths = Object.keys(files)
+    const paths = [...copied.filter(path => config.console || !path.startsWith(`${HTDOCS}/`)), ...Object.keys(files)]
     if (config.console) paths.push(...await writeConsole(outdir, options))
 
     if (options.serverTarball != null) {
@@ -139,5 +145,5 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
         paths.push(path)
     }
 
-    return paths
+    return [...new Set(paths)].sort()
 }

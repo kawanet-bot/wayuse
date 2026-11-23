@@ -98,6 +98,7 @@ Usage: wayuse-build [options]
 Without `-c`, it reads the first of `wayuse.config.ts`, `wayuse.config.mjs` and `wayuse.config.js` in the current directory.
 Without any of them, it prints the usage.
 Without `-d`, it writes to `output.dir` of the configuration. With neither, it stops and writes nothing.
+It prints the path of every file it writes.
 `npx wayuse build` takes the same options and passes them on.
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.

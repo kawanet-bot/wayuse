@@ -208,6 +208,24 @@ describe(TITLE, () => {
         }
     })
 
+    it("lists every file it writes, those copied from assets/ among them", async () => {
+        const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
+        try {
+            const paths = await writeBuildDir(config, outdir)
+            assert.ok(paths.includes("rootfs/etc/xdg/gtk-3.0/settings.ini"))
+            assert.ok(paths.includes("rootfs/opt/wayuse/bin/supervise.sh"))
+            assert.ok(paths.includes("rootfs/opt/wayuse/htdocs/console/index.html"))
+            assert.ok(paths.includes("rootfs/opt/wayuse/bin/chrome-start.sh"))
+            assert.ok(paths.includes("rootfs/opt/wayuse/htdocs/console/js/login.js"))
+
+            // Each once, and each there.
+            assert.equal(new Set(paths).size, paths.length)
+            for (const path of paths) await stat(join(outdir, path))
+        } finally {
+            await rm(outdir, {recursive: true, force: true})
+        }
+    })
+
     it("writes the build directory, the scripts executable", async () => {
         const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
         try {
