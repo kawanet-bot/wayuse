@@ -8,7 +8,7 @@ SHELL := bash
 BUILD_SRC := $(shell find ../src/build -name '*.ts' -not -name '*.test.ts')
 SERVER_SRC := $(shell find ../src/server -name '*.ts' -not -name '*.test.ts')
 CLIENT_SRC := $(shell find ../src/client -name '*.ts' -not -name '*.test.ts')
-SHARED_SRC := $(shell find ../src/jwt ../src/api -name '*.ts' -not -name '*.test.ts')
+SHARED_SRC := $(shell find ../src/jwt ../src/api ../src/screen -name '*.ts' -not -name '*.test.ts')
 CONSOLE_SRC := $(shell find ../src/console -name '*.ts' -not -name '*.test.ts')
 TYPES := $(wildcard ../packages/*/types/*.d.ts)
 ROLLUP_SRC := $(wildcard ./*.ts)
@@ -48,7 +48,7 @@ is-not-buildable:
 	@ [ "$(BUILDABLE)" != "YES" ] || [ ! -f ../node_modules/.bin/rollup ]
 
 # The package name resolves to this file, for bin/wayuse-build.js and for a wayuse.config.ts alike.
-$(BUILD_DST): $(BUILD_CONFIG) $(BUILD_SRC) $(ROLLUP_SRC) ../packages/build/package.json
+$(BUILD_DST): $(BUILD_CONFIG) $(BUILD_SRC) $(SHARED_SRC) $(ROLLUP_SRC) ../packages/build/package.json
 	@mkdir -p $(dir $@)
 	../node_modules/.bin/rollup -c $<
 	@ls -l $@

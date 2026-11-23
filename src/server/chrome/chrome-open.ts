@@ -1,4 +1,5 @@
 import {randomUUID} from "node:crypto"
+import {CASCADE_COUNT, CASCADE_STEP} from "../../screen/cascade.ts"
 import type {ServerDeps} from "../deps.ts"
 import {clearSlot, getSlot} from "../slot/slot.ts"
 import {getSwayWindows, swayCommand} from "../sway/swaymsg.ts"
@@ -10,10 +11,6 @@ import {chromeWindowMark} from "./chrome-tab.ts"
 
 /** "replace" closes what is on the slot and fills it. "add" puts one more window over what is there. */
 export type OpenMode = "replace" | "add"
-
-// Added windows keep their size and step down to the right, and return to the corner before a shadow reaches the next output.
-const CASCADE_STEP = 44
-const CASCADE_COUNT = 10
 
 /** Where the next window goes on a slot that already has `count` of them. */
 export const cascadeOffset = (count: number): number => count % CASCADE_COUNT * CASCADE_STEP

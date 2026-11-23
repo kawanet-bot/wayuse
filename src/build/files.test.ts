@@ -32,6 +32,7 @@ describe(TITLE, () => {
         assert.match(dockerfile, /\n {8}fonts-noto-cjk\n/)
         assert.match(dockerfile, /chrome-start\.sh","\/opt\/wayuse\/bin\/server-start\.sh"\]\n$/)
         assert.match(files["rootfs/etc/wayuse/sway/config"]!, /^output \* resolution 1920x1080$/m)
+        assert.match(files["rootfs/etc/wayuse/sway/config"]!, /^output HEADLESS-2 position 2432 0$/m)
         assert.equal(files["rootfs/etc/wayuse/chrome.env"], "LANGUAGE='ja'\n")
         assert.deepEqual(JSON.parse(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"]!), {AutoplayAllowlist: ["https://www.youtube.com"]})
         assert.deepEqual(JSON.parse(files["rootfs/etc/wayuse/wayuse.config.json"]!), config)
@@ -45,6 +46,12 @@ describe(TITLE, () => {
         assert.equal(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"], undefined)
         assert.equal(files["rootfs/opt/wayuse/htdocs/console/config.json"], "{}\n")
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"@wayuse/server": "^0.0.0"})
+    })
+
+    it("spaces the outputs apart for the widest screen", () => {
+        const sway = generatedFilesOf(resolveConfig({screen: {maxWidth: 2560}}, "wayuse.config.ts"))["rootfs/etc/wayuse/sway/config"]!
+        assert.match(sway, /^output HEADLESS-2 position 3072 0$/m)
+        assert.match(sway, /^output HEADLESS-8 position 21504 0$/m)
     })
 
     it("names the configuration to edit in the headers", () => {

@@ -16,7 +16,7 @@ describe(TITLE, () => {
         assert.deepEqual(outputs.map(output => output.name), ["HEADLESS-2", "HEADLESS-1"])
         assert.deepEqual(outputsOf(outputs), [
             {name: "HEADLESS-1", active: true, rect: {x: 0, y: 0, width: 1280, height: 960}, current_workspace: "2"},
-            {name: "HEADLESS-2", active: true, rect: {x: 3000, y: 0, width: 1280, height: 960}, current_workspace: "1"},
+            {name: "HEADLESS-2", active: true, rect: {x: 2432, y: 0, width: 1280, height: 960}, current_workspace: "1"},
         ])
     })
 
@@ -32,7 +32,7 @@ describe(TITLE, () => {
         assert.equal(rest.length, 0)
         assert.equal(chrome!.app_id, "google-chrome")
         assert.equal(chrome!.name, "Example Domain - Google Chrome")
-        assert.deepEqual(chrome!.rect, {x: 3131, y: 31, width: 1018, height: 898})
+        assert.deepEqual(chrome!.rect, {x: 2563, y: 31, width: 1018, height: 898})
         assert.deepEqual(Object.keys(chrome!).sort(), ["app_id", "focused", "id", "marks", "name", "pid", "rect"])
     })
 

@@ -141,7 +141,7 @@
       "border": "none",
       "current_border_width": 0,
       "rect": {
-        "x": 3000,
+        "x": 2432,
         "y": 0,
         "width": 1280,
         "height": 960
@@ -179,7 +179,7 @@
           "border": "none",
           "current_border_width": 0,
           "rect": {
-            "x": 3000,
+            "x": 2432,
             "y": 0,
             "width": 1280,
             "height": 960
@@ -218,7 +218,7 @@
               "border": "csd",
               "current_border_width": 2,
               "rect": {
-                "x": 3131,
+                "x": 2563,
                 "y": 31,
                 "width": 1018,
                 "height": 898
