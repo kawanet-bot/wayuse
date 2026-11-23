@@ -200,9 +200,9 @@ describe(TITLE, () => {
         const bare = resolveConfig({console: false}, "wayuse.config.ts")
         const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
         try {
-            await writeBuildDir(bare, join(outdir, "docker/my-wayuse"))
-            await stat(join(outdir, "docker/my-wayuse/Dockerfile"))
-            await stat(join(outdir, "docker/my-wayuse/rootfs/opt/wayuse/wayuse.config.json"))
+            await writeBuildDir(bare, join(outdir, "docker/wayuse"))
+            await stat(join(outdir, "docker/wayuse/Dockerfile"))
+            await stat(join(outdir, "docker/wayuse/rootfs/opt/wayuse/wayuse.config.json"))
         } finally {
             await rm(outdir, {recursive: true, force: true})
         }

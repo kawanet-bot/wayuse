@@ -37,8 +37,8 @@ It writes the build directory, and Docker builds the image from it:
 
 ```sh
 npm install -D wayuse @wayuse/build
-npx wayuse build -d docker/my-wayuse
-docker build -t my-wayuse docker/my-wayuse
+npx wayuse build -d docker/wayuse
+docker build -t my-wayuse docker/wayuse
 docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_SCREEN_OUTPUTS=2 -e WAYUSE_JWT_PUBLIC_KEY -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
 
@@ -56,7 +56,7 @@ npx wayuse build && docker compose up --build -d
 
 Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
 The private key is in `.env` too. Keep the file to its owner and out of version control.
-The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `docker/my-wayuse` beside its file.
+The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `docker/wayuse` beside its file.
 
 ## CONFIGURATION
 
@@ -64,7 +64,7 @@ Every item may be left out.
 
 | Item | Default | Meaning |
 |---|---|---|
-| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `docker/my-wayuse`. |
+| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `docker/wayuse`. |
 | `node.version` | the Node.js that runs `@wayuse/build` | Node.js in the image. A full version: ranges are refused. |
 | `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |

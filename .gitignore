@@ -25,7 +25,7 @@ CLAUDE.local.md
 browser/tests
 builder/tests
 dist
-docker/my-wayuse
+docker/wayuse
 node_modules
 nohup.out
 npm-debug.log*
