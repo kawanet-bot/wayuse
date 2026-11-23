@@ -99,6 +99,7 @@ Without `-d`, it writes to `output.dir` of the configuration. With neither, it s
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
 A build writes `rootfs/opt/wayuse/` and `rootfs/etc/wayuse/` anew, and its other files over those of the build before.
+Outside those two, a file stays when the option that wrote it is removed. Remove it by hand.
 The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in it as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are. The server serves that `htdocs/` without a token.
 `@wayuse/build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
 noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.

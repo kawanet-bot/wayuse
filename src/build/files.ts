@@ -116,7 +116,6 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     }
 
     const files = generatedFilesOf(config, options)
-    if (files[POLICIES] == null) await rm(join(outdir, POLICIES), {force: true})
 
     for (const [path, content] of Object.entries(files)) {
         const file = join(outdir, path)

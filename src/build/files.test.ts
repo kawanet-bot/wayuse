@@ -175,28 +175,6 @@ describe(TITLE, () => {
         }
     })
 
-    it("leaves no file of an application that the next configuration does not have", async () => {
-        const apps = resolveConfig({apps: {chrome: {}, redir: {ports: {9223: "127.0.0.1:9222"}}}, console: false}, "wayuse.config.ts")
-        const bare = resolveConfig({console: false}, "wayuse.config.ts")
-        const managed = "rootfs/etc/opt/chrome/policies/managed"
-        const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
-        try {
-            await writeBuildDir(apps, outdir)
-            await stat(join(outdir, "rootfs/etc/wayuse/chrome.env"))
-            await stat(join(outdir, "rootfs/etc/wayuse/redir.conf"))
-            await stat(join(outdir, managed, "wayuse.json"))
-            await writeFile(join(outdir, managed, "other.json"), "{}\n")
-
-            await writeBuildDir(bare, outdir)
-            await assert.rejects(stat(join(outdir, "rootfs/etc/wayuse/chrome.env")))
-            await assert.rejects(stat(join(outdir, "rootfs/etc/wayuse/redir.conf")))
-            await assert.rejects(stat(join(outdir, managed, "wayuse.json")))
-            await stat(join(outdir, managed, "other.json"))
-        } finally {
-            await rm(outdir, {recursive: true, force: true})
-        }
-    })
-
     it("writes into a directory whose parent is not there yet", async () => {
         const bare = resolveConfig({console: false}, "wayuse.config.ts")
         const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
