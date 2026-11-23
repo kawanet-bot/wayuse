@@ -14,7 +14,7 @@ export declare namespace WayuseBuild {
         apps?: AppsConfig
         /** IANA time zone of the whole container, such as "Asia/Tokyo". Default: "Etc/UTC". */
         timezone?: string
-        /** The size a screen has until a client resizes it. */
+        /** The size a screen has until a client resizes it, and the bounds of a resize. */
         screen?: ScreenConfig
         /** Additional apt packages, fonts among them. */
         packages?: string[]
@@ -58,6 +58,14 @@ export declare namespace WayuseBuild {
         width?: number
         /** Default: 960. */
         height?: number
+        /** The smallest size a client may resize a screen to. Default: 768. */
+        minWidth?: number
+        /** Default: 768. */
+        minHeight?: number
+        /** The largest size a client may resize a screen to. A larger screen takes more of /dev/shm. Default: 1920. */
+        maxWidth?: number
+        /** Default: 1920. */
+        maxHeight?: number
     }
 
     interface ConsoleConfig {

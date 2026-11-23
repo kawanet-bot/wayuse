@@ -22,6 +22,10 @@ export default defineConfig({
     screen: {
         width: 1280,
         height: 960,
+        minWidth: 768,
+        minHeight: 768,
+        maxWidth: 1920,
+        maxHeight: 1920,
     },
     packages: [
         "fonts-noto-cjk",

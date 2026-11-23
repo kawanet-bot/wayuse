@@ -74,6 +74,8 @@ Every item may be left out.
 | `apps.redir.ports` | required | The ports to listen on, from 1024 up, each with where it forwards to. `{9223: "127.0.0.1:9222"}` forwards port 9223 to Chrome DevTools Protocol. |
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |
 | `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
+| `screen.minWidth`, `screen.minHeight` | `768`, `768` | The smallest size a client may resize a screen to. |
+| `screen.maxWidth`, `screen.maxHeight` | `1920`, `1920` | The largest size a client may resize a screen to. A larger screen needs more `--shm-size`. |
 | `packages` | `[]` | Additional apt packages, fonts among them. |
 | `auth` | tokens are checked | `false` builds an image whose server asks for no token. Every API is then open to whoever reaches its port, so publish the port to no one else. Given a key, its server answers every request with `503`. |
 | `console` | in the image | `false` leaves the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) out of the image. Nothing of it is built or copied, and the image has the API alone. |

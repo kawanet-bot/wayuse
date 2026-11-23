@@ -12,8 +12,8 @@ export declare namespace WayuseClient {
         /** The installed applications. A key is present only for an installed one. */
         apps: {chrome?: ChromeConfig, redir?: RedirConfig}
         timezone: string
-        /** The size a screen has until a client resizes it. */
-        screen: {width: number, height: number}
+        /** The size a screen has until a client resizes it, and the bounds of a resize. */
+        screen: {width: number, height: number, minWidth: number, minHeight: number, maxWidth: number, maxHeight: number}
         packages: string[]
         /** Whether the server asks for a token. Only false opens every API. */
         auth: boolean
@@ -144,7 +144,7 @@ export declare namespace WayuseClient {
         url: string
         /** Default: the first slot. */
         slot?: string
-        /** 768 to 2560, given together with height. Default: the size in the image's configuration. */
+        /** Within the image's screen bounds, given together with height. Default: the size in the image's configuration. */
         width?: number
         height?: number
         /** "temporary" shares no login and no cookie with any other window. Default: "default". */
