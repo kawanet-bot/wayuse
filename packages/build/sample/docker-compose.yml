@@ -1,7 +1,5 @@
 # To start with this file, see https://github.com/kawanet/wayuse/tree/main/packages/build#readme
 
-name: wayuse-sample
-
 volumes:
   # Chrome's profile outlives the image.
   config-volume:
