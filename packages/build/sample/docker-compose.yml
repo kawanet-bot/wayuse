@@ -1,7 +1,5 @@
 # To start with this file, see https://github.com/kawanet/wayuse/tree/main/packages/build#readme
 
-name: wayuse-sample
-
 volumes:
   # Chrome's profile outlives the image.
   config-volume:
@@ -9,7 +7,7 @@ volumes:
 services:
   wayuse:
     build:
-      context: "./docker/my-wayuse/"
+      context: "./docker/wayuse/"
     # sway dies of a bus error on the 64MB Docker gives by default.
     shm_size: "256mb"
     extra_hosts:
@@ -19,7 +17,7 @@ services:
       # Reached from this host alone, unless .env says otherwise: WAYUSE_PUBLISH=0.0.0.0:9580
       - "${WAYUSE_PUBLISH:-127.0.0.1:9580}:9580"
     environment:
-      WAYUSE_OUTPUTS: "2"
+      WAYUSE_SCREEN_OUTPUTS: "2"
       WAYUSE_JWT_PUBLIC_KEY: "${WAYUSE_JWT_PUBLIC_KEY:-}"
     volumes:
       - "config-volume:/home/wayuse/.config"

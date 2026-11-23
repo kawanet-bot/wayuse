@@ -2,7 +2,7 @@ import {defineConfig} from "@wayuse/build"
 
 export default defineConfig({
     output: {
-        dir: "docker/my-wayuse",
+        dir: "docker/wayuse",
     },
     node: {
         version: "26.13.1",
@@ -20,8 +20,13 @@ export default defineConfig({
     },
     timezone: "Asia/Tokyo",
     screen: {
+        outputs: 1,
         width: 1280,
         height: 960,
+        minWidth: 768,
+        minHeight: 768,
+        maxWidth: 1920,
+        maxHeight: 1920,
     },
     packages: [
         "fonts-noto-cjk",

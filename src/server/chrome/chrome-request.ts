@@ -10,10 +10,6 @@ export type OpenRequest = Required<WayuseClient.ChromeOpenRequest>
 const PROTOCOLS = ["http:", "https:", "about:"]
 const CONTEXTS = ["default", "temporary"]
 
-// The outputs sit 3000 apart, so one up to 2560 wide never reaches the next. 768 is the width of the smallest tablet.
-const MIN_SIZE = 768
-const MAX_SIZE = 2560
-
 const TARGET_ID = /^[0-9A-F]{32}$/
 
 /** A tab's id is CDP's targetId, and nothing of another shape is sent to Chrome. */
@@ -22,9 +18,10 @@ export const checkTabId = (id: string): string => {
     return id
 }
 
-const checkSize = (name: string, value: unknown): number => {
-    if (!Number.isInteger(value) || (value as number) < MIN_SIZE || (value as number) > MAX_SIZE) {
-        throw new HttpError(400, `Invalid ${name}: ${JSON.stringify(value)} (${MIN_SIZE} to ${MAX_SIZE})`)
+// The bounds are the image's. Its outputs are spaced so that a window up to the largest would not reach the next.
+const checkSize = (name: string, value: unknown, min: number, max: number): number => {
+    if (!Number.isInteger(value) || (value as number) < min || (value as number) > max) {
+        throw new HttpError(400, `Invalid ${name}: ${JSON.stringify(value)} (${min} to ${max})`)
     }
     return value as number
 }
@@ -46,11 +43,12 @@ export const resolveOpenRequest = (body: unknown, config: Config, slotIds: strin
     if (first == null) throw new HttpError(503, "sway has no output")
     if (slot != null && typeof slot !== "string") throw new HttpError(400, `Invalid slot: ${JSON.stringify(slot)}`)
 
+    const {screen} = config
     return {
         url,
         slot: slot ?? first,
-        width: width == null ? config.screen.width : checkSize("width", width),
-        height: height == null ? config.screen.height : checkSize("height", height),
+        width: width == null ? screen.width : checkSize("width", width, screen.minWidth, screen.maxWidth),
+        height: height == null ? screen.height : checkSize("height", height, screen.minHeight, screen.maxHeight),
         context: context as OpenRequest["context"],
     }
 }

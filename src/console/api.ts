@@ -125,8 +125,16 @@ const init = async (): Promise<void> => {
     const config = await client.getConfig()
     hasChrome = !!config.apps.chrome
     endpoints = ENDPOINTS.filter(endpoint => !endpoint.app || config.apps[endpoint.app])
-    control("width").setAttribute("placeholder", String(config.screen.width))
-    control("height").setAttribute("placeholder", String(config.screen.height))
+    // The server refuses a size outside the image's bounds.
+    const {screen} = config
+    control("width").setAttribute("placeholder", String(screen.width))
+    control("width").setAttribute("min", String(screen.minWidth))
+    control("width").setAttribute("max", String(screen.maxWidth))
+    control("height").setAttribute("placeholder", String(screen.height))
+    control("height").setAttribute("min", String(screen.minHeight))
+    control("height").setAttribute("max", String(screen.maxHeight))
+    $("width-hint").textContent = `(${screen.minWidth} to ${screen.maxWidth}, with height. Empty for the configured size)`
+    $("height-hint").textContent = `(${screen.minHeight} to ${screen.maxHeight})`
 
     control("endpoint").append(HTML`${endpointGroupsOf(endpoints, BASE)}`)
 

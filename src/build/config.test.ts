@@ -12,7 +12,7 @@ describe(TITLE, () => {
         assert.equal(config.node.version, process.versions.node)
         assert.deepEqual(config.apps, {})
         assert.equal(config.timezone, "Etc/UTC")
-        assert.deepEqual(config.screen, {width: 1280, height: 960})
+        assert.deepEqual(config.screen, {outputs: 1, width: 1280, height: 960, minWidth: 768, minHeight: 768, maxWidth: 1920, maxHeight: 1920})
         assert.deepEqual(config.packages, [])
         assert.equal(config.auth, true)
         assert.deepEqual(config.console, {})
@@ -37,7 +37,7 @@ describe(TITLE, () => {
             node: {version: "24.11.1"},
             apps: {chrome: {channel: "beta", env: {LANGUAGE: "ja"}, policies: {AutoplayAllowlist: ["https://www.youtube.com"]}}},
             timezone: "Asia/Tokyo",
-            screen: {width: 1920, height: 1080},
+            screen: {outputs: 3, width: 1600, height: 900, minWidth: 800, minHeight: 600, maxWidth: 2048, maxHeight: 1536},
             packages: ["fonts-noto-cjk"],
             console: {signIn: "../../sign-in/?next=", vars: {title: "my-wayuse"}},
         }, "wayuse.config.ts")
@@ -45,7 +45,7 @@ describe(TITLE, () => {
         // The policies given are all there is: the defaults are not kept beside them.
         assert.deepEqual(config.apps.chrome, {channel: "beta", env: {LANGUAGE: "ja"}, policies: {AutoplayAllowlist: ["https://www.youtube.com"]}})
         assert.equal(config.timezone, "Asia/Tokyo")
-        assert.deepEqual(config.screen, {width: 1920, height: 1080})
+        assert.deepEqual(config.screen, {outputs: 3, width: 1600, height: 900, minWidth: 800, minHeight: 600, maxWidth: 2048, maxHeight: 1536})
         assert.deepEqual(config.packages, ["fonts-noto-cjk"])
         // The values of vars go into the pages alone. The server would show this object to a client.
         assert.deepEqual(config.console, {signIn: "../../sign-in/?next="})
@@ -169,7 +169,17 @@ describe(TITLE, () => {
         ["a sign-in address with a space", {console: {signIn: "/sign in/?next="}}],
         ["a sign-in address that is not a string", {console: {signIn: true}}],
         ["a screen with a fraction", {screen: {width: 1280.5}}],
+        ["a Chrome variable that the container sets itself", {apps: {chrome: {env: {PATH: "/usr/bin"}}}}],
+        ["a Chrome variable of the image's sway", {apps: {chrome: {env: {WAYLAND_DISPLAY: "wayland-0"}}}}],
+        ["a Chrome variable that its start script sets", {apps: {chrome: {env: {DBUS_SESSION_BUS_ADDRESS: "unix:path=/tmp/bus"}}}}],
         ["a screen too large", {screen: {height: 100000}}],
+        ["no screen", {screen: {outputs: 0}}],
+        ["more screens than sway is placed for", {screen: {outputs: 9}}],
+        ["a screen wider than its bound", {screen: {width: 1300, maxWidth: 1280}}],
+        ["a bound that leaves the default size out", {screen: {maxWidth: 1024}}],
+        ["a lower bound above the upper one", {screen: {width: 1280, minWidth: 1300, maxWidth: 1280}}],
+        ["a lower bound of zero", {screen: {minHeight: 0}}],
+        ["a bound with a fraction", {screen: {maxHeight: 1920.5}}],
     ]
 
     for (const [name, input] of refused) {

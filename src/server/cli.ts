@@ -17,10 +17,13 @@ export const DEFAULT_PORT = 9580
 // Where @wayuse/build puts the console in the image.
 export const DEFAULT_HTDOCS = "/opt/wayuse/htdocs"
 
+// Where @wayuse/build puts the resolved configuration in the image, outside what the server serves without a token.
+export const DEFAULT_CONFIG = "/opt/wayuse/wayuse.config.json"
+
 const USAGE = `
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: ${DEFAULT_PORT})
-  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.config.json)
+  -c, --config <file>  the resolved configuration (default: ${DEFAULT_CONFIG})
   --htdocs <dir>       the files a browser loads without a token (default: ${DEFAULT_HTDOCS})
   -v, --version        print this package's version
   -h, --help           print this usage
@@ -53,7 +56,7 @@ const readArgs = (args: string[]) => {
         args,
         options: {
             port: {type: "string", short: "p", default: String(DEFAULT_PORT)},
-            config: {type: "string", short: "c", default: "/etc/wayuse/wayuse.config.json"},
+            config: {type: "string", short: "c", default: DEFAULT_CONFIG},
             htdocs: {type: "string", default: DEFAULT_HTDOCS},
             version: {type: "boolean", short: "v"},
             help: {type: "boolean", short: "h"},

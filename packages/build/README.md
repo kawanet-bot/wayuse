@@ -37,9 +37,9 @@ It writes the build directory, and Docker builds the image from it:
 
 ```sh
 npm install -D wayuse @wayuse/build
-npx wayuse build -d docker/my-wayuse
-docker build -t my-wayuse docker/my-wayuse
-docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -e WAYUSE_JWT_PUBLIC_KEY -v my-wayuse-config:/home/wayuse/.config my-wayuse
+npx wayuse build -d docker/wayuse
+docker build -t my-wayuse docker/wayuse
+docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_SCREEN_OUTPUTS=2 -e WAYUSE_JWT_PUBLIC_KEY -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
 
 The server in the image needs `WAYUSE_JWT_PUBLIC_KEY`, the public key of the tokens it is to take. Without it, every request gets `503`. [@wayuse/server](../server/README.md#tokens) shows how to make the pair.
@@ -56,7 +56,7 @@ npx wayuse build && docker compose up --build -d
 
 Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
 The private key is in `.env` too. Keep the file to its owner and out of version control.
-The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `docker/my-wayuse` beside its file.
+The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `docker/wayuse` beside its file.
 
 ## CONFIGURATION
 
@@ -64,16 +64,19 @@ Every item may be left out.
 
 | Item | Default | Meaning |
 |---|---|---|
-| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `docker/my-wayuse`. |
+| `output.dir` | none | The build directory to write, from the current directory. Required, unless `--dir` gives it. The sample writes to `docker/wayuse`. |
 | `node.version` | the Node.js that runs `@wayuse/build` | Node.js in the image. A full version: ranges are refused. |
 | `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
-| `apps.chrome.env` | `{}` | Environment variables for the Chrome process alone. `LANGUAGE` sets Chrome's language. No secrets: they are baked into the image. |
+| `apps.chrome.env` | `{}` | Environment variables for Chrome alone, such as `LANGUAGE`. `-e` of the same name wins. Baked in, so no secrets. |
 | `apps.chrome.policies` | the two of the [sample](sample/wayuse.config.ts) | Chrome's [managed policies](https://chromeenterprise.google/policies/), under Chrome's own names. Given, they replace the defaults, which keep Chrome to one profile. |
 | `apps.redir` | not installed | Installs [redir](https://github.com/troglobit/redir) and keeps it running. It forwards TCP ports inside the container. |
 | `apps.redir.ports` | required | The ports to listen on, from 1024 up, each with where it forwards to. `{9223: "127.0.0.1:9222"}` forwards port 9223 to Chrome DevTools Protocol. |
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |
+| `screen.outputs` | `1` | The number of screens, `HEADLESS-1` and up: 1 to 8. `-e WAYUSE_SCREEN_OUTPUTS` wins. |
 | `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
+| `screen.minWidth`, `screen.minHeight` | `768`, `768` | The smallest size a client may resize a screen to. |
+| `screen.maxWidth`, `screen.maxHeight` | `1920`, `1920` | The largest size a client may resize a screen to. A larger screen needs more `--shm-size`. |
 | `packages` | `[]` | Additional apt packages, fonts among them. |
 | `auth` | tokens are checked | `false` builds an image whose server asks for no token. Every API is then open to whoever reaches its port, so publish the port to no one else. Given a key, its server answers every request with `503`. |
 | `console` | in the image | `false` leaves the [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) out of the image. Nothing of it is built or copied, and the image has the API alone. |
@@ -95,23 +98,26 @@ Usage: wayuse-build [options]
 Without `-c`, it reads the first of `wayuse.config.ts`, `wayuse.config.mjs` and `wayuse.config.js` in the current directory.
 Without any of them, it prints the usage.
 Without `-d`, it writes to `output.dir` of the configuration. With neither, it stops and writes nothing.
+It prints the path of every file it writes.
 `npx wayuse build` takes the same options and passes them on.
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
-A build writes `rootfs/opt/wayuse/` and `rootfs/etc/wayuse/` anew, and its other files over those of the build before.
+A build writes `rootfs/opt/wayuse/` anew, and its other files over those of the build before.
+`rootfs/opt/wayuse/` has a `.gitignore`, so git keeps none of it.
+Outside `rootfs/opt/wayuse/`, a file stays when the option that wrote it is removed. Remove it by hand.
 The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in it as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are. The server serves that `htdocs/` without a token.
 `@wayuse/build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
 noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
 It bundles [html-ele](https://github.com/kawanet/html-ele) beside it the same way, as `console/vendor/html-ele.js`, for the console's pages to build their elements with.
-The resolved configuration is baked in as `/etc/wayuse/wayuse.config.json`.
+The resolved configuration is baked in as `/opt/wayuse/wayuse.config.json`.
 
 ## CONTAINER
 
 | `docker run` | Meaning |
 |---|---|
 | `--shm-size 256m` | Required. sway dies of a bus error on the 64MB Docker gives by default. |
-| `-e WAYUSE_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: 1. |
-| `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: Chrome's own. |
+| `-e WAYUSE_SCREEN_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: `screen.outputs`. |
+| `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: the one in `apps.chrome.env`, or else Chrome's own. |
 | `-e WAYUSE_JWT_PUBLIC_KEY=<key>` | The key @wayuse/server verifies tokens with. Without it, every API that needs a token is refused. |
 | `-e WAYUSE_JWT_AUDIENCE=<string>` | The `aud` a token must carry. Default: `wayuse`. |
 | `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |

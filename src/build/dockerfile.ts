@@ -70,12 +70,11 @@ RUN npm install --prefix /opt/wayuse --omit=dev --no-audit --no-fund && \\
     npm cache clean --force
 `.trim()
 
-// Fixed paths, so that `docker exec` reaches the same sway and D-Bus as the processes started here.
-const RUNTIME_ENV = [
+// Fixed paths, so that `docker exec` reaches the same sway as the processes started here.
+export const RUNTIME_ENV = [
     "XDG_RUNTIME_DIR=/run/wayuse",
     "WAYLAND_DISPLAY=wayland-1",
     "SWAYSOCK=/run/wayuse/sway.sock",
-    "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/wayuse/bus",
 ]
 
 /** The processes the container keeps running, in the order they start. */

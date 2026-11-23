@@ -34,8 +34,16 @@ describe(TITLE, () => {
         const url = "about:blank"
         assert.throws(() => resolveOpenRequest({url, width: 1280}, config, slots), status(400, /both width and height/))
         assert.throws(() => resolveOpenRequest({url, width: 767, height: 768}, config, slots), status(400, /^Invalid width: 767/))
-        assert.throws(() => resolveOpenRequest({url, width: 1280, height: 2561}, config, slots), status(400, /^Invalid height: 2561/))
+        assert.throws(() => resolveOpenRequest({url, width: 1280, height: 1921}, config, slots), status(400, /^Invalid height: 1921/))
         assert.throws(() => resolveOpenRequest({url, width: "1280", height: 960}, config, slots), status(400, /^Invalid width/))
+    })
+
+    it("takes the bounds of a size from the image's configuration", () => {
+        const url = "about:blank"
+        const bounded = resolveConfig({screen: {width: 1024, height: 768, minWidth: 800, minHeight: 600, maxWidth: 1100, maxHeight: 900}}, "wayuse.config.ts")
+        assert.equal(resolveOpenRequest({url, width: 800, height: 900}, bounded, slots).width, 800)
+        assert.throws(() => resolveOpenRequest({url, width: 799, height: 768}, bounded, slots), status(400, /^Invalid width: 799 \(800 to 1100\)/))
+        assert.throws(() => resolveOpenRequest({url, width: 1024, height: 901}, bounded, slots), status(400, /^Invalid height: 901 \(600 to 900\)/))
     })
 
     it("refuses an unknown context, and answers 503 while sway has no output", () => {

@@ -58,7 +58,7 @@ The body of PUT and POST:
 |---|---|---|
 | `url` | required | `http:`, `https:` or `about:`. |
 | `slot` | the first screen | The screen the window opens on. |
-| `width`, `height` | the size in the image's configuration | 768 to 2560, given together. |
+| `width`, `height` | the size in the image's configuration | Within the bounds in the image's configuration, given together. |
 | `context` | `"default"` | `"temporary"` opens the window in a context of its own, which shares no login and no cookie with any other. |
 
 An error is answered as `{"error": {"message": "..."}}` with its status.
@@ -123,7 +123,7 @@ This package is under the MIT license, but for what it carries of others:
 ```
 Usage: wayuse-server [options]
   -p, --port <port>    the port to listen on (default: 9580)
-  -c, --config <file>  the resolved configuration (default: /etc/wayuse/wayuse.config.json)
+  -c, --config <file>  the resolved configuration (default: /opt/wayuse/wayuse.config.json)
   --htdocs <dir>       the files a browser loads without a token (default: /opt/wayuse/htdocs)
   -v, --version        print this package's version
   -h, --help           print this usage

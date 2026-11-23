@@ -1,6 +1,9 @@
 import type * as declared from "@wayuse/build"
 import type {WayuseBuild} from "@wayuse/build"
 import type {WayuseClient} from "wayuse"
+import {RUNTIME_ENV} from "./dockerfile.ts"
+import {CHROME_START_ENV} from "./start-scripts.ts"
+import {MAX_OUTPUTS} from "./sway-config.ts"
 import {VERSION} from "./version.ts"
 
 type Input = WayuseBuild.Config
@@ -31,13 +34,15 @@ const OUTPUT_DIR = /^[^\0]+$/
 
 const SIGN_IN = /^(?![A-Za-z][A-Za-z0-9+.-]*:|[\/\\]{2})\S+$/
 
-// sway refuses nothing here, so the bounds are those of the screens the server resizes to.
-const SCREEN_MIN = 1
-const SCREEN_MAX = 2560
+// From 1024x768 to 1920x1080, turned either way. A larger screen takes more of /dev/shm.
+const DEFAULT_SCREEN = {outputs: 1, width: 1280, height: 960, minWidth: 768, minHeight: 768, maxWidth: 1920, maxHeight: 1920}
 
 // The container's user cannot listen on a port below 1024.
 const PORT_MIN = 1024
 const PORT_MAX = 65535
+
+// Chrome has these before its start script sets apps.chrome.env. A value given for one would be ignored. Docker and bash set the last six.
+const TAKEN_ENV = [...RUNTIME_ENV.map(line => line.split("=")[0]), ...Object.keys(CHROME_START_ENV), "PATH", "HOME", "HOSTNAME", "PWD", "SHLVL", "_"]
 
 export class ConfigError extends Error {
 }
@@ -63,12 +68,29 @@ const stringOf = (value: unknown, path: string, pattern: RegExp, fallback: strin
     return value
 }
 
-const sizeOf = (value: unknown, path: string, fallback: number): number => {
-    if (value == null) return fallback
-    if (!Number.isInteger(value) || (value as number) < SCREEN_MIN || (value as number) > SCREEN_MAX) {
-        throw new ConfigError(`${path} must be an integer from ${SCREEN_MIN} to ${SCREEN_MAX}: ${JSON.stringify(value)}`)
+// The default is checked like a given value. A bound given alone may leave it outside.
+const integerOf = (value: unknown, path: string, min: number, max: number, fallback: number): number => {
+    const n = value ?? fallback
+    if (Number.isInteger(n) && (n as number) >= min && (n as number) <= max) return n as number
+    const range = max === Infinity ? `of ${min} or more` : `from ${min} to ${max}`
+    throw new ConfigError(`${path} must be an integer ${range}: ${JSON.stringify(n)}`)
+}
+
+const screenOf = (value: unknown): Resolved["screen"] => {
+    const screen = recordOf(value, "config.screen", Object.keys(DEFAULT_SCREEN))
+    const of = (key: keyof typeof DEFAULT_SCREEN, min: number, max: number): number =>
+        integerOf(screen[key], `config.screen.${key}`, min, max, DEFAULT_SCREEN[key])
+
+    const minWidth = of("minWidth", 1, Infinity)
+    const minHeight = of("minHeight", 1, Infinity)
+    const maxWidth = of("maxWidth", minWidth, Infinity)
+    const maxHeight = of("maxHeight", minHeight, Infinity)
+    return {
+        outputs: of("outputs", 1, MAX_OUTPUTS),
+        width: of("width", minWidth, maxWidth),
+        height: of("height", minHeight, maxHeight),
+        minWidth, minHeight, maxWidth, maxHeight,
     }
-    return value as number
 }
 
 const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {
@@ -82,6 +104,7 @@ const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {
     const env: Record<string, string> = {}
     for (const [name, text] of Object.entries(recordOf(chrome.env, "config.apps.chrome.env", Object.keys(chrome.env ?? {})))) {
         if (!ENV_NAME.test(name)) throw new ConfigError(`config.apps.chrome.env has an invalid name: ${JSON.stringify(name)}`)
+        if (TAKEN_ENV.includes(name)) throw new ConfigError(`config.apps.chrome.env cannot set ${name}, which the container sets itself`)
         if (typeof text !== "string") throw new ConfigError(`config.apps.chrome.env.${name} must be a string`)
         env[name] = text
     }
@@ -167,7 +190,6 @@ export const resolveConfig = (input: Input, file: string): Resolved => {
     const config = recordOf(input ?? {}, "config", ["output", "node", "apps", "timezone", "screen", "packages", "auth", "console"])
     const node = recordOf(config.node, "config.node", ["version"])
     const apps = recordOf(config.apps, "config.apps", ["chrome", "redir"])
-    const screen = recordOf(config.screen, "config.screen", ["width", "height"])
     // false alone leaves the console out. Its other items say how it is written, and take an object.
     const pages = config.console === false ? undefined : recordOf(config.console, "config.console", ["signIn", "vars", "terser"])
     const signIn = stringOf(pages?.signIn, "config.console.signIn", SIGN_IN, "")
@@ -193,10 +215,7 @@ export const resolveConfig = (input: Input, file: string): Resolved => {
         node: {version: stringOf(node.version ?? DEFAULT_NODE_VERSION, "config.node.version", NODE_VERSION, "")},
         apps: installed,
         timezone: stringOf(config.timezone, "config.timezone", TIMEZONE, "Etc/UTC"),
-        screen: {
-            width: sizeOf(screen.width, "config.screen.width", 1280),
-            height: sizeOf(screen.height, "config.screen.height", 960),
-        },
+        screen: screenOf(config.screen),
         packages,
         // Written out either way, so the server opens its APIs for false alone and never for a missing item.
         auth: config.auth !== false,

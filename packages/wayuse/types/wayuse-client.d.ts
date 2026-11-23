@@ -4,7 +4,7 @@ export {} // external module indicator
 
 export declare namespace WayuseClient {
 
-    /** What the image was defined to hold, with every default filled in. Baked in as /etc/wayuse/wayuse.config.json. */
+    /** What the image was defined to hold, with every default filled in. Baked in as /opt/wayuse/wayuse.config.json. */
     interface Config {
         /** The @wayuse/build that filled in the defaults, and the file name of the configuration it read. */
         wayuse: {build: {version: string, config: string}}
@@ -12,8 +12,8 @@ export declare namespace WayuseClient {
         /** The installed applications. A key is present only for an installed one. */
         apps: {chrome?: ChromeConfig, redir?: RedirConfig}
         timezone: string
-        /** The size a screen has until a client resizes it. */
-        screen: {width: number, height: number}
+        /** The size a screen has until a client resizes it, and the bounds of a resize. */
+        screen: {outputs: number, width: number, height: number, minWidth: number, minHeight: number, maxWidth: number, maxHeight: number}
         packages: string[]
         /** Whether the server asks for a token. Only false opens every API. */
         auth: boolean
@@ -144,7 +144,7 @@ export declare namespace WayuseClient {
         url: string
         /** Default: the first slot. */
         slot?: string
-        /** 768 to 2560, given together with height. Default: the size in the image's configuration. */
+        /** Within the image's screen bounds, given together with height. Default: the size in the image's configuration. */
         width?: number
         height?: number
         /** "temporary" shares no login and no cookie with any other window. Default: "default". */

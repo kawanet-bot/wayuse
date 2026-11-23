@@ -1,14 +1,14 @@
 import {EN} from "html-ele"
 import {copyFile, cp, mkdir, readFile, readdir, rm, writeFile} from "node:fs/promises"
-import {dirname, join} from "node:path"
+import {dirname, join, relative} from "node:path"
 import {fileURLToPath} from "node:url"
 import {minify} from "terser"
 import type {WayuseClient} from "wayuse"
 import {DEFAULT_VARS} from "./config.ts"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
-import {shellEnvOf} from "./shell-env.ts"
-import {swayConfigOf} from "./sway-config.ts"
+import {chromeStartOf, redirStartOf, swayStartOf, wayvncStartOf} from "./start-scripts.ts"
+import {SWAY_CONFIG, swayConfigOf} from "./sway-config.ts"
 import {TERSER, bundleVendor} from "./vendor.ts"
 
 type Resolved = WayuseClient.Config
@@ -23,8 +23,11 @@ const consoleScripts = (): string => fileURLToPath(new URL("./console/", import.
 const HTDOCS = "rootfs/opt/wayuse/htdocs"
 const CONSOLE = `${HTDOCS}/console`
 
-// The directories of the image that are this package's alone. A build writes them anew.
-const OWNED = ["rootfs/opt/wayuse", "rootfs/etc/wayuse"]
+// The scripts the container runs. Each is written executable.
+const BIN = "rootfs/opt/wayuse/bin"
+
+// The directory of the image that is this package's alone. A build writes it anew.
+const OWNED = "rootfs/opt/wayuse"
 
 // Chrome reads every file beside it, so the file is in a directory that is not this package's alone.
 const POLICIES = "rootfs/etc/opt/chrome/policies/managed/wayuse.json"
@@ -35,20 +38,24 @@ const POLICIES = "rootfs/etc/opt/chrome/policies/managed/wayuse.json"
 export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): Record<string, string> => {
     const files: Record<string, string> = {
         "Dockerfile": dockerfileOf(config, options),
-        "rootfs/etc/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
-        "rootfs/etc/wayuse/sway/config": swayConfigOf(config),
+        "rootfs/opt/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
+        [`rootfs${SWAY_CONFIG}`]: swayConfigOf(config),
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
+        [`${BIN}/sway-start.sh`]: swayStartOf(config),
+        [`${BIN}/wayvnc-start.sh`]: wayvncStartOf(config),
     }
+
+    // assets/ cannot hold it. npm pack leaves out a directory with a .gitignore in it.
+    files[`${OWNED}/.gitignore`] = "# A build writes this directory anew, so git keeps none of it.\n*\n"
 
     // The entry reads it before it has a token, which the API would ask for.
     if (config.console) files[`${CONSOLE}/config.json`] = JSON.stringify(config.console, null, 2) + "\n"
 
     const {chrome, redir} = config.apps
-    if (chrome) files["rootfs/etc/wayuse/chrome.env"] = shellEnvOf(chrome.env)
+    if (chrome) files[`${BIN}/chrome-start.sh`] = chromeStartOf(config)
     // One file holds every policy. Chrome does not say which wins when two files name the same one.
     if (chrome) files[POLICIES] = JSON.stringify(chrome.policies, null, 2) + "\n"
-    // One line per redir, for the start script to read: the port to listen on, then where it forwards to.
-    if (redir) files["rootfs/etc/wayuse/redir.conf"] = Object.entries(redir.ports).map(([port, target]) => `${port} ${target}\n`).join("")
+    if (redir) files[`${BIN}/redir-start.sh`] = redirStartOf(config)
 
     return files
 }
@@ -100,14 +107,20 @@ const writeConsole = async (outdir: string, options: BuildOptions): Promise<stri
     return paths
 }
 
+// Every file under the directory, by its path from there.
+const filesUnder = async (dir: string): Promise<string[]> =>
+    (await readdir(dir, {recursive: true, withFileTypes: true})).filter(entry => entry.isFile()).map(entry => relative(dir, join(entry.parentPath, entry.name)))
+
 /**
- * Writes the build directory and returns the paths of what it generated.
+ * Writes the build directory and returns the paths of the files it wrote.
  * The directory may be one that has other files, which are neither removed nor read.
  */
 export const writeBuildDir = async (config: Resolved, outdir: string, options: BuildOptions = {}): Promise<string[]> => {
     // A file an earlier configuration generated must not linger and reach the image.
-    for (const dir of OWNED) await rm(join(outdir, dir), {recursive: true, force: true})
+    await rm(join(outdir, OWNED), {recursive: true, force: true})
     await cp(assetsRoot(), outdir, {recursive: true})
+    // Listed with the generated files, as the next build writes over these too.
+    const copied = await filesUnder(assetsRoot())
 
     // An image without the console keeps the directory the server serves, with nothing of the console in it.
     if (!config.console) {
@@ -116,15 +129,14 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     }
 
     const files = generatedFilesOf(config, options)
-    if (files[POLICIES] == null) await rm(join(outdir, POLICIES), {force: true})
 
     for (const [path, content] of Object.entries(files)) {
         const file = join(outdir, path)
         await mkdir(dirname(file), {recursive: true})
-        await writeFile(file, content)
+        await writeFile(file, content, path.startsWith(`${BIN}/`) ? {mode: 0o755} : {})
     }
 
-    const paths = Object.keys(files)
+    const paths = [...copied.filter(path => config.console || !path.startsWith(`${HTDOCS}/`)), ...Object.keys(files)]
     if (config.console) paths.push(...await writeConsole(outdir, options))
 
     if (options.serverTarball != null) {
@@ -133,5 +145,5 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
         paths.push(path)
     }
 
-    return paths
+    return [...new Set(paths)].sort()
 }
