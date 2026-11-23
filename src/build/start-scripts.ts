@@ -2,6 +2,7 @@
 
 import type {WayuseClient} from "wayuse"
 import {shellDefaultsOf} from "./shell-env.ts"
+import {SWAY_CONFIG} from "./sway-config.ts"
 
 type Resolved = WayuseClient.Config
 
@@ -32,7 +33,7 @@ unset WAYLAND_DISPLAY
 # sway takes the path in SWAYSOCK only while nothing is there.
 rm -f "$SWAYSOCK"
 
-exec sway -c /etc/wayuse/sway/config
+exec sway -c ${SWAY_CONFIG}
 `.trimStart()
 
 /**

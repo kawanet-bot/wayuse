@@ -8,7 +8,7 @@ import {DEFAULT_VARS} from "./config.ts"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
 import {chromeStartOf, redirStartOf, swayStartOf, wayvncStartOf} from "./start-scripts.ts"
-import {swayConfigOf} from "./sway-config.ts"
+import {SWAY_CONFIG, swayConfigOf} from "./sway-config.ts"
 import {TERSER, bundleVendor} from "./vendor.ts"
 
 type Resolved = WayuseClient.Config
@@ -26,8 +26,8 @@ const CONSOLE = `${HTDOCS}/console`
 // The scripts the container runs. Each is written executable.
 const BIN = "rootfs/opt/wayuse/bin"
 
-// The directories of the image that are this package's alone. A build writes them anew.
-const OWNED = ["rootfs/opt/wayuse", "rootfs/etc/wayuse"]
+// The directory of the image that is this package's alone. A build writes it anew.
+const OWNED = "rootfs/opt/wayuse"
 
 // Chrome reads every file beside it, so the file is in a directory that is not this package's alone.
 const POLICIES = "rootfs/etc/opt/chrome/policies/managed/wayuse.json"
@@ -38,8 +38,8 @@ const POLICIES = "rootfs/etc/opt/chrome/policies/managed/wayuse.json"
 export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): Record<string, string> => {
     const files: Record<string, string> = {
         "Dockerfile": dockerfileOf(config, options),
-        "rootfs/etc/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
-        "rootfs/etc/wayuse/sway/config": swayConfigOf(config),
+        "rootfs/opt/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
+        [`rootfs${SWAY_CONFIG}`]: swayConfigOf(config),
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
         [`${BIN}/sway-start.sh`]: swayStartOf(config),
         [`${BIN}/wayvnc-start.sh`]: wayvncStartOf(config),
@@ -110,7 +110,7 @@ const writeConsole = async (outdir: string, options: BuildOptions): Promise<stri
  */
 export const writeBuildDir = async (config: Resolved, outdir: string, options: BuildOptions = {}): Promise<string[]> => {
     // A file an earlier configuration generated must not linger and reach the image.
-    for (const dir of OWNED) await rm(join(outdir, dir), {recursive: true, force: true})
+    await rm(join(outdir, OWNED), {recursive: true, force: true})
     await cp(assetsRoot(), outdir, {recursive: true})
 
     // An image without the console keeps the directory the server serves, with nothing of the console in it.

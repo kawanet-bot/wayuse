@@ -11,7 +11,7 @@ base=http://127.0.0.1:$port
 # A list rather than a function, so that $! is node itself and kill reaches it.
 server=(
     node "$rootfs/opt/wayuse/node_modules/@wayuse/server/bin/wayuse-server.js"
-    --port "$port" --config "$rootfs/etc/wayuse/wayuse.config.json" --htdocs "$rootfs/opt/wayuse/htdocs"
+    --port "$port" --config "$rootfs/opt/wayuse/wayuse.config.json" --htdocs "$rootfs/opt/wayuse/htdocs"
 )
 
 # The server answers within a second, and a port that never opens fails the first check after this.

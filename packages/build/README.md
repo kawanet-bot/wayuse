@@ -101,13 +101,13 @@ Without `-d`, it writes to `output.dir` of the configuration. With neither, it s
 `npx wayuse build` takes the same options and passes them on.
 
 The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
-A build writes `rootfs/opt/wayuse/` and `rootfs/etc/wayuse/` anew, and its other files over those of the build before.
-Outside those two, a file stays when the option that wrote it is removed. Remove it by hand.
+A build writes `rootfs/opt/wayuse/` anew, and its other files over those of the build before.
+Outside `rootfs/opt/wayuse/`, a file stays when the option that wrote it is removed. Remove it by hand.
 The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in it as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are. The server serves that `htdocs/` without a token.
 `@wayuse/build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
 noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
 It bundles [html-ele](https://github.com/kawanet/html-ele) beside it the same way, as `console/vendor/html-ele.js`, for the console's pages to build their elements with.
-The resolved configuration is baked in as `/etc/wayuse/wayuse.config.json`.
+The resolved configuration is baked in as `/opt/wayuse/wayuse.config.json`.
 
 ## CONTAINER
 

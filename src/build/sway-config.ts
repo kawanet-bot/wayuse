@@ -3,6 +3,9 @@ import {CASCADE_COUNT, CASCADE_STEP} from "../screen/cascade.ts"
 
 type Resolved = WayuseClient.Config
 
+// Where the image has the sway configuration, for sway-start.sh to give to sway.
+export const SWAY_CONFIG = "/opt/wayuse/config/sway.conf"
+
 // As many position lines as outputs a container may have: a line for an output that does not exist is ignored.
 export const MAX_OUTPUTS = 8
 
