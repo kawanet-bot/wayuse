@@ -62,6 +62,9 @@ set -eu
 
 profile=$HOME/.config/chrome
 
+# Chrome alone does not look for the session bus in $XDG_RUNTIME_DIR by itself.
+export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+
 until [ -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; do sleep 0.2; done
 
 # A lock left by a killed Chrome would refuse this start.
