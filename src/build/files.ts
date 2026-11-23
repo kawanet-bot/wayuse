@@ -53,8 +53,6 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
     // One file holds every policy. Chrome does not say which wins when two files name the same one.
     if (chrome) files[POLICIES] = JSON.stringify(chrome.policies, null, 2) + "\n"
     if (redir) files[`${BIN}/redir-start.sh`] = redirStartOf(config)
-    // One line per redir, for the start script to read: the port to listen on, then where it forwards to.
-    if (redir) files["rootfs/etc/wayuse/redir.conf"] = Object.entries(redir.ports).map(([port, target]) => `${port} ${target}\n`).join("")
 
     return files
 }

@@ -73,13 +73,13 @@ describe(TITLE, () => {
         assert.match(dockerfile, /--no-install-recommends \\\n {8}fonts-noto-cjk \\\n {8}fonts-noto-core\n\n/)
     })
 
-    it("installs redir and keeps it running, with a line for each port in a file of their own", () => {
+    it("installs redir and keeps it running, with a line for each port in its start script", () => {
         const files = generatedFilesOf(resolveConfig({apps: {redir: {ports: {9223: "127.0.0.1:9222", 18081: "host.docker.internal:18081"}}}}, "wayuse.config.ts"))
         const dockerfile = files["Dockerfile"]!
         assert.match(dockerfile, /\n {8}redir\n/)
         assert.match(dockerfile, /"\/opt\/wayuse\/bin\/redir-start\.sh","\/opt\/wayuse\/bin\/server-start\.sh"\]\n$/)
-        assert.equal(files["rootfs/etc/wayuse/redir.conf"], "9223 127.0.0.1:9222\n18081 host.docker.internal:18081\n")
-        assert.match(files["rootfs/opt/wayuse/bin/redir-start.sh"]!, /^#!\/bin\/bash\n/)
+        const start = files["rootfs/opt/wayuse/bin/redir-start.sh"]!
+        assert.match(start, /^redir -n :9223 127\.0\.0\.1:9222 &\nredir -n :18081 host\.docker\.internal:18081 &\n$/m)
     })
 
     it("installs what the server needs for Chrome beside the server", () => {
