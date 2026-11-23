@@ -4,7 +4,7 @@ import {CASCADE_COUNT, CASCADE_STEP} from "../screen/cascade.ts"
 type Resolved = WayuseClient.Config
 
 // As many position lines as outputs a container may have: a line for an output that does not exist is ignored.
-const MAX_OUTPUTS = 8
+export const MAX_OUTPUTS = 8
 
 // Beyond the farthest step of a window, for its shadow.
 const SHADOW = 32

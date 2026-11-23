@@ -39,7 +39,7 @@ It writes the build directory, and Docker builds the image from it:
 npm install -D wayuse @wayuse/build
 npx wayuse build -d docker/my-wayuse
 docker build -t my-wayuse docker/my-wayuse
-docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_OUTPUTS=2 -e WAYUSE_JWT_PUBLIC_KEY -v my-wayuse-config:/home/wayuse/.config my-wayuse
+docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_SCREEN_OUTPUTS=2 -e WAYUSE_JWT_PUBLIC_KEY -v my-wayuse-config:/home/wayuse/.config my-wayuse
 ```
 
 The server in the image needs `WAYUSE_JWT_PUBLIC_KEY`, the public key of the tokens it is to take. Without it, every request gets `503`. [@wayuse/server](../server/README.md#tokens) shows how to make the pair.
@@ -73,6 +73,7 @@ Every item may be left out.
 | `apps.redir` | not installed | Installs [redir](https://github.com/troglobit/redir) and keeps it running. It forwards TCP ports inside the container. |
 | `apps.redir.ports` | required | The ports to listen on, from 1024 up, each with where it forwards to. `{9223: "127.0.0.1:9222"}` forwards port 9223 to Chrome DevTools Protocol. |
 | `timezone` | `"Etc/UTC"` | IANA time zone of the whole container. |
+| `screen.outputs` | `1` | The number of screens, `HEADLESS-1` and up: 1 to 8. `-e WAYUSE_SCREEN_OUTPUTS` wins. |
 | `screen.width`, `screen.height` | `1280`, `960` | The size a screen has until a client resizes it. |
 | `screen.minWidth`, `screen.minHeight` | `768`, `768` | The smallest size a client may resize a screen to. |
 | `screen.maxWidth`, `screen.maxHeight` | `1920`, `1920` | The largest size a client may resize a screen to. A larger screen needs more `--shm-size`. |
@@ -113,7 +114,7 @@ The resolved configuration is baked in as `/etc/wayuse/wayuse.config.json`.
 | `docker run` | Meaning |
 |---|---|
 | `--shm-size 256m` | Required. sway dies of a bus error on the 64MB Docker gives by default. |
-| `-e WAYUSE_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: 1. |
+| `-e WAYUSE_SCREEN_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: `screen.outputs`. |
 | `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: the one in `apps.chrome.env`, or else Chrome's own. |
 | `-e WAYUSE_JWT_PUBLIC_KEY=<key>` | The key @wayuse/server verifies tokens with. Without it, every API that needs a token is refused. |
 | `-e WAYUSE_JWT_AUDIENCE=<string>` | The `aud` a token must carry. Default: `wayuse`. |

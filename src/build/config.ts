@@ -3,6 +3,7 @@ import type {WayuseBuild} from "@wayuse/build"
 import type {WayuseClient} from "wayuse"
 import {RUNTIME_ENV} from "./dockerfile.ts"
 import {CHROME_START_ENV} from "./start-scripts.ts"
+import {MAX_OUTPUTS} from "./sway-config.ts"
 import {VERSION} from "./version.ts"
 
 type Input = WayuseBuild.Config
@@ -34,7 +35,7 @@ const OUTPUT_DIR = /^[^\0]+$/
 const SIGN_IN = /^(?![A-Za-z][A-Za-z0-9+.-]*:|[\/\\]{2})\S+$/
 
 // From 1024x768 to 1920x1080, turned either way. A larger screen takes more of /dev/shm.
-const DEFAULT_SCREEN = {width: 1280, height: 960, minWidth: 768, minHeight: 768, maxWidth: 1920, maxHeight: 1920}
+const DEFAULT_SCREEN = {outputs: 1, width: 1280, height: 960, minWidth: 768, minHeight: 768, maxWidth: 1920, maxHeight: 1920}
 
 // The container's user cannot listen on a port below 1024.
 const PORT_MIN = 1024
@@ -84,7 +85,12 @@ const screenOf = (value: unknown): Resolved["screen"] => {
     const minHeight = of("minHeight", 1, Infinity)
     const maxWidth = of("maxWidth", minWidth, Infinity)
     const maxHeight = of("maxHeight", minHeight, Infinity)
-    return {width: of("width", minWidth, maxWidth), height: of("height", minHeight, maxHeight), minWidth, minHeight, maxWidth, maxHeight}
+    return {
+        outputs: of("outputs", 1, MAX_OUTPUTS),
+        width: of("width", minWidth, maxWidth),
+        height: of("height", minHeight, maxHeight),
+        minWidth, minHeight, maxWidth, maxHeight,
+    }
 }
 
 const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {

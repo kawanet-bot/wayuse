@@ -55,6 +55,13 @@ describe(TITLE, () => {
         assert.match(sway, /^output HEADLESS-8 position 21504 0$/m)
     })
 
+    it("gives sway and wayvnc the number of screens, below what the container is given", () => {
+        const files = generatedFilesOf(resolveConfig({screen: {outputs: 3}}, "wayuse.config.ts"))
+        for (const name of ["sway-start.sh", "wayvnc-start.sh"]) {
+            assert.match(files[`rootfs/opt/wayuse/bin/${name}`]!, /^export WAYUSE_SCREEN_OUTPUTS=\$\{WAYUSE_SCREEN_OUTPUTS:-'3'\}$/m, name)
+        }
+    })
+
     it("gives Chrome the address of the session bus", () => {
         const chrome = generatedFilesOf(config)["rootfs/opt/wayuse/bin/chrome-start.sh"]!
         assert.match(chrome, /^export DBUS_SESSION_BUS_ADDRESS="unix:path=\$XDG_RUNTIME_DIR\/bus"$/m)

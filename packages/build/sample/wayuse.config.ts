@@ -20,6 +20,7 @@ export default defineConfig({
     },
     timezone: "Asia/Tokyo",
     screen: {
+        outputs: 1,
         width: 1280,
         height: 960,
         minWidth: 768,

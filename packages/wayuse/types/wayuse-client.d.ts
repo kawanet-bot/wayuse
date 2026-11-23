@@ -13,7 +13,7 @@ export declare namespace WayuseClient {
         apps: {chrome?: ChromeConfig, redir?: RedirConfig}
         timezone: string
         /** The size a screen has until a client resizes it, and the bounds of a resize. */
-        screen: {width: number, height: number, minWidth: number, minHeight: number, maxWidth: number, maxHeight: number}
+        screen: {outputs: number, width: number, height: number, minWidth: number, minHeight: number, maxWidth: number, maxHeight: number}
         packages: string[]
         /** Whether the server asks for a token. Only false opens every API. */
         auth: boolean

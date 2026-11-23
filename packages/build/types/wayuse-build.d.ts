@@ -54,6 +54,8 @@ export declare namespace WayuseBuild {
     }
 
     interface ScreenConfig {
+        /** The number of screens, HEADLESS-1 and up: 1 to 8. `docker run -e WAYUSE_SCREEN_OUTPUTS` wins. Default: 1. */
+        outputs?: number
         /** Default: 1280. */
         width?: number
         /** Default: 960. */
