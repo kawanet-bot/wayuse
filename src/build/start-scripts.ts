@@ -84,27 +84,21 @@ rm -f "$profile"/Singleton*
 
 # The variables of apps.chrome.env reach this process alone. One given to the container wins.
 ${shellDefaultsOf(config.apps.chrome?.env ?? {})}
-args=(
-    --ozone-platform=wayland
-    --disable-gpu
-    --password-store=basic
-    --no-first-run
-    --no-default-browser-check
-    --remote-debugging-port=9222
-    --user-data-dir="$profile"
-    --profile-directory=Default
-    # Closing the last window must not end Chrome.
-    --no-startup-window
-    # Docker gives a container neither the namespaces of the sandbox nor a large /dev/shm.
-    --no-sandbox
-    --disable-dev-shm-usage
-)
-
-if [ -n "\${WAYUSE_USER_AGENT:-}" ]; then
-    args+=("--user-agent=$WAYUSE_USER_AGENT")
-fi
-
-exec google-chrome "\${args[@]}"
+# --no-startup-window keeps Chrome running after its last window closes.
+# Docker gives a container neither the namespaces of the sandbox nor a large /dev/shm. --no-sandbox and --disable-dev-shm-usage do without them.
+exec google-chrome \\
+    --ozone-platform=wayland \\
+    --disable-gpu \\
+    --password-store=basic \\
+    --no-first-run \\
+    --no-default-browser-check \\
+    --remote-debugging-port=9222 \\
+    --user-data-dir="$profile" \\
+    --profile-directory=Default \\
+    --no-startup-window \\
+    --no-sandbox \\
+    --disable-dev-shm-usage \\
+    \${WAYUSE_USER_AGENT:+"--user-agent=$WAYUSE_USER_AGENT"}
 `.trimStart()
 
 /**
