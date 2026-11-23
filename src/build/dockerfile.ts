@@ -71,7 +71,7 @@ RUN npm install --prefix /opt/wayuse --omit=dev --no-audit --no-fund && \\
 `.trim()
 
 // Fixed paths, so that `docker exec` reaches the same sway as the processes started here.
-const RUNTIME_ENV = [
+export const RUNTIME_ENV = [
     "XDG_RUNTIME_DIR=/run/wayuse",
     "WAYLAND_DISPLAY=wayland-1",
     "SWAYSOCK=/run/wayuse/sway.sock",

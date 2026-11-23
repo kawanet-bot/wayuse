@@ -9,7 +9,7 @@ import {DEFAULT_HTDOCS, DEFAULT_PORT} from "../server/cli.ts"
 import {resolveConfig} from "./config.ts"
 import {generatedFilesOf, writeBuildDir} from "./files.ts"
 import {APP_PACKAGES} from "./npm-package.ts"
-import {shellEnvOf} from "./shell-env.ts"
+import {shellDefaultsOf} from "./shell-env.ts"
 
 const TITLE = "build/files.test.ts"
 
@@ -33,7 +33,7 @@ describe(TITLE, () => {
         assert.match(dockerfile, /chrome-start\.sh","\/opt\/wayuse\/bin\/server-start\.sh"\]\n$/)
         assert.match(files["rootfs/etc/wayuse/sway/config"]!, /^output \* resolution 1920x1080$/m)
         assert.match(files["rootfs/etc/wayuse/sway/config"]!, /^output HEADLESS-2 position 2432 0$/m)
-        assert.equal(files["rootfs/etc/wayuse/chrome.env"], "LANGUAGE='ja'\n")
+        assert.match(files["rootfs/opt/wayuse/bin/chrome-start.sh"]!, /^export LANGUAGE=\$\{LANGUAGE:-'ja'\}$/m)
         assert.deepEqual(JSON.parse(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"]!), {AutoplayAllowlist: ["https://www.youtube.com"]})
         assert.deepEqual(JSON.parse(files["rootfs/etc/wayuse/wayuse.config.json"]!), config)
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/htdocs/console/config.json"]!), {signIn: "/sign-in/?next="})
@@ -42,7 +42,6 @@ describe(TITLE, () => {
     it("leaves Chrome out of an image without it, and what only Chrome needs", () => {
         const files = generatedFilesOf(resolveConfig({}, "wayuse.config.ts"))
         assert.doesNotMatch(files["Dockerfile"]!, /chrome/)
-        assert.equal(files["rootfs/etc/wayuse/chrome.env"], undefined)
         assert.equal(files["rootfs/opt/wayuse/bin/chrome-start.sh"], undefined)
         assert.equal(files["rootfs/opt/wayuse/bin/redir-start.sh"], undefined)
         assert.equal(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"], undefined)
@@ -118,7 +117,7 @@ describe(TITLE, () => {
     })
 
     it("quotes an environment value so that the shell runs none of it", () => {
-        assert.equal(shellEnvOf({A: "it's $(date) `id`"}), "A='it'\\''s $(date) `id`'\n")
+        assert.equal(shellDefaultsOf({A: "it's $(date) `id`"}), "export A=${A:-'it'\\''s $(date) `id`'}\n")
     })
 
     it("writes the pages with the default icon and title where none is given", async () => {

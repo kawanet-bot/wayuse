@@ -1,6 +1,7 @@
 // The start scripts that take values of the configuration. The other scripts are copied from assets/ as they are.
 
 import type {WayuseClient} from "wayuse"
+import {shellDefaultsOf} from "./shell-env.ts"
 
 type Resolved = WayuseClient.Config
 
@@ -51,6 +52,11 @@ done
 wait -n
 `.trimStart()
 
+// Set by chrome-start.sh itself, ahead of apps.chrome.env.
+export const CHROME_START_ENV: Record<string, string> = {DBUS_SESSION_BUS_ADDRESS: "unix:path=$XDG_RUNTIME_DIR/bus"}
+
+const exportsOf = (env: Record<string, string>): string => Object.entries(env).map(([name, value]) => `export ${name}="${value}"\n`).join("")
+
 /**
  * /opt/wayuse/bin/chrome-start.sh, for an image with Chrome.
  */
@@ -63,18 +69,14 @@ set -eu
 profile=$HOME/.config/chrome
 
 # Chrome alone does not look for the session bus in $XDG_RUNTIME_DIR by itself.
-export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
-
+${exportsOf(CHROME_START_ENV)}
 until [ -S "$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY" ]; do sleep 0.2; done
 
 # A lock left by a killed Chrome would refuse this start.
 rm -f "$profile"/Singleton*
 
-# The variables of apps.chrome.env reach this process alone.
-set -a
-. /etc/wayuse/chrome.env
-set +a
-
+# The variables of apps.chrome.env reach this process alone. One given to the container wins.
+${shellDefaultsOf(config.apps.chrome?.env ?? {})}
 args=(
     --ozone-platform=wayland
     --disable-gpu

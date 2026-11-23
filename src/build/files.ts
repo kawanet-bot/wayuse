@@ -7,7 +7,6 @@ import type {WayuseClient} from "wayuse"
 import {DEFAULT_VARS} from "./config.ts"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
-import {shellEnvOf} from "./shell-env.ts"
 import {chromeStartOf, redirStartOf, swayStartOf, wayvncStartOf} from "./start-scripts.ts"
 import {swayConfigOf} from "./sway-config.ts"
 import {TERSER, bundleVendor} from "./vendor.ts"
@@ -51,7 +50,6 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
 
     const {chrome, redir} = config.apps
     if (chrome) files[`${BIN}/chrome-start.sh`] = chromeStartOf(config)
-    if (chrome) files["rootfs/etc/wayuse/chrome.env"] = shellEnvOf(chrome.env)
     // One file holds every policy. Chrome does not say which wins when two files name the same one.
     if (chrome) files[POLICIES] = JSON.stringify(chrome.policies, null, 2) + "\n"
     if (redir) files[`${BIN}/redir-start.sh`] = redirStartOf(config)

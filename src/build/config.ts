@@ -1,6 +1,8 @@
 import type * as declared from "@wayuse/build"
 import type {WayuseBuild} from "@wayuse/build"
 import type {WayuseClient} from "wayuse"
+import {RUNTIME_ENV} from "./dockerfile.ts"
+import {CHROME_START_ENV} from "./start-scripts.ts"
 import {VERSION} from "./version.ts"
 
 type Input = WayuseBuild.Config
@@ -37,6 +39,9 @@ const DEFAULT_SCREEN = {width: 1280, height: 960, minWidth: 768, minHeight: 768,
 // The container's user cannot listen on a port below 1024.
 const PORT_MIN = 1024
 const PORT_MAX = 65535
+
+// Chrome has these before its start script sets apps.chrome.env. A value given for one would be ignored. Docker and bash set the last six.
+const TAKEN_ENV = [...RUNTIME_ENV.map(line => line.split("=")[0]), ...Object.keys(CHROME_START_ENV), "PATH", "HOME", "HOSTNAME", "PWD", "SHLVL", "_"]
 
 export class ConfigError extends Error {
 }
@@ -93,6 +98,7 @@ const chromeOf = (value: unknown): WayuseClient.ChromeConfig => {
     const env: Record<string, string> = {}
     for (const [name, text] of Object.entries(recordOf(chrome.env, "config.apps.chrome.env", Object.keys(chrome.env ?? {})))) {
         if (!ENV_NAME.test(name)) throw new ConfigError(`config.apps.chrome.env has an invalid name: ${JSON.stringify(name)}`)
+        if (TAKEN_ENV.includes(name)) throw new ConfigError(`config.apps.chrome.env cannot set ${name}, which the container sets itself`)
         if (typeof text !== "string") throw new ConfigError(`config.apps.chrome.env.${name} must be a string`)
         env[name] = text
     }

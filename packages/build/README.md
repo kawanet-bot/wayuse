@@ -68,7 +68,7 @@ Every item may be left out.
 | `node.version` | the Node.js that runs `@wayuse/build` | Node.js in the image. A full version: ranges are refused. |
 | `apps.chrome` | not installed | Installs Google Chrome. Without it, every API under `/app/chrome/` answers 404. |
 | `apps.chrome.channel` | `"stable"` | `"stable"`, `"beta"` or `"unstable"`. The version is the channel's current one when the image is built. |
-| `apps.chrome.env` | `{}` | Environment variables for the Chrome process alone. `LANGUAGE` sets Chrome's language. No secrets: they are baked into the image. |
+| `apps.chrome.env` | `{}` | Environment variables for Chrome alone, such as `LANGUAGE`. `-e` of the same name wins. Baked in, so no secrets. |
 | `apps.chrome.policies` | the two of the [sample](sample/wayuse.config.ts) | Chrome's [managed policies](https://chromeenterprise.google/policies/), under Chrome's own names. Given, they replace the defaults, which keep Chrome to one profile. |
 | `apps.redir` | not installed | Installs [redir](https://github.com/troglobit/redir) and keeps it running. It forwards TCP ports inside the container. |
 | `apps.redir.ports` | required | The ports to listen on, from 1024 up, each with where it forwards to. `{9223: "127.0.0.1:9222"}` forwards port 9223 to Chrome DevTools Protocol. |
@@ -114,7 +114,7 @@ The resolved configuration is baked in as `/etc/wayuse/wayuse.config.json`.
 |---|---|
 | `--shm-size 256m` | Required. sway dies of a bus error on the 64MB Docker gives by default. |
 | `-e WAYUSE_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: 1. |
-| `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: Chrome's own. |
+| `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: the one in `apps.chrome.env`, or else Chrome's own. |
 | `-e WAYUSE_JWT_PUBLIC_KEY=<key>` | The key @wayuse/server verifies tokens with. Without it, every API that needs a token is refused. |
 | `-e WAYUSE_JWT_AUDIENCE=<string>` | The `aud` a token must carry. Default: `wayuse`. |
 | `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |

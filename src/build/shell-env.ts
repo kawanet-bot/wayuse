@@ -2,7 +2,7 @@
 const quote = (value: string): string => `'${value.replaceAll("'", "'\\''")}'`
 
 /**
- * Environment variables as a file a shell script sources.
+ * Lines that export each variable with its value as the default. A value the process already has, and not empty, wins.
  */
-export const shellEnvOf = (env: Record<string, string>): string =>
-    Object.entries(env).map(([name, value]) => `${name}=${quote(value)}\n`).join("")
+export const shellDefaultsOf = (env: Record<string, string>): string =>
+    Object.entries(env).map(([name, value]) => `export ${name}=\${${name}:-${quote(value)}}\n`).join("")
