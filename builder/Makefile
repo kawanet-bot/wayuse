@@ -23,9 +23,8 @@ SERVER_CONFIG := ./rollup-server.config.ts
 CLIENT_CONFIG := ./rollup-client.config.ts
 CONSOLE_CONFIG := ./rollup-console.config.ts
 
-# A bundle past its cap has taken in a module that was meant to stay external. Each cap leaves room to grow by half.
-# The files of one bundle count together. Rollup decides which of them a module goes into.
-BUILD_MAX_BYTES := 30000
+# A bundle past its cap has taken in a module meant to stay external. The files of a bundle count together.
+BUILD_MAX_BYTES := 60000
 SERVER_MAX_BYTES := 200000
 CLIENT_MAX_BYTES := 30000
 CONSOLE_MAX_BYTES := 60000

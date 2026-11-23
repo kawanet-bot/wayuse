@@ -8,6 +8,7 @@ import {DEFAULT_VARS} from "./config.ts"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
 import {shellEnvOf} from "./shell-env.ts"
+import {chromeStartOf, redirStartOf, swayStartOf, wayvncStartOf} from "./start-scripts.ts"
 import {swayConfigOf} from "./sway-config.ts"
 import {TERSER, bundleVendor} from "./vendor.ts"
 
@@ -22,6 +23,9 @@ const consoleScripts = (): string => fileURLToPath(new URL("./console/", import.
 // Where the image has what the server serves, and the console in it, laid out as its URLs are.
 const HTDOCS = "rootfs/opt/wayuse/htdocs"
 const CONSOLE = `${HTDOCS}/console`
+
+// The scripts the container runs. Each is written executable.
+const BIN = "rootfs/opt/wayuse/bin"
 
 // The directories of the image that are this package's alone. A build writes them anew.
 const OWNED = ["rootfs/opt/wayuse", "rootfs/etc/wayuse"]
@@ -38,15 +42,19 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
         "rootfs/etc/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
         "rootfs/etc/wayuse/sway/config": swayConfigOf(config),
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
+        [`${BIN}/sway-start.sh`]: swayStartOf(config),
+        [`${BIN}/wayvnc-start.sh`]: wayvncStartOf(config),
     }
 
     // The entry reads it before it has a token, which the API would ask for.
     if (config.console) files[`${CONSOLE}/config.json`] = JSON.stringify(config.console, null, 2) + "\n"
 
     const {chrome, redir} = config.apps
+    if (chrome) files[`${BIN}/chrome-start.sh`] = chromeStartOf(config)
     if (chrome) files["rootfs/etc/wayuse/chrome.env"] = shellEnvOf(chrome.env)
     // One file holds every policy. Chrome does not say which wins when two files name the same one.
     if (chrome) files[POLICIES] = JSON.stringify(chrome.policies, null, 2) + "\n"
+    if (redir) files[`${BIN}/redir-start.sh`] = redirStartOf(config)
     // One line per redir, for the start script to read: the port to listen on, then where it forwards to.
     if (redir) files["rootfs/etc/wayuse/redir.conf"] = Object.entries(redir.ports).map(([port, target]) => `${port} ${target}\n`).join("")
 
@@ -120,7 +128,7 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     for (const [path, content] of Object.entries(files)) {
         const file = join(outdir, path)
         await mkdir(dirname(file), {recursive: true})
-        await writeFile(file, content)
+        await writeFile(file, content, path.startsWith(`${BIN}/`) ? {mode: 0o755} : {})
     }
 
     const paths = Object.keys(files)
