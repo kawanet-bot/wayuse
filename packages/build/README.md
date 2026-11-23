@@ -44,7 +44,7 @@ docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_SCREEN_OUTPUTS=
 
 The server in the image needs `WAYUSE_JWT_PUBLIC_KEY`, the public key of the tokens it is to take. Without it, every request gets `503`. [@wayuse/server](../server/README.md#tokens) shows how to make the pair.
 
-The package ships a `wayuse.config.ts` in [sample/](sample/) that writes out the defaults too, with a [docker-compose.yml](sample/docker-compose.yml) that runs its image.
+The package ships a `wayuse.config.ts` in [sample/](sample/) that writes out the defaults too, with a [docker-compose.yml](sample/docker-compose.yml) that includes the `compose.yml` of its build.
 Copy them, make the keys once, and start the container:
 
 ```sh
@@ -54,7 +54,7 @@ chmod 600 .env
 npx wayuse build && docker compose up --build -d
 ```
 
-Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
+Docker Compose reads `.env` by itself. Of the two keys in it, only the public key reaches the container.
 The private key is in `.env` too. Keep the file to its owner and out of version control.
 The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `docker/wayuse` beside its file.
 
@@ -101,7 +101,7 @@ Without `-d`, it writes to `output.dir` of the configuration. With neither, it s
 It prints the path of every file it writes.
 `npx wayuse build` takes the same options and passes them on.
 
-The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
+The build directory holds the `Dockerfile`, a [compose.yml](#docker-compose) and `rootfs/`, which mirrors the image's file system.
 A build writes `rootfs/opt/wayuse/` anew, and its other files over those of the build before.
 `rootfs/opt/wayuse/` has a `.gitignore`, so git keeps none of it.
 Outside `rootfs/opt/wayuse/`, a file stays when the option that wrote it is removed. Remove it by hand.
@@ -132,6 +132,29 @@ tini is PID 1 in the image, so `--init` is not needed.
 | 9580 | @wayuse/server. Publish it with `-p` to reach the container from outside |
 | 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
 | 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
+
+### Docker Compose
+
+A build writes `compose.yml` beside the `Dockerfile`. The compose file of the project includes it, as the sample's does:
+
+```yaml
+include:
+  - "docker/wayuse/compose.yml"
+```
+
+It gives the container what the `docker run` table names, `--uts=host` aside.
+It passes on the `-e` variables there from `.env` or the shell. A variable the image does not read is left out, such as the key for an image built with `auth: false`.
+`WAYUSE_PUBLISH` there moves the published port, such as `WAYUSE_PUBLISH=0.0.0.0:9580`.
+The service is `wayuse` and the volume is `wayuse_config`. Docker Compose names the image and the volume after the project.
+
+A build writes `compose.yml` again, so a setting of the project's own goes in `compose.override.yml` beside the project's compose file. Docker Compose reads it by itself:
+
+```yaml
+services:
+  wayuse:
+    ports:
+      - "127.0.0.1:9222:9223"
+```
 
 ### Chrome DevTools Protocol from the host
 

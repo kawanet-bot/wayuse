@@ -4,6 +4,7 @@ import {dirname, join, relative} from "node:path"
 import {fileURLToPath} from "node:url"
 import {minify} from "terser"
 import type {WayuseClient} from "wayuse"
+import {composeOf} from "./compose.ts"
 import {DEFAULT_VARS} from "./config.ts"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
@@ -38,6 +39,7 @@ const POLICIES = "rootfs/etc/opt/chrome/policies/managed/wayuse.json"
 export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): Record<string, string> => {
     const files: Record<string, string> = {
         "Dockerfile": dockerfileOf(config, options),
+        "compose.yml": composeOf(config),
         "rootfs/opt/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
         [`rootfs${SWAY_CONFIG}`]: swayConfigOf(config),
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),

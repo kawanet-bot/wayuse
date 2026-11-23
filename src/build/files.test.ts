@@ -113,9 +113,22 @@ describe(TITLE, () => {
         const start = readFileSync(new URL("../../packages/build/assets/rootfs/opt/wayuse/bin/server-start.sh", import.meta.url), "utf8")
         assert.equal(start.match(/ --port=(\d+)$/m)?.[1], port)
 
-        // The sample publishes the port under its own number, which is where the client's default looks.
-        const sample = readFileSync(new URL("../../packages/build/sample/docker-compose.yml", import.meta.url), "utf8")
-        assert.equal(sample.match(/^ +- "\$\{WAYUSE_PUBLISH:-127\.0\.0\.1:(\d+)\}:(\d+)"$/m)?.slice(1).join(), `${port},${port}`)
+        // The compose file publishes the port under its own number, which is where the client's default looks.
+        const compose = generatedFilesOf(config)["compose.yml"]!
+        assert.equal(compose.match(/^ +- "\$\{WAYUSE_PUBLISH:-127\.0\.0\.1:(\d+)\}:(\d+)"$/m)?.slice(1).join(), `${port},${port}`)
+    })
+
+    it("passes on to the container the variables it reads, and no key to an image that checks no token", () => {
+        const namesOf = (compose: string) => [...compose.matchAll(/^ {6}(\w+): "\$\{\1:-\}"$/gm)].map(match => match[1])
+        assert.deepEqual(namesOf(generatedFilesOf(config)["compose.yml"]!), ["WAYUSE_SCREEN_OUTPUTS", "WAYUSE_USER_AGENT", "WAYUSE_JWT_PUBLIC_KEY", "WAYUSE_JWT_AUDIENCE"])
+        assert.deepEqual(namesOf(generatedFilesOf(resolveConfig({auth: false}, "wayuse.config.ts"))["compose.yml"]!), ["WAYUSE_SCREEN_OUTPUTS"])
+    })
+
+    // The sample's two files are copied together, so nothing but this test holds the path of one in the other.
+    it("includes in the sample the compose file the sample's build writes", async () => {
+        const {default: sample} = await import("../../packages/build/sample/wayuse.config.ts")
+        const compose = readFileSync(new URL("../../packages/build/sample/docker-compose.yml", import.meta.url), "utf8")
+        assert.equal(compose.match(/^include:\n(?: +#.*\n)* +- "(.+)"$/m)?.[1], `${sample.output?.dir}/compose.yml`)
     })
 
     // A settings-only change must rebuild nothing above the COPY.
