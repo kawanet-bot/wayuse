@@ -45,6 +45,9 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
         [`${BIN}/wayvnc-start.sh`]: wayvncStartOf(config),
     }
 
+    // assets/ cannot hold it. npm pack leaves out a directory with a .gitignore in it.
+    files[`${OWNED}/.gitignore`] = "# A build writes this directory anew, so git keeps none of it.\n*\n"
+
     // The entry reads it before it has a token, which the API would ask for.
     if (config.console) files[`${CONSOLE}/config.json`] = JSON.stringify(config.console, null, 2) + "\n"
 

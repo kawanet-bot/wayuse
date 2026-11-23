@@ -38,6 +38,7 @@ describe(TITLE, () => {
         // Where the server reads it by default.
         assert.deepEqual(JSON.parse(files[`rootfs${DEFAULT_CONFIG}`]!), config)
         assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/htdocs/console/config.json"]!), {signIn: "/sign-in/?next="})
+        assert.match(files["rootfs/opt/wayuse/.gitignore"]!, /^\*$/m)
     })
 
     it("leaves Chrome out of an image without it, and what only Chrome needs", () => {
