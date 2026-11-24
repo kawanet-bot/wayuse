@@ -1,6 +1,7 @@
 {
   "name": "wayuse-workspace",
   "description": "Workspace for @wayuse/build, @wayuse/server and wayuse.",
+  "version": "0.0.1",
   "author": "Kawanet",
   "devDependencies": {
     "@rollup/plugin-json": "^6.1.0",
@@ -29,7 +30,9 @@
   "scripts": {
     "build": "make -C builder",
     "fixpack": "fixpack && fixpack packages/build/package.json && fixpack packages/server/package.json && fixpack packages/wayuse/package.json",
+    "get-version": "npm pkg get version --workspaces --include-workspace-root",
     "prepare": "make -C builder is-not-buildable 2> /dev/null || make -C builder clean all test",
+    "set-version": "npm version --workspaces --include-workspace-root --no-git-tag-version",
     "test": "make -C builder test",
     "ts-refine": "./node_modules/.bin/ts-refine format && ./node_modules/.bin/ts-refine imports"
   },

@@ -1,7 +1,8 @@
 import type {WayuseClient} from "wayuse"
+import {VERSION} from "./version.ts"
 
-// The @wayuse/server that @wayuse/build was written against. A tarball stands in while that is not on npm.
-const SERVER_RANGE = "^0.0.0"
+// The packages are released at one version, so the server is the one of this package's version.
+const SERVER_RANGE = `^${VERSION}`
 
 /** The tarball's name in the image: fixed, so the generated files do not change with its version. */
 export const SERVER_TARBALL = "wayuse-server.tgz"

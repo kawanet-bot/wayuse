@@ -1,0 +1,85 @@
+name: Publish
+
+# One workflow for the three packages. A publish-<package>.yml names the
+# package and the tag that releases it, and calls this with the package.
+# The staged publish leaves the version invisible until a maintainer
+# approves it with 2FA.
+on:
+  workflow_call:
+    inputs:
+      package:
+        description: The package to publish, by its directory under packages/
+        required: true
+        type: string
+
+# Deny by default; each job opts in to the minimum it needs.
+permissions: { }
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # merge-base below needs the history of main, not just the tag.
+          fetch-depth: 0
+          persist-credentials: false
+
+      # A tag created on a side branch must never reach npm.
+      - name: Verify tag is on main
+        run: git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      # The tag is <name>@<version>, with the name and the version of that package.
+      - name: Verify tag matches package.json
+        run: |
+          tag=$(npm pkg get name version -w "packages/${{ inputs.package }}" | jq -r '.[] | "\(.name)@\(.version)"')
+          test "$tag" = "$GITHUB_REF_NAME"
+
+      # The packages and the workspace share one version, which set-version keeps.
+      - name: Verify every package has the same version
+        run: test "$(npm run -s get-version | jq '[.[]] | unique | length')" = 1
+
+      - run: npm install --ignore-scripts
+      - run: npm run build
+      - run: npm test
+      - run: make -C builder/pack pack test-dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: packages/${{ inputs.package }}/dist/
+          retention-days: 1
+
+  stage:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: npm-stage
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: packages/${{ inputs.package }}/dist/
+
+      # Nothing third party is installed in this job, so no foreign code runs
+      # while the OIDC token is reachable. This only queues the tarball: a
+      # maintainer releases it with 'npm stage approve'.
+      - run: npm stage publish --ignore-scripts -w "packages/${{ inputs.package }}"
