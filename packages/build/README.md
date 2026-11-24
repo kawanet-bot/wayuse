@@ -144,11 +144,12 @@ include:
 
 It gives the container what the `docker run` table names, `--uts=host` aside.
 It passes on the `-e` variables there from `.env` or the shell, or else the values the image has. A variable the image does not read is left out, such as the key for an image built with `auth: false`.
-`WAYUSE_PUBLISH` there moves the published port, such as `WAYUSE_PUBLISH=0.0.0.0:9580`.
+`WAYUSE_PUBLISH` in `.env` moves the published port, such as `WAYUSE_PUBLISH=0.0.0.0:9580`.
 The service is `wayuse` and the volume is `wayuse_config`. Docker Compose names the image and the volume after the project.
 
 A build writes `compose.yml` again, so a setting of the project's own goes in the project's compose file, under `wayuse`.
-Docker Compose merges it into the service of `compose.yml`. A variable written there wins, and a port is added:
+Docker Compose merges it into the service of `compose.yml`. A variable written there wins over `.env`, and a port is added.
+This one publishes the port of `apps.redir` in the next section:
 
 ```yaml
 include:
@@ -193,7 +194,7 @@ Connect by an IP address or `localhost`. Chrome refuses a request whose `Host` h
 A development server on the host, such as `wrangler dev`, is opened in the container as `http://host.docker.internal:<port>/`.
 On Linux a container does not reach the host's `127.0.0.1`, so two things are needed.
 
-1. Give the container the host's name, with `docker run --add-host host.docker.internal:host-gateway`. The sample's `docker-compose.yml` does it with `extra_hosts`.
+1. Give the container the host's name, with `docker run --add-host host.docker.internal:host-gateway`. The `compose.yml` of the build directory does it with `extra_hosts`.
 
 2. Make the server listen on more than `127.0.0.1`, which is where `wrangler dev`, like most development servers, listens by default:
 
