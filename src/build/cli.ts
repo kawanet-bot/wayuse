@@ -1,5 +1,5 @@
 import type * as declared from "@wayuse/build"
-import {basename, join, resolve} from "node:path"
+import {basename, dirname, join, resolve} from "node:path"
 import {pathToFileURL} from "node:url"
 import {parseArgs} from "node:util"
 import {findConfigFile, isFile} from "./config-file.ts"
@@ -70,7 +70,9 @@ export const CLI: typeof declared.CLI = async ({args}) => {
         // The directory is left out, so the image tells nothing of where it was built.
         const config = resolveConfig(input, basename(configFile))
         const dir = outputDirOf(input, options.dir)
-        const files = await writeBuildDir(config, dir, {serverTarball: options["server-tarball"], vars: consoleVarsOf(input), terser: consoleTerserOf(input)})
+        // Outside rootfs/, the scripts name the image after the directory, as Docker Compose names its project.
+        const project = basename(dirname(resolve(configFile)))
+        const files = await writeBuildDir(config, dir, {serverTarball: options["server-tarball"], vars: consoleVarsOf(input), terser: consoleTerserOf(input), project})
         for (const file of files) process.stdout.write(`${join(dir, file)}\n`)
         return 0
     } catch (error) {

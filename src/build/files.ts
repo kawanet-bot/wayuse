@@ -6,6 +6,7 @@ import {minify} from "terser"
 import type {WayuseClient} from "wayuse"
 import {composeOf} from "./compose.ts"
 import {DEFAULT_VARS} from "./config.ts"
+import {dockerBuildOf, dockerRunOf} from "./docker-scripts.ts"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
 import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
 import {chromeStartOf, redirStartOf, swayStartOf, wayvncStartOf} from "./start-scripts.ts"
@@ -24,7 +25,7 @@ const consoleScripts = (): string => fileURLToPath(new URL("./console/", import.
 const HTDOCS = "rootfs/opt/wayuse/htdocs"
 const CONSOLE = `${HTDOCS}/console`
 
-// The scripts the container runs. Each is written executable.
+// The scripts the container runs.
 const BIN = "rootfs/opt/wayuse/bin"
 
 // The directory of the image that is this package's alone. A build writes it anew.
@@ -40,6 +41,8 @@ export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): 
     const files: Record<string, string> = {
         "Dockerfile": dockerfileOf(config, options),
         "compose.yml": composeOf(config),
+        "docker-build.sh": dockerBuildOf(config, options),
+        "docker-run.sh": dockerRunOf(config, options),
         "rootfs/opt/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
         [`rootfs${SWAY_CONFIG}`]: swayConfigOf(config),
         "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
@@ -135,7 +138,9 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     for (const [path, content] of Object.entries(files)) {
         const file = join(outdir, path)
         await mkdir(dirname(file), {recursive: true})
-        await writeFile(file, content, path.startsWith(`${BIN}/`) ? {mode: 0o755} : {})
+        // Written anew, so that a link there is not written through and a script gets its mode, which a new file alone takes.
+        await rm(file, {force: true})
+        await writeFile(file, content, path.endsWith(".sh") ? {mode: 0o755} : {})
     }
 
     const paths = [...copied.filter(path => config.console || !path.startsWith(`${HTDOCS}/`)), ...Object.keys(files)]

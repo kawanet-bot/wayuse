@@ -10,6 +10,8 @@ export interface BuildOptions {
     vars?: Record<string, string>
     /** Whether the console's scripts and the packages beside them are made small. Default: true. */
     terser?: boolean
+    /** The directory of the configuration, as Docker Compose names its project after it. The scripts name the image and the volume the same way. Default: "wayuse". */
+    project?: string
 }
 
 const UBUNTU = "ubuntu:26.04"
