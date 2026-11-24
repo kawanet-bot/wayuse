@@ -44,7 +44,7 @@ docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -e WAYUSE_SCREEN_OUTPUTS=
 
 The server in the image needs `WAYUSE_JWT_PUBLIC_KEY`, the public key of the tokens it is to take. Without it, every request gets `503`. [@wayuse/server](../server/README.md#tokens) shows how to make the pair.
 
-The package ships a `wayuse.config.ts` in [sample/](sample/) that writes out the defaults too, with a [docker-compose.yml](sample/docker-compose.yml) that runs its image.
+The package ships a `wayuse.config.ts` in [sample/](sample/) that writes out the defaults too, with a [docker-compose.yml](sample/docker-compose.yml) that includes the `compose.yml` of its build.
 Copy them, make the keys once, and start the container:
 
 ```sh
@@ -54,7 +54,7 @@ chmod 600 .env
 npx wayuse build && docker compose up --build -d
 ```
 
-Docker Compose reads `.env` by itself, and only the public key in it reaches the container.
+Docker Compose reads `.env` by itself. Of the two keys in it, only the public key reaches the container.
 The private key is in `.env` too. Keep the file to its owner and out of version control.
 The two files work only as copies. Node.js runs no `.ts` under `node_modules`, and Docker Compose looks for `.env` and `docker/wayuse` beside its file.
 
@@ -101,7 +101,7 @@ Without `-d`, it writes to `output.dir` of the configuration. With neither, it s
 It prints the path of every file it writes.
 `npx wayuse build` takes the same options and passes them on.
 
-The build directory holds the `Dockerfile` and `rootfs/`, which mirrors the image's file system.
+The build directory holds the `Dockerfile`, a [compose.yml](#docker-compose) and `rootfs/`, which mirrors the image's file system.
 A build writes `rootfs/opt/wayuse/` anew, and its other files over those of the build before.
 `rootfs/opt/wayuse/` has a `.gitignore`, so git keeps none of it.
 Outside `rootfs/opt/wayuse/`, a file stays when the option that wrote it is removed. Remove it by hand.
@@ -132,6 +132,36 @@ tini is PID 1 in the image, so `--init` is not needed.
 | 9580 | @wayuse/server. Publish it with `-p` to reach the container from outside |
 | 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
 | 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
+
+### Docker Compose
+
+A build writes `compose.yml` beside the `Dockerfile`. The compose file of the project includes it, as the sample's does:
+
+```yaml
+include:
+  - "docker/wayuse/compose.yml"
+```
+
+It gives the container what the `docker run` table names, `--uts=host` aside.
+It passes on the `-e` variables there from `.env` or the shell, or else the values the image has. A variable the image does not read is left out, such as the key for an image built with `auth: false`.
+`WAYUSE_PUBLISH` in `.env` moves the published port, such as `WAYUSE_PUBLISH=0.0.0.0:9580`.
+The service is `wayuse` and the volume is `wayuse_config`. Docker Compose names the image and the volume after the project.
+
+A build writes `compose.yml` again, so a setting of the project's own goes in the project's compose file, under `wayuse`.
+Docker Compose merges it into the service of `compose.yml`. A variable written there wins over `.env`, and a port is added.
+This one publishes the port of `apps.redir` in the next section:
+
+```yaml
+include:
+  - "docker/wayuse/compose.yml"
+
+services:
+  wayuse:
+    ports:
+      - "127.0.0.1:9222:9223"
+    environment:
+      WAYUSE_SCREEN_OUTPUTS: "2"
+```
 
 ### Chrome DevTools Protocol from the host
 
@@ -164,7 +194,7 @@ Connect by an IP address or `localhost`. Chrome refuses a request whose `Host` h
 A development server on the host, such as `wrangler dev`, is opened in the container as `http://host.docker.internal:<port>/`.
 On Linux a container does not reach the host's `127.0.0.1`, so two things are needed.
 
-1. Give the container the host's name, with `docker run --add-host host.docker.internal:host-gateway`. The sample's `docker-compose.yml` does it with `extra_hosts`.
+1. Give the container the host's name, with `docker run --add-host host.docker.internal:host-gateway`. The `compose.yml` of the build directory does it with `extra_hosts`.
 
 2. Make the server listen on more than `127.0.0.1`, which is where `wrangler dev`, like most development servers, listens by default:
 

@@ -70,6 +70,9 @@ RUN npm install --prefix /opt/wayuse --omit=dev --no-audit --no-fund && \\
     npm cache clean --force
 `.trim()
 
+/** The port the server listens on in the image. */
+export const PORT = 9580
+
 // Fixed paths, so that `docker exec` reaches the same sway as the processes started here.
 export const RUNTIME_ENV = [
     "XDG_RUNTIME_DIR=/run/wayuse",
@@ -88,7 +91,7 @@ export const commandsOf = (config: Resolved): string[] => [
 ]
 
 const runtimeOf = (config: Resolved): string => `
-EXPOSE 9580
+EXPOSE ${PORT}
 USER wayuse
 WORKDIR /home/wayuse
 ENV ${RUNTIME_ENV.join(" ")}
