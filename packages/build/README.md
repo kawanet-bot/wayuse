@@ -143,7 +143,7 @@ include:
 ```
 
 It gives the container what the `docker run` table names, `--uts=host` aside.
-It passes on the `-e` variables there from `.env` or the shell. A variable the image does not read is left out, such as the key for an image built with `auth: false`.
+It passes on the `-e` variables there from `.env` or the shell, or else the values the image has. A variable the image does not read is left out, such as the key for an image built with `auth: false`.
 `WAYUSE_PUBLISH` there moves the published port, such as `WAYUSE_PUBLISH=0.0.0.0:9580`.
 The service is `wayuse` and the volume is `wayuse_config`. Docker Compose names the image and the volume after the project.
 

@@ -119,9 +119,22 @@ describe(TITLE, () => {
     })
 
     it("passes on to the container the variables it reads, and no key to an image that checks no token", () => {
-        const namesOf = (compose: string) => [...compose.matchAll(/^ {6}(\w+): "\$\{\1:-\}"$/gm)].map(match => match[1])
+        const namesOf = (compose: string) => [...compose.matchAll(/^ {6}(\w+): "\$\{\1:-.*\}"$/gm)].map(match => match[1])
         assert.deepEqual(namesOf(generatedFilesOf(config)["compose.yml"]!), ["WAYUSE_SCREEN_OUTPUTS", "WAYUSE_USER_AGENT", "WAYUSE_JWT_PUBLIC_KEY", "WAYUSE_JWT_AUDIENCE"])
         assert.deepEqual(namesOf(generatedFilesOf(resolveConfig({auth: false}, "wayuse.config.ts"))["compose.yml"]!), ["WAYUSE_SCREEN_OUTPUTS"])
+    })
+
+    it("gives the container the values the image has, unless .env or the shell has one", () => {
+        const compose = generatedFilesOf(resolveConfig({screen: {outputs: 3}, apps: {chrome: {env: {WAYUSE_USER_AGENT: "Test/1.0 (X11; rv:1.0) +http://a.example/?q=1#top"}}}}, "wayuse.config.ts"))["compose.yml"]!
+        assert.match(compose, /^ {6}WAYUSE_SCREEN_OUTPUTS: "\$\{WAYUSE_SCREEN_OUTPUTS:-3\}"$/m)
+        assert.match(compose, /^ {6}WAYUSE_USER_AGENT: "\$\{WAYUSE_USER_AGENT:-Test\/1\.0 \(X11; rv:1\.0\) \+http:\/\/a\.example\/\?q=1#top\}"$/m)
+        assert.match(compose, /^ {6}WAYUSE_JWT_PUBLIC_KEY: "\$\{WAYUSE_JWT_PUBLIC_KEY:-\}"$/m)
+
+        // Compose would read these otherwise, so the image's own value is left to apply.
+        for (const agent of ["a}b", "a$b", "a\"b"]) {
+            const compose = generatedFilesOf(resolveConfig({apps: {chrome: {env: {WAYUSE_USER_AGENT: agent}}}}, "wayuse.config.ts"))["compose.yml"]!
+            assert.match(compose, /^ {6}WAYUSE_USER_AGENT: "\$\{WAYUSE_USER_AGENT:-\}"$/m, agent)
+        }
     })
 
     // The sample's two files are copied together, so nothing but this test holds the path of one in the other.
