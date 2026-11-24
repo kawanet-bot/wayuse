@@ -142,7 +142,7 @@ describe(TITLE, () => {
         assert.equal(projectOf("my-wayuse"), "my-wayuse")
         assert.equal(projectOf("My.Project_2"), "myproject_2")
         assert.equal(projectOf("-_x"), "x")
-        assert.equal(projectOf("ウェイユース"), "wayuse")
+        assert.equal(projectOf("+.+"), "wayuse")
     })
 
     it("names in the scripts the image and the volume Docker Compose would", () => {
