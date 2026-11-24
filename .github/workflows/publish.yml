@@ -1,6 +1,6 @@
 name: Publish
 
-# One workflow for the three packages. A publish-<package>.yml names the
+# One workflow for every package. A publish-<package>.yml names the
 # package and the tag that releases it, and calls this with the package.
 # The staged publish leaves the version invisible until a maintainer
 # approves it with 2FA.
@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      dist: ${{ steps.dist.outputs.has }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -36,22 +38,28 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
-      # The tag is <name>@<version>, with the name and the version of that package.
+      # The tag is <package>@<version>, with the version of that package.
       - name: Verify tag matches package.json
         run: |
           tag=$(npm pkg get name version -w "packages/${{ inputs.package }}" | jq -r '.[] | "\(.name)@\(.version)"')
           test "$tag" = "$GITHUB_REF_NAME"
 
-      # The packages and the workspace share one version, which set-version keeps.
       - name: Verify every package has the same version
         run: test "$(npm run -s get-version | jq '[.[]] | unique | length')" = 1
 
       - run: npm install --ignore-scripts
       - run: npm run build
       - run: npm test
-      - run: make -C builder/pack pack test-dist
+      - run: make -C builder/pack pack
+      - run: make -C builder/pack test-dist
 
-      - uses: actions/upload-artifact@v7
+      - name: Check for built files
+        id: dist
+        run: |
+          if [ -d "packages/${{ inputs.package }}/dist" ]; then echo "has=true" >> "$GITHUB_OUTPUT"; else echo "has=false" >> "$GITHUB_OUTPUT"; fi
+
+      - if: steps.dist.outputs.has == 'true'
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: packages/${{ inputs.package }}/dist/
@@ -74,7 +82,8 @@ jobs:
           node-version: "24"
           package-manager-cache: false
 
-      - uses: actions/download-artifact@v8
+      - if: needs.build.outputs.dist == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: packages/${{ inputs.package }}/dist/
