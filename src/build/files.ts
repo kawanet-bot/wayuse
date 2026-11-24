@@ -138,7 +138,8 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
     for (const [path, content] of Object.entries(files)) {
         const file = join(outdir, path)
         await mkdir(dirname(file), {recursive: true})
-        // A script is written executable, those of the host and of the container alike.
+        // Written anew, so that a link there is not written through and a script gets its mode, which a new file alone takes.
+        await rm(file, {force: true})
         await writeFile(file, content, path.endsWith(".sh") ? {mode: 0o755} : {})
     }
 

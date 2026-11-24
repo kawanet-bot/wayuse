@@ -176,9 +176,7 @@ docker/wayuse/docker-run.sh
 The variables come from the environment, such as from `EnvironmentFile=` of a systemd unit, which takes the project's `.env` as it is.
 The container gets the variables that `compose.yml` passes on, and no others, so the private key stays out.
 
-The scripts name the image, the container and the volume as Docker Compose does, after the directory of `wayuse.config.ts`.
-For `my-app/`, they are `my-app-wayuse`, `my-app-wayuse-1` and `my-app_wayuse_config`, so either way starts the same image with the same profile.
-`WAYUSE_IMAGE` gives the image another name, such as `my-app-wayuse:v1`. The container keeps its name.
+`WAYUSE_IMAGE` gives the image another name.
 
 Their arguments go to `docker build` and `docker run` as options. A variable given with `-e` there wins over the script's.
 To change another option they give, write a script of the project's own:

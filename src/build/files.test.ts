@@ -1,6 +1,6 @@
 import assert from "node:assert/strict"
 import {readFileSync} from "node:fs"
-import {mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile} from "node:fs/promises"
+import {chmod, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile} from "node:fs/promises"
 import {tmpdir} from "node:os"
 import {join} from "node:path"
 import {describe, it} from "node:test"
@@ -276,6 +276,20 @@ describe(TITLE, () => {
             // Each once, and each there.
             assert.equal(new Set(paths).size, paths.length)
             for (const path of paths) await stat(join(outdir, path))
+        } finally {
+            await rm(outdir, {recursive: true, force: true})
+        }
+    })
+
+    // A script outside rootfs/opt/wayuse/ outlives the build, and may have lost its mode, as an artifact of CI does.
+    it("makes a script executable again when it writes over it", async () => {
+        const outdir = await mkdtemp(join(tmpdir(), "wayuse-"))
+        try {
+            const bare = resolveConfig({console: false}, "wayuse.config.ts")
+            await writeBuildDir(bare, outdir)
+            await chmod(join(outdir, "docker-run.sh"), 0o644)
+            await writeBuildDir(bare, outdir)
+            assert.equal((await stat(join(outdir, "docker-run.sh"))).mode & 0o111, 0o111)
         } finally {
             await rm(outdir, {recursive: true, force: true})
         }
