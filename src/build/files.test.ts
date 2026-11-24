@@ -11,6 +11,7 @@ import {projectOf} from "./docker-scripts.ts"
 import {generatedFilesOf, writeBuildDir} from "./files.ts"
 import {APP_PACKAGES} from "./npm-package.ts"
 import {shellDefaultsOf} from "./shell-env.ts"
+import {VERSION} from "./version.ts"
 
 const TITLE = "build/files.test.ts"
 
@@ -49,7 +50,7 @@ describe(TITLE, () => {
         assert.equal(files["rootfs/opt/wayuse/bin/redir-start.sh"], undefined)
         assert.equal(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"], undefined)
         assert.equal(files["rootfs/opt/wayuse/htdocs/console/config.json"], "{}\n")
-        assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"@wayuse/server": "^0.0.0"})
+        assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"@wayuse/server": `^${VERSION}`})
     })
 
     it("spaces the outputs apart for the widest screen", () => {

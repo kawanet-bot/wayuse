@@ -1,7 +1,7 @@
 {
   "name": "wayuse",
   "description": "The API client and CLI for a wayuse container.",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "Kawanet",
   "bin": {
     "wayuse": "bin/wayuse.js"
