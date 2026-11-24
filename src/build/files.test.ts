@@ -34,7 +34,7 @@ describe(TITLE, () => {
         assert.match(dockerfile, /chrome-start\.sh","\/opt\/wayuse\/bin\/server-start\.sh"\]\n$/)
         assert.match(files["rootfs/opt/wayuse/config/sway.conf"]!, /^output \* resolution 1920x1080$/m)
         assert.match(files["rootfs/opt/wayuse/config/sway.conf"]!, /^output HEADLESS-2 position 2432 0$/m)
-        assert.match(files["rootfs/opt/wayuse/bin/chrome-start.sh"]!, /^export LANGUAGE=\$\{LANGUAGE:-'ja'\}$/m)
+        assert.match(files["rootfs/opt/wayuse/bin/chrome-start.sh"]!, /^export LANGUAGE=\$\{LANGUAGE:-"ja"\}$/m)
         assert.deepEqual(JSON.parse(files["rootfs/etc/opt/chrome/policies/managed/wayuse.json"]!), {AutoplayAllowlist: ["https://www.youtube.com"]})
         // Where the server reads it by default.
         assert.deepEqual(JSON.parse(files[`rootfs${DEFAULT_CONFIG}`]!), config)
@@ -61,7 +61,7 @@ describe(TITLE, () => {
     it("gives sway and wayvnc the number of screens, below what the container is given", () => {
         const files = generatedFilesOf(resolveConfig({screen: {outputs: 3}}, "wayuse.config.ts"))
         for (const name of ["sway-start.sh", "wayvnc-start.sh"]) {
-            assert.match(files[`rootfs/opt/wayuse/bin/${name}`]!, /^export WAYUSE_SCREEN_OUTPUTS=\$\{WAYUSE_SCREEN_OUTPUTS:-'3'\}$/m, name)
+            assert.match(files[`rootfs/opt/wayuse/bin/${name}`]!, /^export WAYUSE_SCREEN_OUTPUTS=\$\{WAYUSE_SCREEN_OUTPUTS:-"3"\}$/m, name)
         }
     })
 
@@ -147,8 +147,8 @@ describe(TITLE, () => {
 
     it("names in the scripts the image and the volume Docker Compose would", () => {
         const files = generatedFilesOf(config, {project: "My.Project"})
-        assert.match(files["docker-build.sh"]!, /^export WAYUSE_IMAGE=\$\{WAYUSE_IMAGE:-'myproject-wayuse'\}$/m)
-        assert.match(files["docker-run.sh"]!, /^export WAYUSE_IMAGE=\$\{WAYUSE_IMAGE:-'myproject-wayuse'\}$/m)
+        assert.match(files["docker-build.sh"]!, /^export WAYUSE_IMAGE=\$\{WAYUSE_IMAGE:-"myproject-wayuse"\}$/m)
+        assert.match(files["docker-run.sh"]!, /^export WAYUSE_IMAGE=\$\{WAYUSE_IMAGE:-"myproject-wayuse"\}$/m)
         assert.match(files["docker-run.sh"]!, /^ {4}-v myproject_wayuse_config:\/home\/wayuse\/\.config \\$/m)
     })
 
@@ -158,7 +158,7 @@ describe(TITLE, () => {
             const composed = [...files["compose.yml"]!.matchAll(/^ {6}(\w+): "\$\{\1:-.*\}"$/gm)].map(match => match[1])
             const run = files["docker-run.sh"]!
             assert.deepEqual([...run.matchAll(/^ {4}-e (\w+) \\$/gm)].map(match => match[1]), composed)
-            for (const name of composed) assert.match(run, new RegExp(`^export ${name}=\\$\\{${name}:-'.*'\\}$`, "m"))
+            for (const name of composed) assert.match(run, new RegExp(`^export ${name}=\\$\\{${name}:-".*"\\}$`, "m"))
             assert.match(run, /\n {4}"\$@" \\\n {4}"\$WAYUSE_IMAGE"\n$/)
         }
         assert.match(generatedFilesOf(config)["docker-build.sh"]!, /^exec docker build -t "\$WAYUSE_IMAGE" "\$@" "\$\(dirname "\$0"\)"$/m)
@@ -179,7 +179,7 @@ describe(TITLE, () => {
     })
 
     it("quotes an environment value so that the shell runs none of it", () => {
-        assert.equal(shellDefaultsOf({A: "it's $(date) `id`"}), "export A=${A:-'it'\\''s $(date) `id`'}\n")
+        assert.equal(shellDefaultsOf({A: "it's \"$(date)\" `id` \\"}), "export A=${A:-\"it's \\\"\\$(date)\\\" \\`id\\` \\\\\"}\n")
     })
 
     it("writes the pages with the default icon and title where none is given", async () => {
