@@ -15,8 +15,9 @@ const headerOf = (config: Resolved): string =>
  */
 export const projectOf = (dir: string): string => dir.toLowerCase().replace(/[^a-z0-9_-]/g, "").replace(/^[_-]+/, "") || SERVICE
 
-// The names Docker Compose gives the image and the volume, so that either way starts the same image with the same profile.
+// The names Docker Compose gives the image, the container and the volume, so that either way starts the same image with the same profile.
 const imageOf = (options: BuildOptions): string => `${projectOf(options.project ?? SERVICE)}-${SERVICE}`
+const containerOf = (options: BuildOptions): string => `${projectOf(options.project ?? SERVICE)}-${SERVICE}-1`
 const volumeOf = (options: BuildOptions): string => `${projectOf(options.project ?? SERVICE)}_${VOLUME}`
 
 /**
@@ -44,7 +45,7 @@ set -eu
 # A value in the environment wins, such as one that EnvironmentFile= of a systemd unit gives.
 ${shellDefaultsOf({WAYUSE_IMAGE: imageOf(options), WAYUSE_PUBLISH: PUBLISH, ...passedOf(config)})}
 # The container gets the variables named here alone, so the private key of the .env stays out.
-exec docker run --rm --name "$WAYUSE_IMAGE" \\
+exec docker run --rm --name ${containerOf(options)} \\
     --shm-size ${SHM_SIZE} \\
     --add-host ${HOST_GATEWAY} \\
     -p "$WAYUSE_PUBLISH:${PORT}" \\

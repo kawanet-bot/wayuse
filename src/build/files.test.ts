@@ -145,8 +145,10 @@ describe(TITLE, () => {
         assert.equal(projectOf("+.+"), "wayuse")
     })
 
-    it("names in the scripts the image and the volume Docker Compose would", () => {
+    it("names in the scripts the image, the container and the volume Docker Compose would", () => {
         const files = generatedFilesOf(config, {project: "My.Project"})
+        // A tag or a registry in WAYUSE_IMAGE would make no name of a container.
+        assert.match(files["docker-run.sh"]!, /^exec docker run --rm --name myproject-wayuse-1 \\$/m)
         assert.match(files["docker-build.sh"]!, /^export WAYUSE_IMAGE=\$\{WAYUSE_IMAGE:-"myproject-wayuse"\}$/m)
         assert.match(files["docker-run.sh"]!, /^export WAYUSE_IMAGE=\$\{WAYUSE_IMAGE:-"myproject-wayuse"\}$/m)
         assert.match(files["docker-run.sh"]!, /^ {4}-v myproject_wayuse_config:\/home\/wayuse\/\.config \\$/m)
