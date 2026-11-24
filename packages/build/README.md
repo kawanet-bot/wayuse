@@ -101,7 +101,7 @@ Without `-d`, it writes to `output.dir` of the configuration. With neither, it s
 It prints the path of every file it writes.
 `npx wayuse build` takes the same options and passes them on.
 
-The build directory holds the `Dockerfile`, a [compose.yml](#docker-compose) and `rootfs/`, which mirrors the image's file system.
+The build directory holds the `Dockerfile`, a [compose.yml](#docker-compose), [two scripts](#without-docker-compose) and `rootfs/`, which mirrors the image's file system.
 A build writes `rootfs/opt/wayuse/` anew, and its other files over those of the build before.
 `rootfs/opt/wayuse/` has a `.gitignore`, so git keeps none of it.
 Outside `rootfs/opt/wayuse/`, a file stays when the option that wrote it is removed. Remove it by hand.
@@ -161,6 +161,31 @@ services:
       - "127.0.0.1:9222:9223"
     environment:
       WAYUSE_SCREEN_OUTPUTS: "2"
+```
+
+### Without Docker Compose
+
+A build writes `docker-build.sh` and `docker-run.sh` beside `compose.yml`, for a host that runs the image without Docker Compose, such as from a systemd unit:
+
+```sh
+docker/wayuse/docker-build.sh
+docker/wayuse/docker-run.sh
+```
+
+`docker-run.sh` runs the container in the foreground, for systemd to watch. It gives the container what `compose.yml` gives.
+The variables come from the environment, such as from `EnvironmentFile=` of a systemd unit, which takes the project's `.env` as it is.
+The container gets the variables that `compose.yml` passes on, and no others, so the private key stays out.
+
+The scripts name the image and the volume as Docker Compose does, after the directory of `wayuse.config.ts`.
+For `my-app/`, they are `my-app-wayuse` and `my-app_wayuse_config`, so either way starts the same image with the same profile.
+`WAYUSE_IMAGE` gives the image another name.
+
+Their arguments go to `docker build` and `docker run` as options. A variable given with `-e` there wins over the script's.
+To change another option they give, write a script of the project's own:
+
+```sh
+docker/wayuse/docker-build.sh --pull
+docker/wayuse/docker-run.sh -p 127.0.0.1:9222:9223
 ```
 
 ### Chrome DevTools Protocol from the host

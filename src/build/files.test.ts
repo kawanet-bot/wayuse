@@ -7,6 +7,7 @@ import {describe, it} from "node:test"
 import {DEFAULT_URL} from "../client/cli-api.ts"
 import {DEFAULT_CONFIG, DEFAULT_HTDOCS, DEFAULT_PORT} from "../server/cli.ts"
 import {resolveConfig} from "./config.ts"
+import {projectOf} from "./docker-scripts.ts"
 import {generatedFilesOf, writeBuildDir} from "./files.ts"
 import {APP_PACKAGES} from "./npm-package.ts"
 import {shellDefaultsOf} from "./shell-env.ts"
@@ -137,6 +138,32 @@ describe(TITLE, () => {
         }
     })
 
+    it("names the project as Docker Compose does", () => {
+        assert.equal(projectOf("my-wayuse"), "my-wayuse")
+        assert.equal(projectOf("My.Project_2"), "myproject_2")
+        assert.equal(projectOf("-_x"), "x")
+        assert.equal(projectOf("ウェイユース"), "wayuse")
+    })
+
+    it("names in the scripts the image and the volume Docker Compose would", () => {
+        const files = generatedFilesOf(config, {project: "My.Project"})
+        assert.match(files["docker-build.sh"]!, /^export WAYUSE_IMAGE=\$\{WAYUSE_IMAGE:-'myproject-wayuse'\}$/m)
+        assert.match(files["docker-run.sh"]!, /^export WAYUSE_IMAGE=\$\{WAYUSE_IMAGE:-'myproject-wayuse'\}$/m)
+        assert.match(files["docker-run.sh"]!, /^ {4}-v myproject_wayuse_config:\/home\/wayuse\/\.config \\$/m)
+    })
+
+    it("gives docker run the variables compose.yml gives, and the arguments ahead of the image", () => {
+        for (const input of [{apps: {chrome: {}}}, {auth: false}] as const) {
+            const files = generatedFilesOf(resolveConfig(input, "wayuse.config.ts"))
+            const composed = [...files["compose.yml"]!.matchAll(/^ {6}(\w+): "\$\{\1:-.*\}"$/gm)].map(match => match[1])
+            const run = files["docker-run.sh"]!
+            assert.deepEqual([...run.matchAll(/^ {4}-e (\w+) \\$/gm)].map(match => match[1]), composed)
+            for (const name of composed) assert.match(run, new RegExp(`^export ${name}=\\$\\{${name}:-'.*'\\}$`, "m"))
+            assert.match(run, /\n {4}"\$@" \\\n {4}"\$WAYUSE_IMAGE"\n$/)
+        }
+        assert.match(generatedFilesOf(config)["docker-build.sh"]!, /^exec docker build -t "\$WAYUSE_IMAGE" "\$@" "\$\(dirname "\$0"\)"$/m)
+    })
+
     // The sample's two files are copied together, so nothing but this test holds the path of one in the other.
     it("includes in the sample the compose file the sample's build writes", async () => {
         const {default: sample} = await import("../../packages/build/sample/wayuse.config.ts")
@@ -261,6 +288,8 @@ describe(TITLE, () => {
             assert.equal(script.mode & 0o111, 0o111)
             const generated = await stat(join(outdir, "rootfs/opt/wayuse/bin/chrome-start.sh"))
             assert.equal(generated.mode & 0o111, 0o111)
+            const run = await stat(join(outdir, "docker-run.sh"))
+            assert.equal(run.mode & 0o111, 0o111)
 
             // The console as its URLs lay it out, where the server looks for it by default.
             const console = join(outdir, "rootfs", DEFAULT_HTDOCS, "console")
