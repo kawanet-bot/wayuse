@@ -1,7 +1,7 @@
 {
   "name": "@wayuse/server",
   "description": "The HTTP server that runs inside the wayuse container.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "Kawanet",
   "bin": {
     "wayuse-server": "bin/wayuse-server.js"
