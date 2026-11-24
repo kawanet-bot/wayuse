@@ -94,8 +94,8 @@ describe(TITLE, () => {
     })
 
     it("installs what the server needs for Chrome beside the server", () => {
-        const files = generatedFilesOf(config, {serverTarball: "server.tgz"})
-        assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"@wayuse/server": "file:wayuse-server.tgz", "html-slim": "^0.5.0"})
+        const files = generatedFilesOf(config)
+        assert.deepEqual(JSON.parse(files["rootfs/opt/wayuse/package.json"]!).dependencies, {"@wayuse/server": `^${VERSION}`, "html-slim": "^0.5.0"})
     })
 
     // @wayuse/build does not depend on the server, so nothing but this test holds the two lists together.

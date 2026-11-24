@@ -1,11 +1,8 @@
 import type {WayuseClient} from "wayuse"
 import {VERSION} from "./version.ts"
 
-// The packages are released at one version, so the server is the one of this package's version.
+// The server is released first at the same version, and a later compatible one serves this build too.
 const SERVER_RANGE = `^${VERSION}`
-
-/** The tarball's name in the image: fixed, so the generated files do not change with its version. */
-export const SERVER_TARBALL = "wayuse-server.tgz"
 
 /** What @wayuse/server needs for an application and leaves out of its own dependencies, as an optional peer. */
 export const APP_PACKAGES: Record<keyof WayuseClient.Config["apps"], Record<string, string>> = {
@@ -16,8 +13,8 @@ export const APP_PACKAGES: Record<keyof WayuseClient.Config["apps"], Record<stri
 /**
  * The package.json of /opt/wayuse: what npm installs into the image, with only what the chosen applications need.
  */
-export const npmPackageOf = (config: WayuseClient.Config, tarball: boolean): string => {
-    const dependencies: Record<string, string> = {"@wayuse/server": tarball ? `file:${SERVER_TARBALL}` : SERVER_RANGE}
+export const npmPackageOf = (config: WayuseClient.Config): string => {
+    const dependencies: Record<string, string> = {"@wayuse/server": SERVER_RANGE}
 
     for (const app of Object.keys(config.apps) as (keyof typeof APP_PACKAGES)[]) Object.assign(dependencies, APP_PACKAGES[app])
 

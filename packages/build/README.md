@@ -88,11 +88,10 @@ Every item may be left out.
 
 ```
 Usage: wayuse-build [options]
-  -c, --config <file>      the configuration to read (default: wayuse.config.ts, .mjs or .js)
-  -d, --dir <dir>          the build directory to write (default: output.dir of the configuration)
-  --server-tarball <file>  a @wayuse/server tarball to install in place of the one on npm
-  -v, --version            print this package's version
-  -h, --help               print this usage
+  -c, --config <file>  the configuration to read (default: wayuse.config.ts, .mjs or .js)
+  -d, --dir <dir>      the build directory to write (default: output.dir of the configuration)
+  -v, --version        print this package's version
+  -h, --help           print this usage
 ```
 
 Without `-c`, it reads the first of `wayuse.config.ts`, `wayuse.config.mjs` and `wayuse.config.js` in the current directory.
