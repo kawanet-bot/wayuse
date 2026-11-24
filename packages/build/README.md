@@ -147,13 +147,19 @@ It passes on the `-e` variables there from `.env` or the shell, or else the valu
 `WAYUSE_PUBLISH` there moves the published port, such as `WAYUSE_PUBLISH=0.0.0.0:9580`.
 The service is `wayuse` and the volume is `wayuse_config`. Docker Compose names the image and the volume after the project.
 
-A build writes `compose.yml` again, so a setting of the project's own goes in `compose.override.yml` beside the project's compose file. Docker Compose reads it by itself:
+A build writes `compose.yml` again, so a setting of the project's own goes in the project's compose file, under `wayuse`.
+Docker Compose merges it into the service of `compose.yml`. A variable written there wins, and a port is added:
 
 ```yaml
+include:
+  - "docker/wayuse/compose.yml"
+
 services:
   wayuse:
     ports:
       - "127.0.0.1:9222:9223"
+    environment:
+      WAYUSE_SCREEN_OUTPUTS: "2"
 ```
 
 ### Chrome DevTools Protocol from the host
