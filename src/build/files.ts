@@ -1,5 +1,5 @@
 import {EN} from "html-ele"
-import {copyFile, cp, mkdir, readFile, readdir, rm, writeFile} from "node:fs/promises"
+import {cp, mkdir, readFile, readdir, rm, writeFile} from "node:fs/promises"
 import {dirname, join, relative} from "node:path"
 import {fileURLToPath} from "node:url"
 import {minify} from "terser"
@@ -8,7 +8,7 @@ import {composeOf} from "./compose.ts"
 import {DEFAULT_VARS} from "./config.ts"
 import {dockerBuildOf, dockerRunOf} from "./docker-scripts.ts"
 import {type BuildOptions, dockerfileOf} from "./dockerfile.ts"
-import {SERVER_TARBALL, npmPackageOf} from "./npm-package.ts"
+import {npmPackageOf} from "./npm-package.ts"
 import {chromeStartOf, redirStartOf, swayStartOf, wayvncStartOf} from "./start-scripts.ts"
 import {SWAY_CONFIG, swayConfigOf} from "./sway-config.ts"
 import {TERSER, bundleVendor} from "./vendor.ts"
@@ -39,13 +39,13 @@ const POLICIES = "rootfs/etc/opt/chrome/policies/managed/wayuse.json"
  */
 export const generatedFilesOf = (config: Resolved, options: BuildOptions = {}): Record<string, string> => {
     const files: Record<string, string> = {
-        "Dockerfile": dockerfileOf(config, options),
+        "Dockerfile": dockerfileOf(config),
         "compose.yml": composeOf(config),
         "docker-build.sh": dockerBuildOf(config, options),
         "docker-run.sh": dockerRunOf(config, options),
         "rootfs/opt/wayuse/wayuse.config.json": JSON.stringify(config, null, 2) + "\n",
         [`rootfs${SWAY_CONFIG}`]: swayConfigOf(config),
-        "rootfs/opt/wayuse/package.json": npmPackageOf(config, options.serverTarball != null),
+        "rootfs/opt/wayuse/package.json": npmPackageOf(config),
         [`${BIN}/sway-start.sh`]: swayStartOf(config),
         [`${BIN}/wayvnc-start.sh`]: wayvncStartOf(config),
     }
@@ -145,12 +145,6 @@ export const writeBuildDir = async (config: Resolved, outdir: string, options: B
 
     const paths = [...copied.filter(path => config.console || !path.startsWith(`${HTDOCS}/`)), ...Object.keys(files)]
     if (config.console) paths.push(...await writeConsole(outdir, options))
-
-    if (options.serverTarball != null) {
-        const path = `rootfs/opt/wayuse/${SERVER_TARBALL}`
-        await copyFile(options.serverTarball, join(outdir, path))
-        paths.push(path)
-    }
 
     return [...new Set(paths)].sort()
 }

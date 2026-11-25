@@ -25,8 +25,8 @@ describe(TITLE, () => {
         const err: string[] = []
         const io = {env: {}, stdout: {write: () => 0}, stderr: {write: (data: string) => err.push(data)}}
         const load = async (name: string) => ({CLI: async ({args}: {args: string[]}) => seen.push(name, args) + 5})
-        assert.equal(await runCLI(["build", "--server-tarball", "server.tgz", "-o", "out"], {...io, load}), 7)
-        assert.deepEqual(seen, ["@wayuse/build", ["--server-tarball", "server.tgz", "-o", "out"]])
+        assert.equal(await runCLI(["build", "-c", "my.config.ts", "-o", "out"], {...io, load}), 7)
+        assert.deepEqual(seen, ["@wayuse/build", ["-c", "my.config.ts", "-o", "out"]])
         assert.deepEqual(err, [])
     })
 

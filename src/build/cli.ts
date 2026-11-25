@@ -9,11 +9,10 @@ import {VERSION} from "./version.ts"
 
 const USAGE = `
 Usage: wayuse-build [options]
-  -c, --config <file>      the configuration to read (default: wayuse.config.ts, .mjs or .js)
-  -d, --dir <dir>          the build directory to write (default: output.dir of the configuration)
-  --server-tarball <file>  a @wayuse/server tarball to install in place of the one on npm
-  -v, --version            print this package's version
-  -h, --help               print this usage
+  -c, --config <file>  the configuration to read (default: wayuse.config.ts, .mjs or .js)
+  -d, --dir <dir>      the build directory to write (default: output.dir of the configuration)
+  -v, --version        print this package's version
+  -h, --help           print this usage
 `.trimStart()
 
 const EXIT_USAGE = 2
@@ -23,7 +22,6 @@ const readArgs = (args: string[]) => parseArgs({
     options: {
         config: {type: "string", short: "c"},
         dir: {type: "string", short: "d"},
-        "server-tarball": {type: "string"},
         version: {type: "boolean", short: "v"},
         help: {type: "boolean", short: "h"},
     },
@@ -72,7 +70,7 @@ export const CLI: typeof declared.CLI = async ({args}) => {
         const dir = outputDirOf(input, options.dir)
         // Outside rootfs/, the scripts name the image after the directory, as Docker Compose names its project.
         const project = basename(dirname(resolve(configFile)))
-        const files = await writeBuildDir(config, dir, {serverTarball: options["server-tarball"], vars: consoleVarsOf(input), terser: consoleTerserOf(input), project})
+        const files = await writeBuildDir(config, dir, {vars: consoleVarsOf(input), terser: consoleTerserOf(input), project})
         for (const file of files) process.stdout.write(`${join(dir, file)}\n`)
         return 0
     } catch (error) {

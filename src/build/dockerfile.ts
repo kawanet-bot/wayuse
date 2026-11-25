@@ -1,11 +1,8 @@
 import type {WayuseClient} from "wayuse"
-import {SERVER_TARBALL} from "./npm-package.ts"
 
 type Resolved = WayuseClient.Config
 
 export interface BuildOptions {
-    /** A @wayuse/server tarball to install in place of the one on npm. */
-    serverTarball?: string
     /** The values of console.vars, with the defaults among them. Default: the defaults alone. */
     vars?: Record<string, string>
     /** Whether the console's scripts and the packages beside them are made small. Default: true. */
@@ -66,8 +63,8 @@ RUN test -f /usr/share/zoneinfo/${timezone} && \\
 `.trim()
 
 // Copied ahead of the rest of rootfs/, so a changed setting does not install the packages again.
-const npmInstall = (tarball: boolean): string => `
-COPY ${["package.json", ...(tarball ? [SERVER_TARBALL] : [])].map(name => `rootfs/opt/wayuse/${name}`).join(" ")} /opt/wayuse/
+const NPM_INSTALL = `
+COPY rootfs/opt/wayuse/package.json /opt/wayuse/
 RUN npm install --prefix /opt/wayuse --omit=dev --no-audit --no-fund && \\
     npm cache clean --force
 `.trim()
@@ -104,7 +101,7 @@ CMD ${JSON.stringify(["/opt/wayuse/bin/supervise.sh", ...commandsOf(config)])}
 /**
  * The Dockerfile, ordered so that a changed setting rebuilds as few layers as it can.
  */
-export const dockerfileOf = (config: Resolved, options: BuildOptions = {}): string => {
+export const dockerfileOf = (config: Resolved): string => {
     const {chrome, redir} = config.apps
 
     const steps = [
@@ -118,8 +115,8 @@ export const dockerfileOf = (config: Resolved, options: BuildOptions = {}): stri
         redir && aptInstall(["redir"]),
         USER_SETUP,
         timezoneSetup(config.timezone),
-        // Last of the installs: the server is what changes most often while it is developed.
-        npmInstall(options.serverTarball != null),
+        // Last of the installs: the server's range changes with each version of the build.
+        NPM_INSTALL,
         "COPY rootfs/ /",
         runtimeOf(config),
     ]
