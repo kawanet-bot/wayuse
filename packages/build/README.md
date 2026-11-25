@@ -101,36 +101,11 @@ It prints the path of every file it writes.
 `npx wayuse build` takes the same options and passes them on.
 
 The build directory holds the `Dockerfile`, a [compose.yml](#docker-compose), [two scripts](#without-docker-compose) and `rootfs/`, which mirrors the image's file system.
-A build writes `rootfs/opt/wayuse/` anew, and its other files over those of the build before.
-`rootfs/opt/wayuse/` has a `.gitignore`, so git keeps none of it.
-Outside `rootfs/opt/wayuse/`, a file stays when the option that wrote it is removed. Remove it by hand.
-The [console](https://github.com/kawanet/wayuse/blob/main/docs/console.md) is in it as `rootfs/opt/wayuse/htdocs/console/`, laid out as its URLs are. The server serves that `htdocs/` without a token.
-`@wayuse/build` also bundles [noVNC](https://github.com/novnc/noVNC) into it, as `console/vendor/novnc.js`, for the console's vnc page.
-noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
-It bundles [html-ele](https://github.com/kawanet/html-ele) beside it the same way, as `console/vendor/html-ele.js`, for the console's pages to build their elements with.
-The resolved configuration is baked in as `/opt/wayuse/wayuse.config.json`.
+[docs/container.md](https://github.com/kawanet/wayuse/blob/main/docs/container.md#build-directory) shows the files of the build directory.
 
 ## CONTAINER
 
-| `docker run` | Meaning |
-|---|---|
-| `--shm-size 256m` | Required. sway dies of a bus error on the 64MB Docker gives by default. |
-| `-e WAYUSE_SCREEN_OUTPUTS=<n>` | The number of screens, `HEADLESS-1` and up. Default: `screen.outputs`. |
-| `-e WAYUSE_USER_AGENT=<string>` | Chrome's User-Agent. Default: the one in `apps.chrome.env`, or else Chrome's own. |
-| `-e WAYUSE_JWT_PUBLIC_KEY=<key>` | The key @wayuse/server verifies tokens with. Without it, every API that needs a token is refused. |
-| `-e WAYUSE_JWT_AUDIENCE=<string>` | The `aud` a token must carry. Default: `wayuse`. |
-| `-v <volume>:/home/wayuse/.config` | Keeps Chrome's profile when the image is rebuilt. |
-| `--uts=host` | Optional. `GET /wayuse/status` then reports the host's name in place of the container's id. |
-
-The container runs as the user `wayuse` (uid 1000).
-It keeps a session D-Bus, sway, wayvnc, Chrome and @wayuse/server running: one that exits is started again.
-tini is PID 1 in the image, so `--init` is not needed.
-
-| Port | Listener |
-|---|---|
-| 9580 | @wayuse/server. Publish it with `-p` to reach the container from outside |
-| 9222 | Chrome DevTools Protocol, on 127.0.0.1 inside the container |
-| 5900 + n | wayvnc for `HEADLESS-n`, on 127.0.0.1 inside the container |
+[docs/container.md](https://github.com/kawanet/wayuse/blob/main/docs/container.md#docker-run) explains each option of `docker run`, and the ports of the container.
 
 ### Docker Compose
 
@@ -141,26 +116,7 @@ include:
   - "docker/wayuse/compose.yml"
 ```
 
-It gives the container what the `docker run` table names, `--uts=host` aside.
-It passes on the `-e` variables there from `.env` or the shell, or else the values the image has. A variable the image does not read is left out, such as the key for an image built with `auth: false`.
-`WAYUSE_PUBLISH` in `.env` moves the published port, such as `WAYUSE_PUBLISH=0.0.0.0:9580`.
-The service is `wayuse` and the volume is `wayuse_config`. Docker Compose names the image and the volume after the project.
-
-A build writes `compose.yml` again, so a setting of the project's own goes in the project's compose file, under `wayuse`.
-Docker Compose merges it into the service of `compose.yml`. A variable written there wins over `.env`, and a port is added.
-This one publishes the port of `apps.redir` in the next section:
-
-```yaml
-include:
-  - "docker/wayuse/compose.yml"
-
-services:
-  wayuse:
-    ports:
-      - "127.0.0.1:9222:9223"
-    environment:
-      WAYUSE_SCREEN_OUTPUTS: "2"
-```
+[docs/container.md](https://github.com/kawanet/wayuse/blob/main/docs/container.md#docker-compose) shows the `compose.yml` a build writes, the variables it passes on, and a setting of the project's own over it.
 
 ### Without Docker Compose
 
@@ -172,18 +128,7 @@ docker/wayuse/docker-run.sh
 ```
 
 `docker-run.sh` runs the container in the foreground, for systemd to watch. It gives the container what `compose.yml` gives.
-The variables come from the environment, such as from `EnvironmentFile=` of a systemd unit, which takes the project's `.env` as it is.
-The container gets the variables that `compose.yml` passes on, and no others, so the private key stays out.
-
-`WAYUSE_IMAGE` gives the image another name.
-
-Their arguments go to `docker build` and `docker run` as options. A variable given with `-e` there wins over the script's.
-To change another option they give, write a script of the project's own:
-
-```sh
-docker/wayuse/docker-build.sh --pull
-docker/wayuse/docker-run.sh -p 127.0.0.1:9222:9223
-```
+[docs/container.md](https://github.com/kawanet/wayuse/blob/main/docs/container.md#without-docker-compose) shows the `docker-run.sh` a build writes, and how to give it variables and options.
 
 ### Chrome DevTools Protocol from the host
 
@@ -199,7 +144,6 @@ export default defineConfig({
 })
 ```
 
-redir listens on every address of the container, one redir for each port.
 Publish that port to the host's `127.0.0.1` only. The host may give it any number, 9222 included:
 
 ```sh
@@ -207,9 +151,19 @@ docker run --rm --shm-size 256m -p 127.0.0.1:9580:9580 -p 127.0.0.1:9222:9223 my
 curl http://127.0.0.1:9222/json/version
 ```
 
+A client of the protocol, such as Playwright or Puppeteer, connects to `webSocketDebuggerUrl` of the answer:
+
+```json
+{
+  "Browser": "Chrome/...",
+  "Protocol-Version": "1.3",
+  "webSocketDebuggerUrl": "ws://127.0.0.1:9222/devtools/browser/<id>"
+}
+```
+
 Chrome DevTools Protocol has no authentication, and it passes by the token of @wayuse/server.
 Whoever reaches the port drives Chrome, reads its cookies and opens `file://` in the container.
-Connect by an IP address or `localhost`. Chrome refuses a request whose `Host` header is another name.
+[docs/container.md](https://github.com/kawanet/wayuse/blob/main/docs/container.md#chrome-devtools-protocol) shows it with Docker Compose, and the names Chrome refuses.
 
 ### A server on the host
 
@@ -231,22 +185,7 @@ npx wayuse chrome open http://host.docker.internal:8787/
 npx wayuse slot capture -o screen.png
 ```
 
-| The server on the host listens on | From the container |
-|---|---|
-| `0.0.0.0` | Reached. The network the host is on reaches it too. |
-| the address of Docker's bridge, which `ip -4 addr show docker0` tells, such as `172.17.0.1` | Reached, and by the containers alone. |
-| `127.0.0.1` | Not reached: Chrome shows that the connection was refused. |
-
-`apps.redir` gives the page the same server as `http://127.0.0.1:8787/`, where a page is in a secure context:
-
-```ts
-redir: {ports: {8787: "host.docker.internal:8787"}},
-```
-
-redir looks the name up when it starts. Without `--add-host`, it ends at once and the supervisor keeps starting it again, every redir with it.
-
-`docker run --network host` is another way: the container then shares the host's network, `127.0.0.1` included.
-Its own ports are then the host's as well: 9580, on every address of the host, and 9222 and 5900 + n.
+[docs/container.md](https://github.com/kawanet/wayuse/blob/main/docs/container.md#a-server-on-the-host) shows who reaches the server by the address it listens on, a secure context with `apps.redir`, and `--network host`.
 
 ## SEE ALSO
 

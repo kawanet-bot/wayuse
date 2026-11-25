@@ -11,6 +11,7 @@ Three packages, one repository:
 More in [docs/](docs/):
 
 - [The console](docs/console.md): The pages an image has for a person.
+- [The container](docs/container.md): What a build writes, and how its container runs.
 
 ## SEE ALSO
 
