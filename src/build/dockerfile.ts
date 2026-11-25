@@ -115,7 +115,7 @@ export const dockerfileOf = (config: Resolved): string => {
         redir && aptInstall(["redir"]),
         USER_SETUP,
         timezoneSetup(config.timezone),
-        // Last of the installs: the server is what changes most often while it is developed.
+        // Last of the installs: the server's range changes with each version of the build.
         NPM_INSTALL,
         "COPY rootfs/ /",
         runtimeOf(config),
