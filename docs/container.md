@@ -21,6 +21,22 @@ A build writes `rootfs/opt/wayuse/` anew, and its other files over those of the 
 `rootfs/opt/wayuse/` has a `.gitignore`, so git keeps none of it.
 Outside `rootfs/opt/wayuse/`, a file stays when the option that wrote it is removed. Remove it by hand.
 
+The image installs @wayuse/server from npm, the latest version that `^` of the build's version takes.
+The `package.json` that @wayuse/build 0.1.0 writes with `apps.chrome`:
+
+```json
+{
+  "name": "wayuse-image",
+  "private": true,
+  "dependencies": {
+    "@wayuse/server": "^0.1.0",
+    "html-slim": "^0.5.0"
+  }
+}
+```
+
+`html-slim` is there for `apps.chrome` alone.
+
 @wayuse/build bundles [noVNC](https://github.com/novnc/noVNC) into the console, as `console/vendor/novnc.js`, for the console's vnc page.
 noVNC is under the MPL 2.0. It comes from its own package and is in none of wayuse's, and its notices stay in the bundle.
 
