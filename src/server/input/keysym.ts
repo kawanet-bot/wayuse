@@ -1,7 +1,7 @@
+import KEYMAPS from "../../../packages/server/assets/keymaps.json" with {type: "json"}
+import KEYSYMDEF from "../../../packages/server/assets/keysymdef.json" with {type: "json"}
 import {HttpError} from "../http-error.ts"
 import type {Modifier} from "./combo.ts"
-import KEYMAPS from "./data/keymaps.json" with {type: "json"}
-import KEYSYMDEF from "./data/keysymdef.json" with {type: "json"}
 
 /** The left-hand key of each modifier, which is the one a sent combination presses. */
 const MODIFIER_KEYS: Record<Modifier, string> = {shift: "Shift_L", ctrl: "Control_L", mod1: "Alt_L", mod4: "Super_L"}

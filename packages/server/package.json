@@ -25,6 +25,7 @@
     }
   },
   "files": [
+    "assets/LICENSE.*",
     "bin/wayuse-server.js",
     "dist/wayuse-server.js",
     "dist/server/",

@@ -116,7 +116,7 @@ The server relays the WebSocket to the wayvnc of the screen, which listens insid
 
 This package is under the MIT license, but for what it carries of others:
 
-- The key tables are made from X.Org's keysymdef.h and from keycodemapdb, the latter under its BSD license. Their notices are in [src/server/input/data/](../../src/server/input/data/).
+- The key tables are made from X.Org's keysymdef.h and from keycodemapdb, the latter under its BSD license. Their notices are in [assets/LICENSE.xorgproto](assets/LICENSE.xorgproto) and [assets/LICENSE.keycodemapdb](assets/LICENSE.keycodemapdb).
 
 ## COMMAND
 
